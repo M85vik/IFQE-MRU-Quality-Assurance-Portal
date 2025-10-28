@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  body.light-theme {
+    @apply bg-white text-gray-800;
+  }
+}
+
+@layer components {
+    .showcase-container {
+        perspective: 2000px;
+    }
+    .feature-card {
+        transform-style: preserve-3d;
+    }
+}
+
