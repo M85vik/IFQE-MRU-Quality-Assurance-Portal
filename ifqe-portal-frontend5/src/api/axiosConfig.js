@@ -1,10 +1,18 @@
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
 
+
+
+
+const apiUrl = import.meta.env.VITE_API_URL;
+
+if(!apiUrl) throw new Error("Base Url environment variable not loaded.")
 const apiClient = axios.create({
   
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
+  baseURL:`${apiUrl}/api`
 });
+
+
 
 // Request Interceptor
 apiClient.interceptors.request.use(
