@@ -117,9 +117,33 @@ const getUploadUrl = async (req, res) => {
  * @query   {string} fileKey - The unique S3 key of the file to download.
  * @returns {json} 200 - { downloadUrl }
  */
+
 const getDownloadUrl = async (req, res) => {
+
+  console.log("getdownload HIT ");
+  
   const { fileKey } = req.query;
   const user = req.user;
+
+  
+
+
+  
+
+   if (fileKey.startsWith('templates/')) {
+    const command = new GetObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: fileKey,
+    });
+
+    try {
+      const downloadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+      return res.json({ downloadUrl }); // ✅ Return immediately after responding
+    } catch (error) {
+      console.error('Could not generate template download URL:', error);
+      return res.status(500).json({ message: 'Could not generate download URL' });
+    }
+  }
 
   // --- 1. Find the submission associated with the fileKey ---
   // This is a crucial security step. We find the submission to check permissions against it.
@@ -160,6 +184,7 @@ const getDownloadUrl = async (req, res) => {
     res.status(500).json({ message: 'Could not generate download URL' });
   }
 };
+
 
 /**
  * @desc    Delete a file directly from S3.
@@ -211,38 +236,7 @@ const deleteFile = async (req, res) => {
 
 
 
-const getTemplateDownloadUrl = async (req, res) => {
-  const { fileKey } = req.query;
-  const user = req.user;
-
-  // Ensure the user is authenticated by middleware; double-check here for safety
-  if (!user) return res.status(401).json({ message: 'Authentication required.' });
-
-  if (!fileKey || typeof fileKey !== 'string') {
-    return res.status(400).json({ message: 'fileKey is required.' });
-  }
-
-  // This endpoint is only for templates
-  if (!fileKey.startsWith('templates/')) {
-    return res.status(400).json({ message: 'Invalid file key. Only template files can be downloaded from this endpoint.' });
-  }
-
-  const command = new GetObjectCommand({
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: fileKey,
-  });
-
-  try {
-    const downloadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
-    res.json({ downloadUrl });
-  } catch (error) {
-    console.error('Could not generate template download URL:', error);
-    res.status(500).json({ message: 'Could not generate download URL' });
-  }
-};
-
-
 
 
 // Export the controller functions.
-module.exports = { getUploadUrl, getDownloadUrl, deleteFile , getTemplateDownloadUrl};
+module.exports = { getUploadUrl, getDownloadUrl, deleteFile };

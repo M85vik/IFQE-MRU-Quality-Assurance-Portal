@@ -11,7 +11,7 @@ const router = express.Router();
 
 // Import controller functions that contain the logic for generating URLs and handling S3 commands.
 
-const { getUploadUrl, getDownloadUrl, deleteFile,getTemplateDownloadUrl } = require('../controllers/fileController'); 
+const { getUploadUrl, getDownloadUrl, deleteFile } = require('../controllers/fileController'); 
 // The user provided 'fileController' in the router, but the controller logic was in 's3Controller'. I've used the correct controller path here. If your file is named fileController.js, you can change this path.
 
 // Import the 'protect' middleware to ensure a user is authenticated via JWT.
@@ -46,7 +46,7 @@ router.get('/download-url', protect, getDownloadUrl);
 router.delete('/delete-file', protect, deleteFile);
 
 
-router.get('/template-download-url', protect, getTemplateDownloadUrl);
+
 
 
 // Export the configured router to be mounted in the main server file.
