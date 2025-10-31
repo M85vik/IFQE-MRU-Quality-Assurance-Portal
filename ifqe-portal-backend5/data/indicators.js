@@ -13,7 +13,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.1",
     templateFileKey: "templates/1.1.1_Template.xlsx",
-    requiresEvidenceLink: false,
+    requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "The curriculum is fully aligned with the vision, all mission & core values with the coverage of 100%." },
       veryGood: { score: 3, description: "The curriculum is mostly aligned with vision, all mission & core values with the coverage >=80%." },
@@ -59,6 +59,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.1",
     templateFileKey: "templates/1.1.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Benchmarked with both national & international standards" },
       veryGood: { score: 3, description: "Benchmarked with international standards" },
@@ -81,6 +82,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.1",
     templateFileKey: "templates/1.1.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=70%" },
       veryGood: { score: 3, description: ">=50%" },
@@ -105,6 +107,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.1",
     templateFileKey: "templates/1.1.5_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=75%" },
       veryGood: { score: 3, description: ">=60%" },
@@ -126,6 +129,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.1",
     templateFileKey: "templates/1.1.6_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=20%" },
       veryGood: { score: 3, description: ">=15%" },
@@ -150,6 +154,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.1",
     templateFileKey: "templates/1.1.7_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=5" },
       veryGood: { score: 3, description: ">=4" },
@@ -173,6 +178,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.1",
     templateFileKey: "templates/1.1.8_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">3" },
       veryGood: { score: 3, description: "3" },
@@ -196,6 +202,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.2",
     templateFileKey: "templates/1.2.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=10" },
       veryGood: { score: 3, description: "8-10" },
@@ -216,6 +223,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.2",
     templateFileKey: "templates/1.2.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Different support initiatives implemented with regular assessment, impact analysis, feedback, and action taken reports documented" },
       veryGood: { score: 3, description: "Different support initiatives implemented with regular assessment, impact analysis, with and action taken reports documented but no feedback." },
@@ -238,6 +246,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.2",
     templateFileKey: "templates/1.2.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Initiatives taken by the department in support for students from diverse regional background, outcome achieved and feedback from students" },
       veryGood: { score: 3, description: "" },
@@ -262,6 +271,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.3",
     templateFileKey: "templates/1.3.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=80%" },
       veryGood: { score: 3, description: ">=60%" },
@@ -283,6 +293,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.3",
     templateFileKey: "templates/1.3.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Content of 80% and above courses is published on ERP with minimum 25% course content self created with plagiarism report, various ICT enabled tools used and documentation as per the required template" },
       veryGood: { score: 3, description: "Content of 70% and above courses is published on ERP with minimum 25% course content self created with plagiarism report, various ICT enabled tools used and documentation as per the required template" },
@@ -305,6 +316,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.4",
     templateFileKey: "templates/1.4.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Well-defined BOS-approved CAPS, comprehensive result analysis, and detailed action taken reports are available in 100% of course files" },
       veryGood: { score: 3, description: "BOS-approved CAPs, result analysis, and action taken reports are available in >=85% of course files" },
@@ -325,6 +337,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.4",
     templateFileKey: "templates/1.4.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Well defined rubrics, 100% certificates or project reports available" },
       veryGood: { score: 3, description: "" },
@@ -349,6 +362,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.5",
     templateFileKey: "templates/1.5.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "100%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -369,6 +383,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.5",
     templateFileKey: "templates/1.5.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -391,6 +406,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.6",
     templateFileKey: "templates/1.6.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       veryGood: { score: 3, description: "" },
@@ -410,6 +426,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.6",
     templateFileKey: "templates/1.6.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       veryGood: { score: 3, description: "" },
@@ -429,6 +446,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.6",
     templateFileKey: "templates/1.6.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "CO Targets of >=80% courses attained" },
       veryGood: { score: 3, description: "CO Targets of >=70% courses attained" },
@@ -449,6 +467,7 @@ const indicators = [
     criterionCode: "1",
     subCriterionCode: "1.6",
     templateFileKey: "templates/1.6.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Overall PO attainment target of >=80% PO's/PSO's attained and continuous improvement strategies are in place" },
       veryGood: { score: 3, description: "Overall PO attainment target of >=70% PO's/PSO's attained and action taken reports are well defined" },
@@ -476,6 +495,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.1",
     templateFileKey: "templates/2.1.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">3" },
       veryGood: { score: 3, description: "3" },
@@ -505,6 +525,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.1",
     templateFileKey: "templates/2.1.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">3" },
       veryGood: { score: 3, description: "3" },
@@ -532,6 +553,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.1",
     templateFileKey: "templates/2.1.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=1" },
       veryGood: { score: 3, description: ">=0.75" },
@@ -560,6 +582,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.1",
     templateFileKey: "templates/No_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=50" },
       veryGood: { score: 3, description: ">=30" },
@@ -580,6 +603,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.1",
     templateFileKey: "templates/No_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">75% of the faculty members with citation index >5" },
       veryGood: { score: 3, description: "51-75% of the faculty members with citation index >5" },
@@ -599,6 +623,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.1",
     templateFileKey: "templates/2.1.6_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
       veryGood: { score: 3, description: "3" },
@@ -626,6 +651,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.2",
     templateFileKey: "templates/2.2.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=5" },
       veryGood: { score: 3, description: ">=4" },
@@ -648,6 +674,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.2",
     templateFileKey: "templates/2.2.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
       veryGood: { score: 3, description: "3" },
@@ -670,6 +697,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.2",
     templateFileKey: "templates/2.2.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       veryGood: { score: 3, description: "" },
@@ -692,6 +720,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.3",
     templateFileKey: "templates/2.3.1_Template.xlsx",
+     requiresEvidenceLink: true,
     // NOTE: This has sub-categories in the PDF, which we simplify for the title.
     rubric: {
       excellent: { score: 4, description: ">=5 (STEM), >=60% (Non-STEM)" },
@@ -713,6 +742,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.3",
     templateFileKey: "templates/2.3.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Varies by source and STEM/Non-STEM" },
       veryGood: { score: 3, description: "Varies by source and STEM/Non-STEM" },
@@ -734,6 +764,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.3",
     templateFileKey: "templates/2.3.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Varies by source" },
       veryGood: { score: 3, description: "Varies by source" },
@@ -754,6 +785,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.3",
     templateFileKey: "templates/2.3.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       veryGood: { score: 3, description: "" },
@@ -776,6 +808,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.4",
     templateFileKey: "templates/2.4.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
       veryGood: { score: 3, description: "3" },
@@ -796,6 +829,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.4",
     templateFileKey: "templates/2.4.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">15" },
       veryGood: { score: 3, description: ">=11" },
@@ -818,6 +852,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.5",
     templateFileKey: "templates/2.5.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=0.5%" },
       veryGood: { score: 3, description: "0.5-0.26%" },
@@ -837,6 +872,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.5",
     templateFileKey: "templates/2.5.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
       veryGood: { score: 3, description: "3" },
@@ -857,6 +893,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.5",
     templateFileKey: "templates/2.5.3_Template.xlsx",
+     requiresEvidenceLink: true,
     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes (if DPIIT registered)" },
@@ -901,6 +938,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.6",
     templateFileKey: "templates/2.6.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=8" },
       veryGood: { score: 3, description: ">=6" },
@@ -925,6 +963,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.7",
     templateFileKey: "templates/2.7.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=30%" },
       veryGood: { score: 3, description: ">=20%" },
@@ -945,6 +984,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.7",
     templateFileKey: "templates/2.7.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=30%" },
       veryGood: { score: 3, description: ">=20%" },
@@ -967,6 +1007,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.8",
     templateFileKey: "templates/2.8.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "100% seats filled against the vacancies available." },
       veryGood: { score: 3, description: ">=80% seats filled against the vacancies available." },
@@ -987,6 +1028,7 @@ const indicators = [
     criterionCode: "2",
     subCriterionCode: "2.8",
     templateFileKey: "templates/2.8.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=15%" },
       veryGood: { score: 3, description: ">=10%" },
@@ -1019,6 +1061,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.1",
     templateFileKey: "templates/3.1.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -1040,6 +1083,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.1",
     templateFileKey: "templates/3.1.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "No marking" },
     },
@@ -1056,6 +1100,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.1",
     templateFileKey: "templates/3.1.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "No marking" },
     },
@@ -1072,6 +1117,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.1",
     templateFileKey: "templates/3.1.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "30%" },
       veryGood: { score: 3, description: "20%" },
@@ -1092,6 +1138,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.1",
     templateFileKey: "templates/3.1.5_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "No marking" },
     },
@@ -1109,6 +1156,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.1",
     templateFileKey: "templates/3.1.6_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=30%" },
       veryGood: { score: 3, description: ">=20%" },
@@ -1134,6 +1182,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.2",
     templateFileKey: "templates/3.2.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Orientation schedule and communication through multiple channels. Comprehensive report covering all the activities, students feedback and key takeaways along with 90% and above students attendance." },
       veryGood: { score: 3, description: "Major events are included in the report but lack of student feedback and key learning along with 75-89% student attendance." },
@@ -1157,6 +1206,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.2",
     templateFileKey: "templates/3.2.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "1:10" },
       veryGood: { score: 3, description: "1:15" },
@@ -1181,6 +1231,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.3",
     templateFileKey: "templates/3.3.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Regular planned meeting of mentor mentee (at least once in a month) along with their MOM and Action Taken Report with other relevant documents." },
       veryGood: { score: 3, description: "Regular meetings are planned with little bit delay(1 meeting in two months). MOM and Mentor-Mentee file is available with relevant information." },
@@ -1205,6 +1256,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.3",
     templateFileKey: "templates/3.3.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Well defined and publicized system... action taken within 24-48 hours and the grievance has been closed. 100% Cases are solved." },
       veryGood: { score: 3, description: "Well defined and publicized system... action taken within 3-5 days and the grievance has been closed. 75% Cases are solved." },
@@ -1231,6 +1283,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.3",
     templateFileKey: "templates/3.3.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Dissemination of information and Initiatives taken by the department for student awareness." },
       veryGood: { score: 3, description: "" },
@@ -1255,6 +1308,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.4",
     templateFileKey: "templates/3.4.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4 (all documents are available)" },
       veryGood: { score: 3, description: "3" },
@@ -1282,6 +1336,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.4",
     templateFileKey: "templates/3.4.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4 (all documents are available)" },
       veryGood: { score: 3, description: "3" },
@@ -1309,6 +1364,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.4",
     templateFileKey: "templates/3.4.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes (along with relevant documents)" },
       veryGood: { score: 3, description: "" },
@@ -1336,6 +1392,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.4",
     templateFileKey: "templates/3.4.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
       veryGood: { score: 3, description: "3" },
@@ -1363,6 +1420,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.4",
     templateFileKey: "templates/3.4.5_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
       veryGood: { score: 3, description: "3" },
@@ -1391,6 +1449,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.5",
     templateFileKey: "templates/3.5.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       notSatisfactory: { score: 0, description: "No" },
@@ -1432,6 +1491,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.5",
     templateFileKey: "templates/3.5.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4 national/ international participation with among top 3 positions at least in two events" },
       veryGood: { score: 3, description: "3 national/ international participation with among top 3 positions at least in one event" },
@@ -1455,6 +1515,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.6",
     templateFileKey: "templates/3.6.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "4" },
       veryGood: { score: 3, description: "3" },
@@ -1479,6 +1540,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.7",
     templateFileKey: "templates/3.7.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -1500,6 +1562,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.7",
     templateFileKey: "templates/3.7.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">= 60 LPA (Engg), >=10 LPA (Non-Engg)" },
       veryGood: { score: 3, description: "40-60 LPA (Engg), 8-10 LPA (Non-Engg)" },
@@ -1523,6 +1586,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.7",
     templateFileKey: "templates/3.7.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -1547,6 +1611,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.7",
     templateFileKey: "templates/3.7.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -1569,6 +1634,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.8",
     templateFileKey: "templates/3.8.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "100%" },
       notSatisfactory: { score: 0, description: "0" },
@@ -1589,6 +1655,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.8",
     templateFileKey: "templates/3.8.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=20" },
       veryGood: { score: 3, description: ">=15" },
@@ -1615,6 +1682,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.9",
     templateFileKey: "templates/3.9.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "2% of total student strength" },
       veryGood: { score: 3, description: "1.5% of total student strength" },
@@ -1644,6 +1712,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.9",
     templateFileKey: "templates/3.9.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=10" },
       veryGood: { score: 3, description: ">=8" },
@@ -1666,6 +1735,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.9",
     templateFileKey: "templates/3.9.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=20" },
       veryGood: { score: 3, description: ">=15" },
@@ -1688,6 +1758,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.10",
     templateFileKey: "templates/3.10.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
       veryGood: { score: 3, description: ">=3" },
@@ -1709,6 +1780,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.10",
     templateFileKey: "templates/3.10.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -1728,6 +1800,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.10",
     templateFileKey: "templates/3.10.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=7" },
       veryGood: { score: 3, description: ">=5" },
@@ -1753,6 +1826,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.10",
     templateFileKey: "templates/3.10.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "4" },
       veryGood: { score: 3, description: "3" },
@@ -1774,6 +1848,7 @@ const indicators = [
     criterionCode: "3",
     subCriterionCode: "3.10",
     templateFileKey: "templates/3.10.5_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=5 lacs" },
       veryGood: { score: 3, description: ">=4 lacs" },
@@ -1800,6 +1875,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.1",
     templateFileKey: "templates/4.1.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "100% filled" },
       veryGood: { score: 3, description: "90-95% filled" },
@@ -1820,6 +1896,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.1",
     templateFileKey: "templates/4.1.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=95%" },
       veryGood: { score: 3, description: "85-94%" },
@@ -1840,6 +1917,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.1",
     templateFileKey: "templates/4.1.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=10%" },
       veryGood: { score: 3, description: ">=8%" },
@@ -1860,6 +1938,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.1",
     templateFileKey: "templates/4.1.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Strong (40:60)" },
       veryGood: { score: 3, description: "Balanced (50:50)" },
@@ -1879,6 +1958,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.1",
     templateFileKey: "templates/4.1.5_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "33.33% (<8yrs), 33.33% (8-15yrs), 33.33% (>15yrs)" },
     },
@@ -1902,6 +1982,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.2",
     templateFileKey: "templates/4.2.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4 Trainings/Seminar/Workshops, Conference organized, FDPs organized Offline, 2 FDPs online" },
       veryGood: { score: 3, description: "3 Trainings/Seminar/Workshops" },
@@ -1935,6 +2016,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.2",
     templateFileKey: "templates/4.2.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "100%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -1957,6 +2039,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.2",
     templateFileKey: "templates/4.2.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=20%" },
       veryGood: { score: 3, description: ">=15%" },
@@ -1980,6 +2063,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.2",
     templateFileKey: "templates/4.2.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=10%" },
       veryGood: { score: 3, description: ">=7%" },
@@ -2007,6 +2091,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.2",
     templateFileKey: "templates/4.2.5_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=30%" },
       veryGood: { score: 3, description: ">=20%" },
@@ -2028,6 +2113,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.2",
     templateFileKey: "templates/4.2.6_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "100%" },
       veryGood: { score: 3, description: ">=90%" },
@@ -2049,6 +2135,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.2",
     templateFileKey: "templates/4.2.7_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Developed on any four or more platform" },
       veryGood: { score: 3, description: "Developed on any three platform" },
@@ -2070,6 +2157,7 @@ const indicators = [
     criterionCode: "4",
     subCriterionCode: "4.2",
     templateFileKey: "templates/4.2.8_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
       veryGood: { score: 3, description: ">=80%" },
@@ -2098,6 +2186,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">80% budget utilized" },
       veryGood: { score: 3, description: ">=70%" },
@@ -2121,6 +2210,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "All laboratories/MOOT court, classrooms, faculty rooms, and notice boards are well-maintained with complete documentation..." },
       veryGood: { score: 3, description: "Facilities are well-maintained with partial documentation..." },
@@ -2145,6 +2235,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Feedback taken and action taken recommended through Academic Council/ Board of Studies/ IQAC" },
       veryGood: { score: 3, description: "Feedback taken with action taken" },
@@ -2166,6 +2257,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "15-20L" },
       veryGood: { score: 3, description: "10-15L" },
@@ -2187,6 +2279,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.5_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Available with issue register for faculty and students both." },
       veryGood: { score: 3, description: "Available with issue register but access limited only for faculty." },
@@ -2207,6 +2300,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.6_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=20" },
       veryGood: { score: 3, description: ">=15" },
@@ -2228,6 +2322,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.7_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "40%" },
       veryGood: { score: 3, description: "30%" },
@@ -2250,6 +2345,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.8_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Content is rich and relevant, layout is clear and engaging, language is error-free, design is creative and appealing..." },
       veryGood: { score: 3, description: "Content is appropriate and engaging, layout is neat, minor language errors present, design is simple..." },
@@ -2271,6 +2367,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.9_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       notSatisfactory: { score: 0, description: "No" },
@@ -2287,6 +2384,7 @@ const indicators = [
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.10_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Fully updated" },
       satisfactory: { score: 2, description: "Partially updated" },
@@ -2310,6 +2408,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.1",
     templateFileKey: "templates/6.1.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
       veryGood: { score: 3, description: "3" },
@@ -2335,6 +2434,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.2",
     templateFileKey: "templates/6.2.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       notSatisfactory: { score: 0, description: "No" },
@@ -2354,6 +2454,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.2",
     templateFileKey: "templates/6.2.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       notSatisfactory: { score: 0, description: "No" },
@@ -2373,6 +2474,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.2",
     templateFileKey: "templates/6.2.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "4" },
       veryGood: { score: 3, description: "3" },
@@ -2395,6 +2497,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.2",
     templateFileKey: "templates/6.2.4_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes(>=1%)" },
       satisfactory: { score: 2, description: "< 1%" },
@@ -2416,6 +2519,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.2",
     templateFileKey: "templates/6.2.5_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "4" },
       veryGood: { score: 3, description: "3" },
@@ -2440,6 +2544,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.2",
     templateFileKey: "templates/6.2.6_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=25%" },
       veryGood: { score: 3, description: ">=20%" },
@@ -2464,6 +2569,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.3",
     templateFileKey: "templates/6.3.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       notSatisfactory: { score: 0, description: "No" },
@@ -2486,6 +2592,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.3",
     templateFileKey: "templates/6.3.2_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=16" },
       veryGood: { score: 3, description: ">=11" },
@@ -2507,6 +2614,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.3",
     templateFileKey: "templates/6.3.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "100%" },
       veryGood: { score: 3, description: ">=75%" },
@@ -2530,6 +2638,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.4",
     templateFileKey: "templates/6.4.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4 Countries" },
       veryGood: { score: 3, description: "3" },
@@ -2555,6 +2664,7 @@ const indicators = [
     criterionCode: "6",
     subCriterionCode: "6.5",
     templateFileKey: "templates/6.5.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=5" },
       veryGood: { score: 3, description: "4" },
@@ -2584,6 +2694,7 @@ const indicators = [
     criterionCode: "7",
     subCriterionCode: "7.1",
     templateFileKey: "templates/7.1.1_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "100%" },
       veryGood: { score: 3, description: ">=90%" },
@@ -2603,8 +2714,8 @@ const indicators = [
     title: "Net Promoter Score",
     criterionCode: "7",
     subCriterionCode: "7.1",
-    templateFileKey: null,
-    requiresEvidenceLink: false,
+    templateFileKey: "templates/NO_Template.xlsx",
+    requiresEvidenceLink: true,
     templateFileKey: "templates/7.1.2_Template.xlsx",
     rubric: {
       excellent: { score: 4, description: ">12" },
@@ -2625,6 +2736,7 @@ const indicators = [
     criterionCode: "7",
     subCriterionCode: "7.1",
     templateFileKey: "templates/7.1.3_Template.xlsx",
+     requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
       veryGood: { score: 3, description: "" },
