@@ -19,7 +19,7 @@ const teamMembers = [
   {
     name: 'Vikas Sharma',
     role: 'Lead Backend Developer',
-    linkedin: 'https://linkedin.com/in/vikas-sharma',
+    linkedin: 'https://www.linkedin.com/in/vikas-sharma0b/',
     dept: 'School of Engineering',
     email: '858sharma@gmail.com',
     phone: '8587000747',
@@ -28,7 +28,7 @@ const teamMembers = [
   {
     name: 'Gajal',
     role: 'Project Manager',
-    linkedin: 'https://linkedin.com/in/gajal',
+    linkedin: 'https://www.linkedin.com/in/gajal-singhal-34871b24a/',
     dept: 'School of Engineering',
     email: 'gajal_22@manavrachna.net',
     phone: '9053012355',
@@ -37,7 +37,7 @@ const teamMembers = [
   {
     name: 'Rimjhim Verma',
     role: 'Junior Frontend Developer',
-    linkedin: 'https://linkedin.com/in/rimjhim-verma',
+    linkedin: 'https://www.linkedin.com/in/rimjhim-verma-599447290',
     dept: 'School of Engineering',
     email: 'rimjhimverma179@gmail.com',
     phone: '9540591587',
@@ -46,7 +46,7 @@ const teamMembers = [
   {
     name: 'Somya Prabhakar',
     role: 'Junior Frontend Developer',
-    linkedin: 'https://linkedin.com/in/somyaprabhakar',
+    linkedin: 'https://www.linkedin.com/in/somya-prabhakar-b64759285/',
     dept: 'School of Engineering',
     email: 'somyaprabhkar300@gmail.com',
     phone: '8800673104',
@@ -55,7 +55,7 @@ const teamMembers = [
   {
     name: 'Chandan Kumar',
     role: 'Junior Backend Developer',
-    linkedin: 'https://linkedin.com/in/chandan-kumar',
+    linkedin: 'https://www.linkedin.com/in/chandan-kumar-80b21928a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
     dept: 'School of Engineering',
     email: 'naryan.chandan2006@gmail.com',
     phone: '8800202689',

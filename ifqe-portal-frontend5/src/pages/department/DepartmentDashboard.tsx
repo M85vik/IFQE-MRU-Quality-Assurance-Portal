@@ -97,7 +97,7 @@ const DepartmentDashboard: React.FC = () => {
          <form onSubmit={handleConfirmCreateSubmission} className="space-y-4">
             {modalError && <Alert message={modalError} type="error" />}
             <Input id="title" name="title" label="Submission Title" value={newSubmissionData.title} onChange={(e) => setNewSubmissionData({ ...newSubmissionData, title: e.target.value })} required />
-            <Input id="academicYear" name="academicYear" label="Academic Year" value={newSubmissionData.academicYear} onChange={(e) => setNewSubmissionData({ ...newSubmissionData, academicYear: e.target.value })} required />
+            <Input placeholder='e.g. 2024-2025' id="academicYear" name="academicYear" label="Academic Year" value={newSubmissionData.academicYear} onChange={(e) => setNewSubmissionData({ ...newSubmissionData, academicYear: e.target.value })} required />
             <div>
               <label htmlFor="submissionType" className="block text-sm font-medium text-muted-foreground mb-1">Type</label>
               <select id="submissionType" name="submissionType" className="w-full p-2 border border-input bg-card rounded-md" value={newSubmissionData.submissionType} onChange={(e) => setNewSubmissionData({ ...newSubmissionData, submissionType: e.target.value })} >
