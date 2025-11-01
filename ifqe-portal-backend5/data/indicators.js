@@ -382,7 +382,7 @@ const indicators = [
     title: "Pass percentage/ Completion Rate",
     criterionCode: "1",
     subCriterionCode: "1.5",
-    templateFileKey: "templates/1.5.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
@@ -405,7 +405,7 @@ const indicators = [
     title: "Program Articulation Matrix",
     criterionCode: "1",
     subCriterionCode: "1.6",
-    templateFileKey: "templates/1.6.1_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
@@ -425,7 +425,7 @@ const indicators = [
     title: "Assessment methods and processes contributing to attainment of COs being followed",
     criterionCode: "1",
     subCriterionCode: "1.6",
-    templateFileKey: "templates/1.6.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
@@ -581,7 +581,7 @@ const indicators = [
     title: "Median value of citations - Google",
     criterionCode: "2",
     subCriterionCode: "2.1",
-    templateFileKey: "templates/No_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=50" },
@@ -602,7 +602,7 @@ const indicators = [
     title: "H-index of the researcher",
     criterionCode: "2",
     subCriterionCode: "2.1",
-    templateFileKey: "templates/No_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">75% of the faculty members with citation index >5" },
@@ -673,7 +673,7 @@ const indicators = [
     title: "Number of patents granted with MRU affiliation",
     criterionCode: "2",
     subCriterionCode: "2.2",
-    templateFileKey: "templates/2.2.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
@@ -696,7 +696,7 @@ const indicators = [
     title: "Commercialized patents",
     criterionCode: "2",
     subCriterionCode: "2.2",
-    templateFileKey: "templates/2.2.3_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
@@ -741,7 +741,7 @@ const indicators = [
     title: "Grant received through Govt./Non Govt./Industry/ Institution in the CFY (INR Lakhs)",
     criterionCode: "2",
     subCriterionCode: "2.3",
-    templateFileKey: "templates/2.3.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Varies by source and STEM/Non-STEM" },
@@ -763,7 +763,7 @@ const indicators = [
     title: "Number of Faculty mentoring projects",
     criterionCode: "2",
     subCriterionCode: "2.3",
-    templateFileKey: "templates/2.3.3_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Varies by source" },
@@ -784,7 +784,7 @@ const indicators = [
     title: "Students involved in projects",
     criterionCode: "2",
     subCriterionCode: "2.3",
-    templateFileKey: "templates/2.3.4_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
@@ -828,7 +828,7 @@ const indicators = [
     title: "Revenue generated through Consultancy/MDPs (INR Lakhs)",
     criterionCode: "2",
     subCriterionCode: "2.4",
-    templateFileKey: "templates/2.4.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">15" },
@@ -871,7 +871,7 @@ const indicators = [
     title: "Number of Faculty mentoring startups",
     criterionCode: "2",
     subCriterionCode: "2.5",
-    templateFileKey: "templates/2.5.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
@@ -892,7 +892,7 @@ const indicators = [
     title: "Incubated startups by students",
     criterionCode: "2",
     subCriterionCode: "2.5",
-    templateFileKey: "templates/2.5.3_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     requiresEvidenceLink: true,
     rubric: {
@@ -962,7 +962,7 @@ const indicators = [
     title: "Percentage of publications highlighting interdisciplinary research",
     criterionCode: "2",
     subCriterionCode: "2.7",
-    templateFileKey: "templates/2.7.1_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=30%" },
@@ -983,7 +983,7 @@ const indicators = [
     title: "Percentage of Interdisciplinary Research projects/ Consultancy/ MDP assignments",
     criterionCode: "2",
     subCriterionCode: "2.7",
-    templateFileKey: "templates/2.7.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=30%" },
@@ -1082,7 +1082,7 @@ const indicators = [
     title: "Regional Diversity",
     criterionCode: "3",
     subCriterionCode: "3.1",
-    templateFileKey: "templates/3.1.2_Template.xlsx",
+    templateFileKey: "templates/3.1.2 __3.1.3__3.1.4__3.1.6_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "No marking" },
@@ -1099,7 +1099,7 @@ const indicators = [
     title: "Gender ratio of students",
     criterionCode: "3",
     subCriterionCode: "3.1",
-    templateFileKey: "templates/3.1.3_Template.xlsx",
+    templateFileKey: "templates/3.1.2 __3.1.3__3.1.4__3.1.6_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "No marking" },
@@ -1116,7 +1116,7 @@ const indicators = [
     title: "Students admitted through JEE/GATE/CLAT/CAT/MAT/CUET",
     criterionCode: "3",
     subCriterionCode: "3.1",
-    templateFileKey: "templates/3.1.4_Template.xlsx",
+    templateFileKey: "templates/3.1.2 __3.1.3__3.1.4__3.1.6_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "30%" },
@@ -1155,7 +1155,7 @@ const indicators = [
     title: "Number of students availing scholarship/fee waiver",
     criterionCode: "3",
     subCriterionCode: "3.1",
-    templateFileKey: "templates/3.1.6_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=30%" },
@@ -1282,7 +1282,7 @@ const indicators = [
     title: "Preventive Measures for Anti-Ragging and Harassment",
     criterionCode: "3",
     subCriterionCode: "3.3",
-    templateFileKey: "templates/3.3.3_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Dissemination of information and Initiatives taken by the department for student awareness." },
@@ -1654,7 +1654,7 @@ const indicators = [
     title: "Number of students going for paid internships",
     criterionCode: "3",
     subCriterionCode: "3.8",
-    templateFileKey: "templates/3.8.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=20" },
@@ -1757,7 +1757,7 @@ const indicators = [
     title: "Alumni representatives in various committees",
     criterionCode: "3",
     subCriterionCode: "3.10",
-    templateFileKey: "templates/3.10.1_Template.xlsx",
+    templateFileKey: "templates/3.10.1_3.10.3_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=4" },
@@ -1799,7 +1799,7 @@ const indicators = [
     title: "Number of lectures/seminars/events by alumni",
     criterionCode: "3",
     subCriterionCode: "3.10",
-    templateFileKey: "templates/3.10.3_Template.xlsx",
+    templateFileKey: "templates/3.10.1_3.10.3_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=7" },
@@ -1895,7 +1895,7 @@ const indicators = [
     title: "Percentage of Faculty with PhD",
     criterionCode: "4",
     subCriterionCode: "4.1",
-    templateFileKey: "templates/4.1.2_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=95%" },
@@ -1916,7 +1916,7 @@ const indicators = [
     title: "Percentage of Faculty with PostDoc",
     criterionCode: "4",
     subCriterionCode: "4.1",
-    templateFileKey: "templates/4.1.3_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=10%" },
@@ -1937,7 +1937,7 @@ const indicators = [
     title: "Gender Ratio (Male: Female:Other)",
     criterionCode: "4",
     subCriterionCode: "4.1",
-    templateFileKey: "templates/4.1.4_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Strong (40:60)" },
@@ -1957,7 +1957,7 @@ const indicators = [
     title: "Experience of Faculty members (Academic and Industry)",
     criterionCode: "4",
     subCriterionCode: "4.1",
-    templateFileKey: "templates/4.1.5_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "33.33% (<8yrs), 33.33% (8-15yrs), 33.33% (>15yrs)" },
@@ -2716,7 +2716,7 @@ const indicators = [
     subCriterionCode: "7.1",
     templateFileKey: "templates/NO_Template.xlsx",
     requiresEvidenceLink: true,
-    templateFileKey: "templates/7.1.2_Template.xlsx",
+  
     rubric: {
       excellent: { score: 4, description: ">12" },
       veryGood: { score: 3, description: ">8" },
@@ -2735,7 +2735,7 @@ const indicators = [
     title: "Analysis & Action Taken Report",
     criterionCode: "7",
     subCriterionCode: "7.1",
-    templateFileKey: "templates/7.1.3_Template.xlsx",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
