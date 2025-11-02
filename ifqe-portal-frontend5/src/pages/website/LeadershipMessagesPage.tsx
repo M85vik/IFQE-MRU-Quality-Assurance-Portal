@@ -5,16 +5,16 @@ import { MessageSquareQuote } from 'lucide-react';
 
 const leaders = [
   {
-    name: 'Dr. Prashant Bhalla',
-    title: 'Chancellor, Manav Rachna University',
-    message: "The IFQE framework represents a significant leap forward in our relentless pursuit of academic excellence. It institutionalizes our commitment to quality and ensures that every stakeholder is an active participant in our journey of continuous improvement.",
-    imageUrl: './portraits/Dr. Prashant Bhalla.webp',
-  },
-  {
     name: 'Prof. (Dr.) Deependra Kumar Jha',
     title: 'Vice-Chancellor, Manav Rachna University',
     message: "This initiative is a cornerstone of the MRU 2.0 evolution. By establishing a comprehensive framework for quality enhancement, we are not only aligning with national and global standards but are also fostering a culture of accountability and innovation from the ground up.",
     imageUrl: './portraits/Prof. (Dr.) Deependra Kumar Jha.png',
+  },
+  {
+    name: 'Prof. (Dr.) Sangita Banga',
+    title: 'Chancellor, Manav Rachna University',
+    message: "The IFQE framework represents a significant leap forward in our relentless pursuit of academic excellence. It institutionalizes our commitment to quality and ensures that every stakeholder is an active participant in our journey of continuous improvement.",
+    imageUrl: './portraits/Prof. (Dr.) Sangita Banga.png',
   },
   {
     name: 'Prof. (Dr.) Deepa Arora',
