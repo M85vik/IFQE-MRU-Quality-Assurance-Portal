@@ -114,5 +114,60 @@ const getUserProfile = async (req, res) => {
   });
 };
 
+
+
+const getAllUsers= async (req,res)=>{
+try {  
+const users = await User.find({}).select('-password -__v');
+  return res.status(200).json(users);
+} catch (error) {
+   console.error(`Error in Getting Users: ${error.message}`);
+    res.status(500).json({ message: 'Error Fetching All Users.' });
+}
+  
+}
+
+
+
+
+const updateUserRole = async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  if (!role) {
+    return res.status(400).json({ message: 'Role is required.' });
+  }
+try {
+  
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+  
+    user.role = role;
+    await user.save();
+  
+    return res.status(200).json({ message: 'Role updated successfully.', user });
+} catch (error) {
+   console.error(`Error Updating User: ${error.message}`);
+    res.status(500).json({ message: 'Error Updating User.' });
+}
+};
+
+// ✅ Delete user
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
+ try {
+   const user = await User.findById(id);
+   if (!user) return res.status(404).json({ message: 'User not found.' });
+ 
+   await user.deleteOne();
+   return res.status(200).json({ message: 'User deleted successfully.' });
+ } catch (error) {
+   console.error(`Error Deleting User: ${error.message}`);
+    res.status(500).json({ message: 'Error Deleting User.' });
+  
+ }
+};
+
+
 // Export the controller functions to be used in the user routes file.
-module.exports = { registerUser, loginUser, getUserProfile };
+module.exports = { registerUser, loginUser, getUserProfile,getAllUsers,updateUserRole,deleteUser};
