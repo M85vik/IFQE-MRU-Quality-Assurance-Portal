@@ -20,13 +20,13 @@ const LandingPage: React.FC = () => {
       <main>
         <HeroSection />
         <PillarsSection />
-        <LeadershipSection />
-        <SchoolsAndDepartmentsSection />
+        {/* <LeadershipSection /> */}
+        {/* <SchoolsAndDepartmentsSection /> */}
         <FrameworkSection />
-        <QualityInActionSection />
+        {/* <QualityInActionSection /> */}
         <AnnouncementsSection />
         <InteractiveHubSection />
-        <CallToActionSection />
+        {/* <CallToActionSection /> */}
         <FooterSection />
         <Footer />
       </main>

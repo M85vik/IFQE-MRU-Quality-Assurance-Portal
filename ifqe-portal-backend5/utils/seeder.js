@@ -28,28 +28,27 @@ const importData = async () => {
     // Create the full list of 5 schools and 8 departments
     const schoolEng = await School.create({ name: 'School of Engineering' });
     const schoolLaw = await School.create({ name: 'School of Law' });
-    const schoolManagement = await School.create({ name: 'School of Management & Commerce' });
+    const schoolManagement = await School.create({ name: 'School of Business' });
     const schoolEducation = await School.create({ name: 'School of Education & Humanities' });
     const schoolSciences = await School.create({ name: 'School of Sciences' });
     console.log('All 5 Schools Imported...');
     
     // Departments for School of Engineering
-    const csDept = await Department.create({ name: 'Computer Science', school: schoolEng._id });
+    const csDept = await Department.create({ name: 'Computer Science & Technology', school: schoolEng._id });
     await Department.create({ name: 'Mechanical Engineering', school: schoolEng._id });
+    await Department.create({ name: 'Electronics & Communication', school: schoolEng._id });
 
     // Departments for School of Law
     await Department.create({ name: 'Corporate Law', school: schoolLaw._id });
 
     // Departments for School of Management & Commerce
-    await Department.create({ name: 'Business Administration', school: schoolManagement._id });
-    await Department.create({ name: 'Commerce', school: schoolManagement._id });
+    await Department.create({ name: 'Business', school: schoolManagement._id });
     
     // Departments for School of Education & Humanities
-    await Department.create({ name: 'Education', school: schoolEducation._id });
-    await Department.create({ name: 'English', school: schoolEducation._id });
+    await Department.create({ name: 'Education & Humanities', school: schoolEducation._id });
 
     // Department for School of Sciences
-    await Department.create({ name: 'Physics', school: schoolSciences._id });
+    await Department.create({ name: 'Sciences', school: schoolSciences._id });
     console.log('All 8 Departments Imported...');
 
     await User.create({

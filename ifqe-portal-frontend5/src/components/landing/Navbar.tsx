@@ -75,28 +75,30 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-20">
 
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/logo.jpg" alt="Manav Rachna University Logo" className="h-11" />
-            <span className="text-l font-sans font-bold text-primary-DEFAULT">Manav Rachna University</span>
+            <img src="/mru-logo.png" alt="Manav Rachna University Logo" className="h-11" />
           </Link>
 
           <div className="hidden lg:flex items-center space-x-8">
-            <NavItem to="/about-ifqe">About IFQE</NavItem>
-            <NavItem to="/criteria">The 7 Criteria</NavItem>
 
             <DropdownNavItem title="About">
               <DropdownLink to="/about-mru">About MRU</DropdownLink>
               <DropdownLink to="/qaa">The QAA Office</DropdownLink>
             </DropdownNavItem>
 
+            <DropdownNavItem title="IFQE">
+              <DropdownLink to="/about-ifqe">About IFQE</DropdownLink>
+              <DropdownLink to="/criteria">IFQE Criteria</DropdownLink>
+            </DropdownNavItem>
+            
+            <NavItem to="/leadership-messages">Our Leadership & Governance</NavItem>
+
             <DropdownNavItem title="Our Team">
-              <DropdownLink to="/developing-team">Developing Team</DropdownLink>
-              <DropdownLink to="/faculty-team">Faculty Team</DropdownLink>
-              <DropdownLink to="/leadership-messages">Leadership Messages</DropdownLink>
+              <DropdownLink to="/faculty-team">Faculty</DropdownLink>
+              <DropdownLink to="/developing-team">DEVs</DropdownLink>
             </DropdownNavItem>
           </div>
 
           <div className="hidden lg:flex">
-            {/* --- FIX: Changed button color to primary blue for high contrast --- */}
             <Link
               to="/login"
               className="flex items-center gap-2 px-5 py-2.5 rounded-md bg-sky-500 text-primary-foreground font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"

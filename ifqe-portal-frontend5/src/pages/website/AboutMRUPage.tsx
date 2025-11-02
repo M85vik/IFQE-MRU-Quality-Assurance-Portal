@@ -26,7 +26,7 @@ export default function AboutMRUPage() {
             Manav Rachna University (MRU) stands as a beacon of academic excellence, innovation, and holistic development. With NAAC ‘A’ accreditation and global recognition, MRU blends rigorous academics, advanced research, and a vibrant campus culture to prepare students as ethical leaders and innovators.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
-            <img src="https://manavrachna.edu.in/assets/campus/mru/images/overview-banner-mid1.webp"
+            <img src="campus.png"
               alt="MRU Campus"
               className="rounded-2xl shadow-xl w-full max-w-lg"
             />
@@ -109,64 +109,6 @@ export default function AboutMRUPage() {
                 <li>International collaborations and faculty/student exchanges.</li>
               </ul>
             </div>
-          </div>
-        </motion.section>
-
-        {/* Infrastructure and Student Life */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={sectionFade}
-          transition={{ delay: 0.3, duration: 0.7 }}
-          className="py-20 bg-white"
-        >
-          <div className="max-w-7xl mx-auto px-4 grid gap-10 md:grid-cols-2">
-            <div>
-              <h2 className="text-3xl font-bold text-blue-800 mb-6">Campus & Facilities</h2>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start gap-3"><Library className="text-red-500 mt-1" /> 
-                  Modern digital library, 60+ advanced labs & studios</li>
-                <li className="flex items-start gap-3"><Users className="text-blue-600 mt-1" /> 
-                  Sports Academy, hostels, food courts, recreation</li>
-                <li className="flex items-start gap-3"><Lightbulb className="text-green-500 mt-1" /> 
-                  360° support: healthcare, mentoring, well-being, placement cell</li>
-                <li className="flex items-start gap-3"><TrendingUp className="text-amber-500 mt-1" /> 
-                  Award-winning Green & Smart Campus</li>
-              </ul>
-            </div>
-            <img src="https://manavrachna.edu.in/assets/campus/mru/images/CampusFacilities-img1.webp"
-              alt="MRU Hostel"
-              className="rounded-2xl shadow-xl ring-2 ring-blue-300 mx-auto max-w-md"
-            />
-          </div>
-        </motion.section>
-
-        {/* Impact, Diversity & Vision */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={sectionFade}
-          transition={{ delay: 0.45, duration: 0.7 }}
-          className="max-w-7xl mx-auto py-16 px-4"
-        >
-          <h2 className="text-3xl font-bold text-blue-800 mb-8 text-center">Vision for the Future</h2>
-          <div className="md:flex gap-10 items-center">
-            <div className="flex-1 text-lg text-gray-700 mb-8 md:mb-0">
-              <p>
-                MRU continually evolves with the National Education Policy (NEP 2020), offering flexible, globally benchmarked programs and an adaptive credit system[web:7][web:10].
-                The university embraces innovation in teaching, digital transformation, and socio-environmental leadership for sustainable growth and real-world impact.
-              </p>
-              <p className="mt-6">
-                MRU students and alumni drive change worldwide—thanks to a foundation that blends tradition, technology, and curiosity in a powerful academic ecosystem.
-              </p>
-            </div>
-            <img
-              src="https://manavrachna.edu.in/assets/campus/mru/images/Sciences-lab.webp"
-              alt="MRU Lab"
-              className="w-full max-w-md rounded-xl ring-2 ring-red-400 shadow-xl object-cover"
-            />
           </div>
         </motion.section>
       </main>

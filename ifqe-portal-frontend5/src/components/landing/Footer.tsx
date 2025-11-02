@@ -9,7 +9,7 @@ export default function Footer() {
         {/* Brand and Description */}
         <div className="space-y-4">
           <img
-            src="/logo.jpg"
+            src="/mru-logo.png"
             alt="IFQE Logo"
             className="w-28"
             loading="lazy"
@@ -38,17 +38,17 @@ export default function Footer() {
           </h3>
           <ul className="space-y-1 text-sm">
             <li>
-              <a href="/about-ifqe" className="hover:text-pink-600 transition">
-                IFQE Overview
+              <a href="/about-mru" className="hover:text-pink-600 transition">
+                MRU
               </a>
             </li>
             <li>
-              <a href="/leadership" className="hover:text-pink-600 transition">
+              <a href="/leadership-messages" className="hover:text-pink-600 transition">
                 Leadership
               </a>
             </li>
             <li>
-              <a href="/team" className="hover:text-pink-600 transition">
+              <a href="/faculty-team" className="hover:text-pink-600 transition">
                 Our Team
               </a>
             </li>
@@ -62,18 +62,13 @@ export default function Footer() {
           </h3>
           <ul className="space-y-1 text-sm">
             <li>
+              <a href="/about-ifqe" className="hover:text-pink-600 transition">
+                IFQE Overview
+              </a>
+            </li>
+            <li>
               <a href="/criteria" className="hover:text-pink-600 transition">
                 7 Criteria
-              </a>
-            </li>
-            <li>
-              <a href="/reports" className="hover:text-pink-600 transition">
-                Reports
-              </a>
-            </li>
-            <li>
-              <a href="/guidelines" className="hover:text-pink-600 transition">
-                Guidelines
               </a>
             </li>
           </ul>
@@ -84,8 +79,8 @@ export default function Footer() {
           <h3 className="text-lg font-semibold text-blue-700 uppercase tracking-wide">
             Contact
           </h3>
-          <p>Email: <a href="mailto:info@ifqe.mru.edu" className="hover:text-pink-600">info@ifqe.mru.edu</a></p>
-          <p>Phone: <a href="tel:+911234567890" className="hover:text-pink-600">+91 1234 567 890</a></p>
+          <p>Email: <a href="mailto:info@ifqe.mru.edu" className="hover:text-pink-600">director.iqac@mru.edu.in</a></p>
+          <p>Phone: <a href="tel:+911234567890" className="hover:text-pink-600">01294268605</a></p>
           <p className="mt-4 text-xs text-gray-400">
             © {new Date().getFullYear()} Manav Rachna University - IFQE. All rights reserved.
           </p>

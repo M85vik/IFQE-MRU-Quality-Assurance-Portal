@@ -38,11 +38,6 @@ export default function IFQEPage() {
           <blockquote className="text-xl italic text-gray-700 font-medium">
             “What we build within becomes the foundation of what the world acknowledges.”
           </blockquote>
-          <img
-            src="https://manavrachna.edu.in/assets/campus/mru/images/overview-banner-mid1.webp"
-            alt="Campus"
-            className="rounded-2xl mt-6 shadow-xl mx-auto w-full max-w-3xl ring-2 ring-blue-400"
-          />
         </motion.section>
 
         {/* Executive Summary with Animation */}
@@ -58,16 +53,21 @@ export default function IFQEPage() {
             <FileText className="text-blue-500" /> Executive Summary
           </h2>
           <p className="text-gray-800 leading-relaxed">
-            The IFQE at MRU is a dynamic quality enhancement system for academic and institutional excellence. By integrating global benchmarks (NAAC, NBA, NIRF, QS), IFQE empowers sustainable improvement, robust decision-making, and confidence in governance.
+            Manav Rachna University (MRU), under the visionary leadership of Hon’ble Vice Chancellor,
+            Prof. (Dr.) Deependra Kumar Jha, has established a comprehensive Institutional Framework
+            for Quality Enhancement (IFQE) that drives continuous academic and institutional
+            excellence. This framework, aligned with national standards and inspired by global best
+            practices, aims to elevate teaching quality, research outcomes, and overall academic
+            development.
           </p>
-          <div className="flex flex-wrap gap-3 mt-3">
-            <BadgeCheck className="text-red-500" />
-            <span>Vision & strategy aligned to MRU 2.0</span>
-            <BadgeCheck className="text-blue-500" />
-            <span>Qualitative and quantitative indicator tracking</span>
-            <BadgeCheck className="text-red-500" />
-            <span>Transparent rubrics, reviews and feedback</span>
-          </div>
+          <p className="text-gray-800 leading-relaxed">
+            At the core of MRU’s quality ecosystem lies the Office of Quality Assurance & Accreditation
+            (QAA), a strategic unit dedicated to planning, monitoring, and systematically enhancing
+            academic standards. In pursuit of deeper and more structured quality assurance, MRU has
+            introduced the Institutional Framework for Quality Enhancement (IFQE). It is a structured,
+            two-pronged model encompassing qualitative and quantitative indicators that collectively
+            support data-informed and experience-driven decision-making.
+          </p>
         </motion.section>
 
         {/* Key Features Cards Row with Animation */}
@@ -105,48 +105,6 @@ export default function IFQEPage() {
           </motion.article>
         </motion.section>
 
-        {/* Strategic Projects Timeline Section */}
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeY}
-          transition={{ duration: 0.7 }}
-          className="max-w-6xl mx-auto flex flex-col lg:flex-row bg-white shadow rounded-2xl overflow-hidden mt-8"
-        >
-          <div className="w-full lg:w-2/3 p-10">
-            <h2 className="text-3xl font-bold text-blue-700 mb-3 flex gap-2 items-center">
-              <TrendingUp /> MRU 2.0 Strategic Projects
-            </h2>
-            <ol className="relative border-l-4 border-red-500 ml-4 space-y-7">
-              {[
-                { date: 'Jan 2024', text: 'Academic curriculum revamp & NEP 2020 alignment.' },
-                { date: 'Mar 2024', text: 'Launch of Research Funding & Innovation Incubator.' },
-                { date: 'Jun 2024', text: 'Comprehensive Faculty Training Weeks.' },
-                { date: 'Aug 2024', text: 'MoUs: Industry/Academic Collaborations.' },
-                { date: 'Oct 2024', text: 'Digital Transformation of Admin Processes.' }
-              ].map((proj, i) => (
-                <li key={i} className="mb-6 ml-4">
-                  <div className="absolute -left-6 flex items-center justify-center w-12 h-12 bg-blue-200 rounded-full border-4 border-blue-500 shadow">
-                    <Calendar className="text-blue-600" />
-                  </div>
-                  <div className="pl-10">
-                    <span className="font-bold text-blue-900">{proj.date}</span>
-                    <p className="text-gray-800">{proj.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div className="w-full lg:w-1/3 bg-gradient-to-b from-blue-100 via-white to-red-100 flex items-center justify-center p-8">
-            <img src="https://cdni.iconscout.com/illustration/premium/thumb/time-management-illustration-svg-download-png-6137897.png"
-              alt="Quality Timeline"
-              className="mx-auto rounded-xl shadow-lg w-full max-w-xs saturate-200 ring-2 ring-red-300"
-            />
-          </div>
-        </motion.section>
-
-        {/* Stakeholder Panels with Animation */}
         <motion.section
           initial="hidden"
           whileInView="visible"
@@ -157,29 +115,37 @@ export default function IFQEPage() {
         >
           <motion.div whileHover={{ scale: 1.06 }} className="bg-white shadow-xl rounded-2xl p-8 border-t-8 border-blue-500 flex flex-col items-center text-center">
             <Users className="mb-4 text-red-600" size={48} />
-            <h3 className="text-2xl font-semibold text-blue-700 mb-2">Student Engagement</h3>
-            <p className="mb-4 text-gray-700">
-              Clubs, events, internships and alumni initiatives empower student growth and satisfaction.
+            <h3 className="text-2xl font-semibold text-blue-700 mb-2">Part A: Qualitative Assessment</h3>
+            <p className="mb-4 text-gray-700 justify">
+              Part A of the Institutional Framework for Quality Enhancement (IFQE) provides an
+              Executive Summary from each school, highlighting its profile, vision and mission, and their
+              alignment with MRU’s institutional goals. It includes a SWOC analysis, outlines strategic
+              plans, and presents best practices, especially those aligned with the UN Sustainable
+              Development Goals (SDGs). This section captures the school’s commitment to quality,
+              sustainability, and continuous improvement through structured, goal-driven initiatives.
             </p>
             <img
               src="https://static.vecteezy.com/system/resources/thumbnails/047/784/019/small/an-illustration-of-online-learning-with-a-group-of-students-using-laptops-and-a-teacher-presenting-a-pie-chart-free-vector.jpg"
               alt="Students"
               className="rounded-lg shadow-lg object-cover h-40 w-full mb-4"
             />
-            <span className="inline-block rounded-full px-4 py-1 bg-blue-100 text-blue-800 font-semibold text-sm">#LifeAtMRU</span>
           </motion.div>
           <motion.div whileHover={{ scale: 1.06 }} className="bg-white shadow-xl rounded-2xl p-8 border-t-8 border-red-500 flex flex-col items-center text-center">
             <Award className="mb-4 text-blue-600" size={48} />
-            <h3 className="text-2xl font-semibold text-red-700 mb-2">Faculty Excellence</h3>
+            <h3 className="text-2xl font-semibold text-red-700 mb-2">Part B: Quantitative Assessment</h3>
             <p className="mb-4 text-gray-700">
-              Recognizing top-performing faculty for research, innovation, and teaching excellence.
+              Part B encompasses a thoughtfully structured set of indicators that offer a
+              multidimensional assessment of institutional performance. These metrics go beyond
+              conventional benchmarks to capture the essence of academic quality, research
+              productivity, and faculty effectiveness, while also reflecting the depth of student
+              engagement, perception, and the institution’s commitment to good governance and a
+              global academic outlook.
             </p>
             <img
               src="https://faculty-excellence-tracker.vercel.app/assets/Hero_section_image-D-rn-ObN.jpg"
               alt="Faculty"
               className="rounded-lg shadow-lg object-cover h-40 w-full mb-4"
             />
-            <span className="inline-block rounded-full px-4 py-1 bg-red-100 text-red-800 font-semibold text-sm">#FacultyFirst</span>
           </motion.div>
         </motion.section>
 

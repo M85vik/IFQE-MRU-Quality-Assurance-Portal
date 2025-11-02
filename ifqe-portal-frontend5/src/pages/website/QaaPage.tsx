@@ -157,11 +157,6 @@ const QaaPage = () => {
             The Office of Quality Assurance and Accreditation at MRU embodies a strategic vision of sustained academic excellence and institutional integrity.
             Through meticulous monitoring, rigorous accreditation processes, and a vibrant stakeholder culture, the QAA ensures MRU remains at the forefront of higher education innovation and impact.
           </p>
-          <img
-            src="https://manavrachna.edu.in/assets/campus/mru/images/diversity-banner.webp"
-            alt="MRU Campus Quality Assurance"
-            className="mx-auto rounded-2xl shadow-lg max-w-xl ring-4 ring-blue-300"
-          />
         </motion.section>
 
       </main>

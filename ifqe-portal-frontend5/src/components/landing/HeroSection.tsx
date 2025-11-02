@@ -18,14 +18,6 @@ export default function HeroSection() {
       </div>
 
       {/* Decorative poster, visually balanced */}
-      <motion.img
-        src="https://static.vecteezy.com/system/resources/previews/029/238/049/non_2x/illustration-graphic-cartoon-character-of-quality-control-vector.jpg"
-        alt="IFQE Portal Poster"
-        className="absolute left-0 bottom-0 w-[34vw] max-w-sm rounded-2xl shadow-2xl ring-4 ring-pink-200 z-10 hidden md:block"
-        initial={{ rotate: -5, opacity: 0, y: 40 }}
-        animate={{ rotate: 0, opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.9, type: "spring" }}
-      />
 
       {/* Gradient Overlay */}
       <div className="absolute inset-0 z-0 bg-gradient-to-tl from-blue-400/10 via-pink-400/5 to-white/0 pointer-events-none"></div>
