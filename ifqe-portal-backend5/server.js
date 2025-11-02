@@ -15,6 +15,7 @@ const FRONTEND_URL= process.env.FRONTEND_URL
 if(!FRONTEND_URL) throw new Error("Front URL Environment Varibale Not loaded.");
 
 app.use(cors({ origin:[FRONTEND_URL] }));
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
