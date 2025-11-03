@@ -12,15 +12,15 @@ const leaders = [
   },
   {
     name: 'Prof. (Dr.) Sangita Banga',
-    title: 'Chancellor, Manav Rachna University',
-    message: "The IFQE framework represents a significant leap forward in our relentless pursuit of academic excellence. It institutionalizes our commitment to quality and ensures that every stakeholder is an active participant in our journey of continuous improvement.",
+    title: 'Pro Vice-Chancellor, Manav Rachna University',
+    message: "At Manav Rachna University, quality is not a destination—it is a dynamic journey of reflection, refinement, and reinvention. The Internal Framework for Quality Enhancement (IFQE) is a significant step in this journey. Designed with a forward-looking approach, the IFQE embodies our institutional philosophy of continuous improvement through evidence-based reflection.",
     imageUrl: './portraits/Prof. (Dr.) Sangita Banga.png',
   },
   {
     name: 'Prof. (Dr.) Deepa Arora',
     title: 'Director, Quality Assurance & Accreditation',
     message: "The IFQE is more than a mechanism for evaluation; it's a testament to our university's allegiance to quality. This structured, dual-approach model empowers us to make data-informed decisions while valuing the rich academic experiences across our institution.",
-    imageUrl: './portraits/Dr.Deepa.webp',
+    imageUrl: './portraits/Dr.Deepa.png',
   },
 ];
 

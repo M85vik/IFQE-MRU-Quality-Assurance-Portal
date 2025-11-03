@@ -39,7 +39,7 @@ export default function FrameworkSection() {
     <section className="py-24 bg-gradient-to-b from-pink-50 to-white min-h-[80vh]">
       <div className="max-w-6xl mx-auto text-center px-5">
         <h2 className="text-4xl font-extrabold text-indigo-900 mb-3">
-          IFQE Institutional Framework
+          Data-Driven Quality Excellence System
         </h2>
         <div className="h-1 bg-gradient-to-r from-indigo-500 to-pink-500 rounded-full w-24 mx-auto mb-12" />
         <p className="text-gray-600 max-w-xl mx-auto mb-20 leading-relaxed">
