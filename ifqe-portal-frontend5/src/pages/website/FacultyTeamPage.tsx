@@ -9,7 +9,7 @@ const committee = [
     name: 'Dr. Deepa Arora',
     position: 'Professor and Director-QAA',
     department: 'Quality Assurance & Accreditation, MRU',
-    imageUrl: '/portraits/Dr.Deepa.webp',
+    imageUrl: '/portraits/Dr.Deepa.png',
   },
   {
     name: 'Dr. Prashant Bhardwaj',
@@ -39,7 +39,7 @@ const committee = [
     name: 'Dr. Chandni Magoo',
     position: 'Associate Professor',
     department: 'Department of Computer Science & Technology',
-    imageUrl: '/portraits/Ms.Chandini.webp',
+    imageUrl: '/portraits/Ms.Chandini.png',
   },
   {
     name: 'Dr. Arushi Malik',
