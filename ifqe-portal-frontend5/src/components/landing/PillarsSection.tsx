@@ -70,11 +70,11 @@ export default function PillarsSection() {
           transition={{ duration: 0.7 }}
           className="text-4xl md:text-5xl font-extrabold text-blue-900 mb-2"
         >
-          IFQE&nbsp;7 Pillars of Excellence
+          IFQE:&nbsp;7 Pillars of Excellence
         </motion.h2>
         <div className="w-24 h-1 mx-auto rounded-full bg-gradient-to-r from-blue-600 to-pink-500 mb-4" />
         <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-          Our institutional quality framework is scaffolded on seven bold, future-ready pillars. Each one shapes holistic progress and sustainable excellence at Manav Rachna University.
+          The Framework is founded on seven forward-looking pillars that foster holistic growth, innovation, and sustainable excellence across all academic and administrative domains at Manav Rachna University
         </p>
       </div>
       <div className="max-w-6xl mx-auto grid gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

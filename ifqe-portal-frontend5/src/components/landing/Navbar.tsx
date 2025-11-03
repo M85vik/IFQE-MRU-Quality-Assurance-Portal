@@ -82,18 +82,15 @@ const Navbar: React.FC = () => {
 
             <DropdownNavItem title="About">
               <DropdownLink to="/about-mru">About MRU</DropdownLink>
-              <DropdownLink to="/qaa">The QAA Office</DropdownLink>
+              <DropdownLink to="/qaa">Office of QAA</DropdownLink>
             </DropdownNavItem>
 
-            <DropdownNavItem title="IFQE">
-              <DropdownLink to="/about-ifqe">About IFQE</DropdownLink>
-              <DropdownLink to="/criteria">IFQE Criteria</DropdownLink>
-            </DropdownNavItem>
+            <NavItem to="/criteria">IFQE</NavItem>
             
             <NavItem to="/leadership-messages">Our Leadership & Governance</NavItem>
 
             <DropdownNavItem title="Our Team">
-              <DropdownLink to="/faculty-team">Faculty</DropdownLink>
+              <DropdownLink to="/faculty-team">Steering Group</DropdownLink>
               <DropdownLink to="/developing-team">DEVs</DropdownLink>
             </DropdownNavItem>
           </div>

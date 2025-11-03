@@ -26,12 +26,12 @@ const QaaPage = () => {
         >
           <ClipboardList className="inline-block text-blue-700 mb-4" size={56} />
           <h1 className="text-5xl font-extrabold text-blue-900 mb-2">
-            Quality Assurance & Accreditation (QAA) Office
+            Office of Quality Assurance & Accreditation
           </h1>
           <span className="block w-20 h-1 bg-red-600 rounded-full mx-auto mb-6"></span>
           <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-800 leading-relaxed">
             Quality in higher education is the cornerstone of academic excellence, institutional credibility, and societal development.
-            At Manav Rachna University, the QAA office institutionalizes a structured, strategic approach to quality assurance,
+            At Manav Rachna University, the Office of QAA institutionalizes a structured, strategic approach to quality assurance,
             continuous improvement, and stakeholder engagement aligned with the highest national and international standards.
           </p>
         </motion.section>
@@ -51,7 +51,7 @@ const QaaPage = () => {
               Strategic Planning & Monitoring
             </h3>
             <p className="text-gray-700">
-              The QAA office ensures data-driven, continuous quality planning and rigorous monitoring across all academic and administrative units.
+              The Office of QAA ensures data-driven, continuous quality planning and rigorous monitoring across all academic and administrative units.
             </p>
           </article>
 
@@ -144,7 +144,7 @@ const QaaPage = () => {
         </motion.section>
 
         {/* Impact and Vision */}
-        <motion.section
+        {/* <motion.section
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -157,7 +157,7 @@ const QaaPage = () => {
             The Office of Quality Assurance and Accreditation at MRU embodies a strategic vision of sustained academic excellence and institutional integrity.
             Through meticulous monitoring, rigorous accreditation processes, and a vibrant stakeholder culture, the QAA ensures MRU remains at the forefront of higher education innovation and impact.
           </p>
-        </motion.section>
+        </motion.section> */}
 
       </main>
     </WebsiteLayout>

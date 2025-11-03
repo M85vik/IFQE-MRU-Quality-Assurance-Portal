@@ -11,11 +11,12 @@ export default function HeroSection() {
     <section className="relative h-[100vh] min-h-[600px] flex items-center justify-center text-center bg-gradient-to-br from-blue-100 via-violet-50 to-pink-100 overflow-hidden">
 
       {/* Spline 3D Scene: Right Side */}
-      <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-[42vw] h-[62vh] pointer-events-none z-10">
+      <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
         <Suspense fallback={null}>
           <SplineViewer />
         </Suspense>
       </div>
+
 
       {/* Decorative poster, visually balanced */}
 
@@ -24,19 +25,24 @@ export default function HeroSection() {
 
       {/* Hero Content */}
       <motion.div
-        className="z-20 relative px-5 sm:px-12 py-16 max-w-2xl mx-auto backdrop-blur-lg mt-12"
+        className="z-20 relative px-8 sm:px-16 py-20 max-w-4xl mx-auto backdrop-blur-lg mt-12"
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.8 }}
       >
+
         <motion.h1
           className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-blue-900 drop-shadow mb-6 mt-5"
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.7 }}
         >
-          Redefining <span className="text-pink-600">Academic Excellence</span>
+          {/* Institutional Framework<span className="text-pink-600">Institutional Framework for Quality Enhancement</span> */}
+          <h1 className='text-pink-600'>Institutional Framework for Quality Enhancement</h1>
         </motion.h1>
+        <h2 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-6">
+          Redefining Academic Excellence
+        </h2>
         <motion.p
           className="text-lg text-gray-700 font-medium mb-12 max-w-xl mx-auto"
           initial={{ opacity: 0, y: 10 }}

@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import {
-  GraduationCap, Award, Users, Lightbulb, TrendingUp, Globe, Library, Medal
+  GraduationCap, Award, Users, Lightbulb, TrendingUp, Globe, Library, Medal,
+  HandGrab,
+  Handshake
 } from 'lucide-react';
 import WebsiteLayout from '../../components/layout/WebsiteLayout';
 
@@ -47,24 +49,24 @@ export default function AboutMRUPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {[
                 {
-                  icon: <Award size={40} className="text-red-500" />,
-                  title: 'Academic Excellence',
-                  desc: 'NAAC A-accredited courses, AICTE & UGC recognition, and modern pedagogy for today’s learners.',
+                  icon: <Handshake size={40} className="text-red-500" />,
+                  title: 'Industry-Connect',
+                  desc: '',
                 },
                 {
                   icon: <Lightbulb size={40} className="text-blue-600" />,
-                  title: 'Innovation & Research',
-                  desc: "Award-winning faculty and students, leading-edge research, and strong industry partnerships drive progress.",
+                  title: 'Innovation',
+                  desc: "",
                 },
                 {
                   icon: <Users size={40} className="text-green-500" />,
-                  title: 'Community & Diversity',
-                  desc: 'A vibrant, inclusive campus welcoming talent from across India and the globe.',
+                  title: 'Interdisciplinary',
+                  desc: '',
                 },
                 {
-                  icon: <TrendingUp size={40} className="text-amber-500" />,
-                  title: 'Holistic Development',
-                  desc: 'Leadership, sports, culture, entrepreneurship, and social impact—all shape the MRU student journey.',
+                  icon: <Globe size={40} className="text-amber-500" />,
+                  title: 'Internationalization',
+                  desc: '',
                 },
               ].map((pillar, idx) => (
                 <div key={idx} className="bg-blue-50 rounded-xl p-7 shadow flex flex-col items-center text-center hover:bg-blue-100 transition">
@@ -95,18 +97,21 @@ export default function AboutMRUPage() {
               <h3 className="text-lg font-bold mb-2">Leading State Private University</h3>
               <ul className="list-disc list-inside text-gray-700 text-left space-y-1">
                 <li>Established under Haryana State Legislature Act 26, 2014.</li>
-                <li>NAAC ‘A’ grade; Times Engineering Survey #1 in Research Capability.</li>
-                <li>UGC, AICTE, NIRF recognized, NBA-accredited programs.</li>
-                <li>Global alliances (Indian Global Higher Education Alliance, AWS Academy).</li>
+                <li>UGC, AICTE, BCI and NCTE Recognised Programs</li>
+                <li>NAAC ‘A’ Grade Accredited (2024–2029)</li>
+                <li>NBA Accredited B.Tech. CSE (2023-2026).</li>
+                <li>QS I-GAUGE 'Diamond' Rating for University (2025-2028).</li>
+                <li>QS I-Gauge: Platinum Rating for Engineering (2025-2027).</li>
               </ul>
             </div>
             <div className="bg-blue-50 rounded-xl p-7 shadow flex flex-col items-center">
               <Globe size={48} className="text-blue-600 mb-4" />
               <h3 className="text-lg font-bold mb-2">Research & Global Impact</h3>
               <ul className="list-disc list-inside text-gray-700 text-left space-y-1">
-                <li>600+ Scopus-indexed publications.</li>
-                <li>Strong research grants and innovation projects spanning sustainability, digital technologies, agriculture, and society.</li>
-                <li>International collaborations and faculty/student exchanges.</li>
+                <li>H-index: 46</li>
+                <li>1100+ Scopus-indexed publications.</li>
+                <li>Strong research grants and innovation projects.</li>
+                <li>International collaborations and exchange programs.</li>
               </ul>
             </div>
           </div>
