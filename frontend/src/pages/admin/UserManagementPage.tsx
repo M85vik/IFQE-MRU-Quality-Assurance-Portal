@@ -234,7 +234,8 @@ const UserManagementPage: React.FC = () => {
 
         {/* ---------------- All Users Section ---------------- */}
         <Card className="p-0">
-          {success && <Alert message={success} type="success" />}
+          {CopySuccess && <Alert message={CopySuccess} type="success" />}
+            {CopyError && <Alert message={CopyError} type="error" />}
           <div className="px-6 py-4 border-b border-border flex items-center gap-3">
             <Users size={22} />
             <h2 className="text-xl font-semibold text-card-foreground flex-1">All Users</h2>
