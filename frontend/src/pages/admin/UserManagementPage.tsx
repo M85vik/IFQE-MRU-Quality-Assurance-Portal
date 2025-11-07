@@ -26,8 +26,6 @@ const UserManagementPage: React.FC = () => {
   const [pageError, setPageError] = useState('');
   const [modalError, setModalError] = useState('');
   const [success, setSuccess] = useState('');
-  const [CopySuccess, setCopySuccess] = useState('');
-  const [CopyError, setCopyError] = useState('');
 
   // --- Fetch schools
   useEffect(() => {
@@ -138,11 +136,7 @@ const UserManagementPage: React.FC = () => {
 
   const handleCopyAll = () => {
     if (!users.length) {
-      setCopyError("No users to copy.");
-
-      { CopyError && <Alert message={CopyError} type="error" /> }
-
-      setTimeout(() => setCopySuccess(''), 3000);
+      alert("No users to copy.");
       return;
     }
 
@@ -156,20 +150,11 @@ const UserManagementPage: React.FC = () => {
     // Copy to clipboard
     navigator.clipboard.writeText(textToCopy)
       .then(() => {
-        setCopySuccess('User details copied to clipboard!');
-        setTimeout(() => setCopySuccess(''), 3000);
+        setSuccess('User details copied to clipboard!');
+        setTimeout(() => setSuccess(''), 3000);
         // alert("User details copied to clipboard!")
       })
-      .catch(() => {
-        setCopyError("Failed to copy user details.");
-
-        { CopyError && <Alert message={CopyError} type="error" /> }
-
-        setTimeout(() => setCopySuccess(''), 3000);
-
-        // alert("Failed to copy user details.")
-      }
-      );
+      .catch(() => alert("Failed to copy user details."));
   };
 
 
@@ -234,7 +219,6 @@ const UserManagementPage: React.FC = () => {
 
         {/* ---------------- All Users Section ---------------- */}
         <Card className="p-0">
-          {success && <Alert message={success} type="success" />}
           <div className="px-6 py-4 border-b border-border flex items-center gap-3">
             <Users size={22} />
             <h2 className="text-xl font-semibold text-card-foreground flex-1">All Users</h2>
