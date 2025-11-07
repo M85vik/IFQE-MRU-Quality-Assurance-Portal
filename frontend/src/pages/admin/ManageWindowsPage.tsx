@@ -63,7 +63,7 @@ const ManageWindowsPage: React.FC = () => {
             resetForm();
             await fetchWindows();
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Operation failed.');
+            setError(err.message || 'Operation failed.');
         } finally {
             setIsSubmitting(false);
         }
