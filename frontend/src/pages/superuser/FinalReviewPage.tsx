@@ -79,7 +79,7 @@ const FinalReviewPage: React.FC = () => {
     useEffect(() => {
         fetchSubmission();
     }, [fetchSubmission]);
-    
+
     const handleStateChange = (path: (string | number)[], value: any) => {
         setSubmission(prev => {
             if (!prev) return null;
@@ -114,7 +114,7 @@ const FinalReviewPage: React.FC = () => {
                     });
                     return { ...appealedInd, finalScore };
                 });
-                
+
                 payload = {
                     partB: submission.partB, // Send the full partB for remarks
                     appeal: { indicators: updatedAppealIndicators },
@@ -191,17 +191,55 @@ const FinalReviewPage: React.FC = () => {
                                                 <div className="space-y-3">
                                                     <p className="text-sm">Self-Assessed: <span className="font-bold">{ind.selfAssessedScore ?? 'N/A'}</span></p>
                                                     <p className="text-sm">Reviewer 1 Score: <span className="font-bold">{ind.reviewScore ?? 'N/A'}</span></p>
+
                                                     <div>
-                                                        <Input
+
+                                                        
+                                                        {/* <Input
                                                             id={`finalScore-${ind.indicatorCode}`}
                                                             label="Final Score (0-4)"
                                                             type="number"
+                                                            min={0}
+                                                            max={4}
+                                                            step={1}
+                                                            onKeyDown={(e) => e.preventDefault()}
                                                             value={ind.finalScore ?? ind.reviewScore ?? ''}
                                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'], e.target.value === '' ? null : Number(e.target.value))}
                                                             disabled={!isEditable || isSubmitting}
                                                             className={!isEditable ? 'bg-muted' : ''}
-                                                        />
+                                                        /> */}
+
+
+                                                      
+                                                            <label
+                                                                htmlFor={`finalScore-${ind.indicatorCode}`}
+                                                                className="block text-sm font-medium text-foreground mb-1"
+                                                            >
+                                                                Final Score (0–4)
+                                                            </label>
+                                                            <select
+                                                                id={`finalScore-${ind.indicatorCode}`}
+                                                                value={ind.finalScore ?? ''}
+                                                                onChange={(e) =>
+                                                                    handleStateChange(
+                                                                        ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'],
+                                                                        e.target.value === '' ? null : Number(e.target.value)
+                                                                    )
+                                                                }
+                                                                disabled={!isEditable || isSubmitting}
+                                                                className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted' : ''}`}
+                                                            >
+                                                                <option value="">Select score</option>
+                                                                {[0, 1, 2, 3, 4].map((score) => (
+                                                                    <option key={score} value={score}>
+                                                                        {score}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                
+
                                                     </div>
+
                                                 </div>
                                                 <div>
                                                     <label className="block text-sm font-medium text-foreground mb-1">Reviewer 1 Remark</label>
@@ -228,8 +266,8 @@ const FinalReviewPage: React.FC = () => {
                                     );
                                 })}
                                 <div className="pt-4 mt-4 border-t border-border">
-                                     <label className="block text-sm font-medium text-foreground mb-1">Overall Superuser Remarks for this Sub-Criterion</label>
-                                     <textarea
+                                    <label className="block text-sm font-medium text-foreground mb-1">Overall Superuser Remarks for this Sub-Criterion</label>
+                                    <textarea
                                         value={sc.superuserRemark || ''}
                                         onChange={(e) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'superuserRemark'], e.target.value)}
                                         rows={2}

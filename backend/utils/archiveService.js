@@ -79,10 +79,12 @@ const createSubmissionArchive = async (submission) => {
         // --- 3. Start the S3 Upload in parallel ---
         // The `Upload` utility will start listening to the `passThrough` stream for data.
         // It will not complete until the stream ends (when we call `archive.finalize()`).
+        const S3_BUCKET_NAME=process.env.S3_BUCKET_NAME;
+        if(!S3_BUCKET_NAME) throw new Error("Error Loading AWS Environment Variable.")
         const upload = new Upload({
             client: s3Client,
             params: {
-                Bucket: process.env.AWS_BUCKET_NAME,
+                Bucket: S3_BUCKET_NAME,
                 Key: archiveKey,
                 Body: passThrough, // The body of the upload is our stream.
                 ContentType: 'application/zip',
@@ -93,8 +95,10 @@ const createSubmissionArchive = async (submission) => {
         // This loop fetches each file from S3 one by one and appends it to the archive stream.
         for (const file of fileKeys) {
             try {
-                const getObjectCommand = new GetObjectCommand({ Bucket: process.env.AWS_BUCKET_NAME, Key: file.key });
+                const getObjectCommand = new GetObjectCommand({ Bucket:S3_BUCKET_NAME, Key: file.key });
                 const response = await s3Client.send(getObjectCommand); // response.Body is a readable stream.
+                console.log(`[Archive Service] Fetching from bucket: ${S3_BUCKET_NAME}, key: ${file.key}`);
+
                 
                 // Append the downloaded file stream to the archive with its new name.
                 archive.append(response.Body, { name: file.name });
@@ -114,6 +118,16 @@ const createSubmissionArchive = async (submission) => {
         // `upload.done()` returns a promise that resolves when the S3 upload is fully complete.
         // This promise won't resolve until the `passThrough` stream has ended.
         await upload.done();
+
+
+
+        //incomplete archiveFileKey fix
+         submission.archiveFileKey=archiveKey;
+         await submission.save();
+        console.log("Submission archive filekey:", submission.archiveFileKey);
+        
+
+        
         
         console.log(`[Archive Service] Successfully created archive: ${archiveKey}`);
         return archiveKey; // Return the key of the new archive file.

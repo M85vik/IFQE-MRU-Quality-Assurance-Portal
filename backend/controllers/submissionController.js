@@ -199,6 +199,8 @@ const createSubmission = async (req, res) => {
  * @access  Private (Department, QAA, Superuser)
  */
 const updateSubmission = async (req, res) => {
+    console.log("Submission API WHILE SUPERUSER");
+    
     try {
         const submission = await Submission.findById(req.params.id).populate('school department');
         if (!submission) {
@@ -509,6 +511,7 @@ const getSubmissionsForSuperuser = async (req, res) => {
  * @access  Private (Department user)
  */
 const submitAppeal = async (req, res) => {
+    
     try {
         const { indicators } = req.body;
         const submission = await Submission.findById(req.params.id);
