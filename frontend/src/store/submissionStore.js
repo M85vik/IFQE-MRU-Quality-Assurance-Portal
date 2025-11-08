@@ -169,11 +169,7 @@ const useSubmissionStore = create((set, get) => ({
       set({ submission: data }); 
       return data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to save draft.';
-      if (msg.toLowerCase().includes('already submitted')) {
-        alert(msg);
-      }
-      throw new Error(msg);
+      throw new Error(err.response?.data?.message || 'Failed to save draft.');
     }
   },
 
@@ -189,11 +185,7 @@ const useSubmissionStore = create((set, get) => ({
         set({ submission: data });
         return data;
     } catch (err) {
-        const msg = err.response?.data?.message || 'Failed to submit for review.';
-        if (msg.toLowerCase().includes('already submitted')) {
-          alert(msg);
-        }
-        throw new Error(msg);
+        throw new Error(err.response?.data?.message || 'Failed to submit for review.');
     }
   },
   

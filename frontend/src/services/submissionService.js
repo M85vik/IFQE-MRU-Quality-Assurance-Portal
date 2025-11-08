@@ -14,13 +14,8 @@ export const createNewSubmission = async (submissionData) => {
   try {
     const { data } = await apiClient.post('/submissions', submissionData);
     return data;
-    } catch (error) {
-    const msg = error.response?.data?.message || 'Could not create new submission.';
-    // user-friendly alert for school/year duplicate rule
-    if (msg.toLowerCase().includes('already submitted')) {
-      alert(msg);
-    }
-    throw new Error(msg);
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Could not create new submission.');
   }
 };
 

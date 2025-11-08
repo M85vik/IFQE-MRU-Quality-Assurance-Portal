@@ -88,17 +88,6 @@ const createSubmission = async (req, res) => {
         return res.status(400).json({ message: 'User is not correctly associated with a department and school.' });
     }
 
-    // NEW RULE: prevent another submission for same school + same academic year
-    const existingSchoolYearSubmission = await Submission.findOne({
-        school: fullUser.school._id,
-        academicYear,
-    });
-
-    if (existingSchoolYearSubmission) {
-        return res.status(400).json({
-            message: `Your school has already submitted a file for ${academicYear}. Only one submission per academic year is allowed.`,
-        });
-    }
     // Prevent duplicate submissions with the same title for the same department and year.
     const existingSubmission = await Submission.findOne({
         department: fullUser.department._id,
