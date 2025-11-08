@@ -8,8 +8,8 @@
     "dev": "nodemon server.js",
     "data:import": "node utils/seeder.js",
     "data:destroy": "node utils/seeder.js -d",
-    "uploadTemplates":"node utils/populateTemplates.js",
-    "start":"node server.js"
+    "uploadTemplates": "node utils/populateTemplates.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +26,7 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mime-types": "^3.0.1",
     "mongoose": "^8.18.0"
   },
   "devDependencies": {
