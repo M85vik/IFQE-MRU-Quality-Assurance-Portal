@@ -16,8 +16,10 @@ const useSecureDownloader = () => {
         setError(null);
         
         try {
-            const { data } = await apiClient.get(`/files/download-url?fileKey=${fileKey}`);
-            
+
+            //archive download fix 
+            // const { data } = await apiClient.get(`/files/download-url?fileKey=${fileKey}`);
+             const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}`);
             if (data && data.downloadUrl) {
                 
                 const link = document.createElement('a');

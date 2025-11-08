@@ -120,14 +120,12 @@ const getUploadUrl = async (req, res) => {
 
 const getDownloadUrl = async (req, res) => {
 
-  console.log("getdownload HIT ");
+  console.log("getdownload HIT while archive downloading  ");
   
   const { fileKey } = req.query;
   const user = req.user;
-
-  
-
-
+ console.log("filekey",fileKey);
+ 
   
 
    if (fileKey.startsWith('templates/')) {
