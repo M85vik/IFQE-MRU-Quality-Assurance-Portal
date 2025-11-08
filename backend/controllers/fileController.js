@@ -7,7 +7,7 @@
 // --- AWS SDK v3 Imports ---
 const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-
+const mime = require('mime-types');
 // --- Node.js Built-in & Local Imports ---
 const crypto = require('crypto'); // Used for generating secure random filenames.
 const s3Client = require('../config/s3Client'); // The configured S3 client instance.
@@ -69,8 +69,11 @@ const getUploadUrl = async (req, res) => {
 
   // --- 2. Generate a Unique File Key (Path in S3) ---
   const fileName = generateFileName();
-  const fileExtension = fileType.split('/')[1] || 'bin'; // Extract extension from MIME type.
-  
+
+  // const fileExtension = fileType.split('/')[1] || 'bin'; // Extract extension from MIME type.
+  // file format fix 
+ 
+  const fileExtension = mime.extension(fileType) || 'bin';
   let key;
   // Define a structured base path in S3 for better organization.
   const basePath = `evidence/${submission.academicYear}/${submission.school}/${submission.department}`;
@@ -120,11 +123,11 @@ const getUploadUrl = async (req, res) => {
 
 const getDownloadUrl = async (req, res) => {
 
-  console.log("getdownload HIT while archive downloading  ");
+
   
   const { fileKey } = req.query;
   const user = req.user;
- console.log("filekey",fileKey);
+
  
   
 

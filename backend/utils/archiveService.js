@@ -21,7 +21,19 @@ const { Upload } = require("@aws-sdk/lib-storage");
 // --- Local & Node.js Imports ---
 const s3Client = require('../config/s3Client'); // The configured S3 client.
 const archiver = require('archiver'); // A library for creating archives (ZIP, TAR, etc.).
-const { PassThrough } = require('stream'); // A fundamental Node.js stream utility.
+const { PassThrough, Readable } = require('stream'); // A fundamental Node.js stream utility.
+
+
+
+
+function toNodeStream(body) {
+    if (body instanceof Readable) return body; // already a stream
+    if (body && typeof body[Symbol.asyncIterator] === 'function') {
+        return Readable.from(body); // convert async iterable to stream
+    }
+    throw new Error('Unexpected Body type from S3');
+}
+
 
 
 /**
@@ -63,12 +75,12 @@ const createSubmissionArchive = async (submission) => {
 
         // --- 2. Set up the streaming pipeline ---
         const archive = archiver('zip', { zlib: { level: 9 } }); // High compression level.
-        
+
         // A PassThrough stream is a simple readable/writable stream. Data written to it
         // is immediately made available to be read from it. It acts as a pipe or a buffer
         // connecting the archiver's output to the S3 uploader's input.
         const passThrough = new PassThrough();
-        
+
         // Connect the output of the archiver to the input of our pass-through pipe.
         archive.pipe(passThrough);
 
@@ -79,8 +91,8 @@ const createSubmissionArchive = async (submission) => {
         // --- 3. Start the S3 Upload in parallel ---
         // The `Upload` utility will start listening to the `passThrough` stream for data.
         // It will not complete until the stream ends (when we call `archive.finalize()`).
-        const S3_BUCKET_NAME=process.env.S3_BUCKET_NAME;
-        if(!S3_BUCKET_NAME) throw new Error("Error Loading AWS Environment Variable.")
+        const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
+        if (!S3_BUCKET_NAME) throw new Error("Error Loading AWS Environment Variable.")
         const upload = new Upload({
             client: s3Client,
             params: {
@@ -95,13 +107,22 @@ const createSubmissionArchive = async (submission) => {
         // This loop fetches each file from S3 one by one and appends it to the archive stream.
         for (const file of fileKeys) {
             try {
-                const getObjectCommand = new GetObjectCommand({ Bucket:S3_BUCKET_NAME, Key: file.key });
+                const getObjectCommand = new GetObjectCommand({ Bucket: S3_BUCKET_NAME, Key: file.key });
                 const response = await s3Client.send(getObjectCommand); // response.Body is a readable stream.
-                console.log(`[Archive Service] Fetching from bucket: ${S3_BUCKET_NAME}, key: ${file.key}`);
 
-                
+
+
                 // Append the downloaded file stream to the archive with its new name.
-                archive.append(response.Body, { name: file.name });
+                // archive.append(response.Body, { name: file.name });
+                //File Format Fix 
+
+                const fileStream = toNodeStream(response.Body);
+                await new Promise((resolve, reject) => {
+                    fileStream.on('end', resolve);
+                    fileStream.on('error', reject);
+                    archive.append(fileStream, { name: file.name });
+                });
+
             } catch (getObjectError) {
                 // Robustness: If a single file is missing from S3, don't fail the whole archive.
                 // Instead, log the error and add a placeholder text file to the ZIP.
@@ -114,7 +135,7 @@ const createSubmissionArchive = async (submission) => {
         // Finalizing the archive tells it that no more files will be added. It writes
         // the central directory and then emits an 'end' signal on the `passThrough` stream.
         await archive.finalize();
-        
+
         // `upload.done()` returns a promise that resolves when the S3 upload is fully complete.
         // This promise won't resolve until the `passThrough` stream has ended.
         await upload.done();
@@ -122,13 +143,13 @@ const createSubmissionArchive = async (submission) => {
 
 
         //incomplete archiveFileKey fix
-         submission.archiveFileKey=archiveKey;
-         await submission.save();
+        submission.archiveFileKey = archiveKey;
+        await submission.save();
         console.log("Submission archive filekey:", submission.archiveFileKey);
-        
 
-        
-        
+
+
+
         console.log(`[Archive Service] Successfully created archive: ${archiveKey}`);
         return archiveKey; // Return the key of the new archive file.
 
