@@ -1,161 +1,124 @@
-/**
- * @fileoverview This utility provides a service to create a ZIP archive of all files
- * associated with a submission. It operates entirely in memory using Node.js streams,
- * making it highly efficient. The process is as follows:
- * 1. Collect all S3 file keys from a given submission document.
- * 2. Create a writable stream (`PassThrough`) that will receive the ZIP data.
- * 3. Concurrently, initiate an upload of this stream to a new S3 object (the final ZIP file).
- * 4. Sequentially download each individual file from S3 as a readable stream.
- * 5. Pipe each downloaded file stream into an 'archiver' instance.
- * 6. The archiver compresses the data and writes it to the `PassThrough` stream.
- * 7. The S3 upload library consumes the data from the `PassThrough` stream as it arrives.
- * This avoids saving any files (source or destination) to the server's disk.
- * @module utils/archiveService
- */
-
-// --- AWS SDK v3 Imports ---
 const { GetObjectCommand } = require('@aws-sdk/client-s3');
-// A high-level abstraction for multipart uploads, which is ideal for streaming large files.
 const { Upload } = require("@aws-sdk/lib-storage");
+const s3Client = require('../config/s3Client');
+const archiver = require('archiver');
+const { PassThrough, Readable } = require('stream');
 
-// --- Local & Node.js Imports ---
-const s3Client = require('../config/s3Client'); // The configured S3 client.
-const archiver = require('archiver'); // A library for creating archives (ZIP, TAR, etc.).
-const { PassThrough, Readable } = require('stream'); // A fundamental Node.js stream utility.
-
-
-
+// --- HELPER FUNCTIONS (No changes) ---
 
 function toNodeStream(body) {
-    if (body instanceof Readable) return body; // already a stream
-    if (body && typeof body[Symbol.asyncIterator] === 'function') {
-        return Readable.from(body); // convert async iterable to stream
-    }
-    throw new Error('Unexpected Body type from S3');
+    if (body instanceof Readable) return body;
+    if (body && typeof body[Symbol.asyncIterator] === 'function') return Readable.from(body);
+    throw new Error('Unexpected Body type from S3.');
 }
 
+const streamToBuffer = (stream) => new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on('data', (chunk) => chunks.push(chunk));
+    stream.on('error', reject);
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+});
 
 
-/**
- * Creates a ZIP archive in S3 containing all evidence files from a submission.
- * @param {object} submission - The fully populated Mongoose submission document.
- * @returns {Promise<string|null>} - The S3 key of the newly created archive, or null if there were no files.
- * @throws {Error} - Throws an error if the archiving process fails.
- */
+// --- MAIN SERVICE FUNCTION ---
+
 const createSubmissionArchive = async (submission) => {
-    console.log(`[Archive Service] Starting archive for submission: ${submission._id}`);
-    try {
-        // --- 1. Collect all file keys and desired filenames from the submission document ---
-        const fileKeys = [];
-        if (submission.partA.summaryFileKey) {
-            const fileName = submission.partA.summaryFileKey.split('/').pop();
-            fileKeys.push({ key: submission.partA.summaryFileKey, name: `Part A - Executive Summary - ${fileName}` });
-        }
-        submission.partB.criteria.forEach(c => {
-            c.subCriteria.forEach(sc => {
-                sc.indicators.forEach(i => {
-                    if (i.fileKey) {
-                        const fileName = i.fileKey.split('/').pop();
-                        // Create a structured path inside the ZIP file for better organization.
-                        fileKeys.push({ key: i.fileKey, name: `Part B/Criterion ${c.criteriaCode}/${sc.subCriteriaCode}/${i.indicatorCode} - ${fileName}` });
-                    }
-                    if (i.evidenceLinkFileKey) {
-                        const fileName = i.evidenceLinkFileKey.split('/').pop();
-                        fileKeys.push({ key: i.evidenceLinkFileKey, name: `Part B/Criterion ${c.criteriaCode}/${sc.subCriteriaCode}/${i.indicatorCode} - Evidence - ${fileName}` });
-                    }
-                });
+    const SUB_ID = submission._id;
+    console.log(`[Archive Service | ${SUB_ID}] --- STARTING ARCHIVE ---`);
+
+    // --- 1. Collect file keys ---
+    const fileKeys = [];
+    // ... (your file collection logic)
+    if (submission.partA.summaryFileKey) {
+        const fileName = submission.partA.summaryFileKey.split('/').pop();
+        fileKeys.push({ key: submission.partA.summaryFileKey, name: `Part A - Executive Summary - ${fileName}` });
+    }
+    submission.partB.criteria.forEach(c => {
+        c.subCriteria.forEach(sc => {
+            sc.indicators.forEach(i => {
+                if (i.fileKey) {
+                    const fileName = i.fileKey.split('/').pop();
+                    fileKeys.push({ key: i.fileKey, name: `Part B/Criterion ${c.criteriaCode}/${sc.subCriteriaCode}/${i.indicatorCode} - ${fileName}` });
+                }
+                if (i.evidenceLinkFileKey) {
+                    const fileName = i.evidenceLinkFileKey.split('/').pop();
+                    fileKeys.push({ key: i.evidenceLinkFileKey, name: `Part B/Criterion ${c.criteriaCode}/${sc.subCriteriaCode}/${i.indicatorCode} - Evidence - ${fileName}` });
+                }
             });
         });
+    });
 
-        // If there are no files to archive, there's nothing to do.
-        if (fileKeys.length === 0) {
-            console.log(`[Archive Service] No files to archive for submission: ${submission._id}`);
-            return null;
-        }
+    if (fileKeys.length === 0) {
+        console.log(`[Archive Service | ${SUB_ID}] No files found. Exiting.`);
+        return null;
+    }
+    console.log(`[Archive Service | ${SUB_ID}] Found ${fileKeys.length} files.`);
 
-        // --- 2. Set up the streaming pipeline ---
-        const archive = archiver('zip', { zlib: { level: 9 } }); // High compression level.
+    // --- 2. Setup streams and S3 upload params ---
+    const passThrough = new PassThrough();
+    const archive = archiver('zip', { zlib: { level: 9 } });
 
-        // A PassThrough stream is a simple readable/writable stream. Data written to it
-        // is immediately made available to be read from it. It acts as a pipe or a buffer
-        // connecting the archiver's output to the S3 uploader's input.
-        const passThrough = new PassThrough();
+    const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
+    if (!S3_BUCKET_NAME) throw new Error("S3_BUCKET_NAME env var not set.");
+    const archiveKey = `archives/${submission.academicYear}/${submission.school.name.replace(/ /g, '_')}/${submission.department.name.replace(/ /g, '_')}/${submission.title.replace(/ /g, '_')}.zip`;
 
-        // Connect the output of the archiver to the input of our pass-through pipe.
+    const upload = new Upload({
+        client: s3Client,
+        params: { Bucket: S3_BUCKET_NAME, Key: archiveKey, Body: passThrough, ContentType: 'application/zip' },
+    });
+
+    // --- 3. Create two promises that run in parallel ---
+    // Promise 1: The S3 upload. It consumes the passThrough stream.
+    const uploadPromise = upload.done();
+    console.log(`[Archive Service | ${SUB_ID}] S3 Upload initiated. Waiting for data.`);
+
+    // Promise 2: The archive creation. It produces data and writes to the passThrough stream.
+    // We wrap this in an immediately-invoked async function to handle its lifecycle.
+    const archivePromise = (async () => {
+        // IMPORTANT: Pipe archiver to passThrough. If the archiver has an error, destroy the passThrough.
+        archive.on('error', (err) => passThrough.destroy(err));
         archive.pipe(passThrough);
 
-        // Define the S3 key (full path and filename) for the final ZIP archive.
-        // Replace spaces with underscores for URL-friendly names.
-        const archiveKey = `archives/${submission.academicYear}/${submission.school.name.replace(/ /g, '_')}/${submission.department.name.replace(/ /g, '_')}/${submission.title.replace(/ /g, '_')}.zip`;
-
-        // --- 3. Start the S3 Upload in parallel ---
-        // The `Upload` utility will start listening to the `passThrough` stream for data.
-        // It will not complete until the stream ends (when we call `archive.finalize()`).
-        const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME;
-        if (!S3_BUCKET_NAME) throw new Error("Error Loading AWS Environment Variable.")
-        const upload = new Upload({
-            client: s3Client,
-            params: {
-                Bucket: S3_BUCKET_NAME,
-                Key: archiveKey,
-                Body: passThrough, // The body of the upload is our stream.
-                ContentType: 'application/zip',
-            },
-        });
-
-        // --- 4. Fetch and append each file to the archive ---
-        // This loop fetches each file from S3 one by one and appends it to the archive stream.
-        for (const file of fileKeys) {
+        for (let i = 0; i < fileKeys.length; i++) {
+            const file = fileKeys[i];
             try {
                 const getObjectCommand = new GetObjectCommand({ Bucket: S3_BUCKET_NAME, Key: file.key });
-                const response = await s3Client.send(getObjectCommand); // response.Body is a readable stream.
-
-
-
-                // Append the downloaded file stream to the archive with its new name.
-                // archive.append(response.Body, { name: file.name });
-                //File Format Fix 
-
-                const fileStream = toNodeStream(response.Body);
-                await new Promise((resolve, reject) => {
-                    fileStream.on('end', resolve);
-                    fileStream.on('error', reject);
-                    archive.append(fileStream, { name: file.name });
-                });
-
-            } catch (getObjectError) {
-                // Robustness: If a single file is missing from S3, don't fail the whole archive.
-                // Instead, log the error and add a placeholder text file to the ZIP.
-                console.error(`[Archive Service] Could not find or append file ${file.key}. Skipping.`);
-                archive.append(`File not found in S3: ${file.name}`, { name: `MISSING_FILE_${file.name.replace(/\//g, '_')}.txt` });
+                const response = await s3Client.send(getObjectCommand);
+                const fileBuffer = await streamToBuffer(toNodeStream(response.Body));
+                archive.append(fileBuffer, { name: file.name });
+                 console.log(`[Archive Service | ${SUB_ID}] Appended file ${i + 1}/${fileKeys.length}: ${file.name}`);
+            } catch (err) {
+                console.error(`[Archive Service | ${SUB_ID}] Skipping file ${file.key} due to error:`, err.name);
+                archive.append(`File not found: ${file.key}`, { name: `MISSING_FILE - ${file.name.replace(/\//g, '_')}.txt` });
             }
         }
 
-        // --- 5. Finalize the process ---
-        // Finalizing the archive tells it that no more files will be added. It writes
-        // the central directory and then emits an 'end' signal on the `passThrough` stream.
+        console.log(`[Archive Service | ${SUB_ID}] All files appended. Finalizing archive...`);
+        // This might take time if the upload is slow (due to backpressure), but it will resolve.
         await archive.finalize();
+        console.log(`[Archive Service | ${SUB_ID}] Archive finalized.`);
+    })();
 
-        // `upload.done()` returns a promise that resolves when the S3 upload is fully complete.
-        // This promise won't resolve until the `passThrough` stream has ended.
-        await upload.done();
+    try {
+        // --- 4. Wait for BOTH promises to complete ---
+        // This is the key. `Promise.all` ensures we wait for both the producer and consumer to finish.
+        // If `archivePromise` fails, it will reject here. If `uploadPromise` fails, it will reject here.
+        await Promise.all([archivePromise, uploadPromise]);
 
+        console.log(`[Archive Service | ${SUB_ID}] Upload successful.`);
 
-
-        //incomplete archiveFileKey fix
+        // --- 5. Update database ---
         submission.archiveFileKey = archiveKey;
         await submission.save();
-        console.log("Submission archive filekey:", submission.archiveFileKey);
-
-
-
-
-        console.log(`[Archive Service] Successfully created archive: ${archiveKey}`);
-        return archiveKey; // Return the key of the new archive file.
-
+        console.log(`[Archive Service | ${SUB_ID}] DB updated successfully.`);
+        
+        console.log(`[Archive Service | ${SUB_ID}] --- ARCHIVE PROCESS SUCCESSFUL ---`);
+        return archiveKey;
     } catch (error) {
-        console.error(`[Archive Service] Failed to create archive for submission ${submission._id}:`, error);
-        throw error; // Re-throw the error so the calling function knows the process failed.
+        console.error(`[Archive Service | ${SUB_ID}] --- CRITICAL FAILURE IN ARCHIVE PROCESS ---`, error);
+        // If something failed, we should try to abort the upload if it's still in progress.
+        upload.abort();
+        throw error;
     }
 };
 

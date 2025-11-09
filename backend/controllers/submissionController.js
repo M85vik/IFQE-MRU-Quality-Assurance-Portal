@@ -353,7 +353,11 @@ const updateSubmission = async (req, res) => {
                     }
                 });
                 submission.status = 'Completed';
-                submission.archiveFileKey = await createSubmissionArchive(submission); // Generate final archive
+
+
+                submission.archiveFileKey = await createSubmissionArchive(submission);
+
+
             }
             submission.markModified('partB');
             submission.markModified('appeal'); // Also mark appeal as modified if changes were made.
