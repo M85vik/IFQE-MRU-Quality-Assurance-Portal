@@ -235,7 +235,7 @@ const UserManagementPage: React.FC = () => {
         {/* ---------------- All Users Section ---------------- */}
         <Card className="p-0">
           {CopySuccess && <Alert message={CopySuccess} type="success" />}
-            {CopyError && <Alert message={CopyError} type="error" />}
+          {CopyError && <Alert message={CopyError} type="error" />}
           <div className="px-6 py-4 border-b border-border flex items-center gap-3">
             <Users size={22} />
             <h2 className="text-xl font-semibold text-card-foreground flex-1">All Users</h2>
@@ -258,10 +258,18 @@ const UserManagementPage: React.FC = () => {
                   <tr key={u._id}>
                     <td className="px-4 py-2 border">{u.name}</td>
                     <td className="px-4 py-2 border">{u.email}</td>
+
+
                     <td className="px-4 py-2 border">
                       <select
                         value={u.role}
                         onChange={(e) => handleRoleChange(u._id, e.target.value)}
+                        disabled={u.role === 'admin' || u.role === 'superuser'}
+                        title={
+                          u.role === 'admin' || u.role === 'superuser'
+                            ? 'Role changes are disabled for admin/superuser accounts.'
+                            : ''
+                        }
                         className="border border-input rounded-md px-2 py-1"
                       >
                         <option value="department">department</option>
@@ -270,6 +278,7 @@ const UserManagementPage: React.FC = () => {
                         <option value="admin">admin</option>
                       </select>
                     </td>
+
                     <td className="px-4 py-2 border text-center">
                       <button
                         onClick={() => handleDelete(u._id)}

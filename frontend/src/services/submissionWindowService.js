@@ -37,3 +37,13 @@ export const deleteSubmissionWindow = async (id) => {
         throw new Error(error.response?.data?.message || 'Could not delete submission window.');
     }
 };
+
+export const getCurrentWindow = async () => {
+  try {
+    const { data } = await apiClient.get('/submission-windows/current');
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Could not fetch current window');
+  }
+};
