@@ -34,8 +34,18 @@ const ArchivesPage: React.FC = () => {
     fetchSubmissions();
   }, []);
 
-  const archivedSubmissions = useMemo(() => 
-    submissions.filter(sub => sub.archiveFileKey && (['Appeal Closed', 'Approved'].includes(sub.status) || (sub.status === 'Completed' && sub.hasAppealed))),
+
+  // const archivedSubmissions = useMemo(() => 
+  //   submissions.filter(sub => sub.archiveFileKey && (['Appeal Closed', 'Approved'].includes(sub.status) || (sub.status === 'Completed' && sub.hasAppealed))),
+  //   [submissions]
+  // );
+  // Fix Archive fix with respect to submisiion status 
+
+  const archivedSubmissions = useMemo(() =>
+    submissions.filter(sub =>
+      sub.archiveFileKey &&
+      ['Completed', 'Appeal Closed', 'Approved'].includes(sub.status)
+    ),
     [submissions]
   );
 
@@ -46,13 +56,13 @@ const ArchivesPage: React.FC = () => {
       <h1 className="text-3xl font-bold text-primary-DEFAULT">Archived Submissions</h1>
       <Card className="p-0">
         <div className="px-6 py-4 border-b border-border flex items-center gap-3">
-            <Archive className="text-green-500" />
-            <h2 className="text-xl font-semibold">Completed Archives ({archivedSubmissions.length})</h2>
+          <Archive className="text-green-500" />
+          <h2 className="text-xl font-semibold">Completed Archives ({archivedSubmissions.length})</h2>
         </div>
         {archivedSubmissions.length > 0 ? (
-            <table className="min-w-full"><thead className="bg-secondary/50"><tr><th className="px-6 py-3 text-left text-xs uppercase">Title</th><th className="px-6 py-3 text-left text-xs uppercase">Academic Year</th><th className="relative px-6 py-3"></th></tr></thead>
-            <tbody className="divide-y divide-border">{archivedSubmissions.map(sub => (<tr key={sub._id} className="hover:bg-accent"><td className="px-6 py-4 font-medium">{sub.title}</td><td className="px-6 py-4 text-sm">{sub.academicYear}</td><td className="px-6 py-4 text-right"><Button onClick={() => downloadFile(sub.archiveFileKey!)} variant="secondary" isLoading={isDownloading}><Download size={16} className="mr-2"/> Download ZIP</Button></td></tr>))}</tbody></table>
-        ) : <div className="text-center py-16 text-muted-foreground"><Inbox size={48} className="mx-auto"/><p className="mt-4 font-semibold">No submissions have been archived yet.</p></div>}
+          <table className="min-w-full"><thead className="bg-secondary/50"><tr><th className="px-6 py-3 text-left text-xs uppercase">Title</th><th className="px-6 py-3 text-left text-xs uppercase">Academic Year</th><th className="relative px-6 py-3"></th></tr></thead>
+            <tbody className="divide-y divide-border">{archivedSubmissions.map(sub => (<tr key={sub._id} className="hover:bg-accent"><td className="px-6 py-4 font-medium">{sub.title}</td><td className="px-6 py-4 text-sm">{sub.academicYear}</td><td className="px-6 py-4 text-right"><Button onClick={() => downloadFile(sub.archiveFileKey!)} variant="secondary" isLoading={isDownloading}><Download size={16} className="mr-2" /> Download ZIP</Button></td></tr>))}</tbody></table>
+        ) : <div className="text-center py-16 text-muted-foreground"><Inbox size={48} className="mx-auto" /><p className="mt-4 font-semibold">No submissions have been archived yet.</p></div>}
       </Card>
     </div>
   );
