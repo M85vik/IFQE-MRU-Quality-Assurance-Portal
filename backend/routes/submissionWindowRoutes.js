@@ -17,10 +17,15 @@ const {
     createSubmissionWindow,
     updateSubmissionWindow,
     deleteSubmissionWindow,
+    getCurrentOpenWindow
 } = require('../controllers/submissionWindowController');
 
 // Import middleware for authentication and role-based authorization.
 const { protect, authorize } = require('../middleware/authMiddleware');
+
+
+
+router.get('/current', protect, getCurrentOpenWindow);
 
 
 // --- Global Middleware for this Router ---

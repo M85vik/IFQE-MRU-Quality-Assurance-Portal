@@ -144,10 +144,33 @@ const deleteSubmissionWindow = async (req, res) => {
     }
 };
 
+/**
+ * @desc   Get the currently open appeal window
+ * @route  GET /api/submission-windows/current
+ * @access Private (department, qaa, admin)
+ */
+const getCurrentOpenWindow = async (req, res) => {
+  try {
+    const now = new Date();
+    const openWindow = await SubmissionWindow.findOne({
+      windowType: 'Appeal',
+      startDate: { $lte: now },
+      endDate: { $gte: now }
+    });
+
+    res.json(openWindow || null);
+  } catch (error) {
+    console.error('Error fetching current appeal window:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+
 // Export all controller functions.
 module.exports = {
     getSubmissionWindows,
     createSubmissionWindow,
     updateSubmissionWindow,
     deleteSubmissionWindow,
+    getCurrentOpenWindow
 };
