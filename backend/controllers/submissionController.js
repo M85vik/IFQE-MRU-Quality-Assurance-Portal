@@ -33,7 +33,7 @@ const deleteS3Object = async (key) => {
     if (!key) return;
     try {
         const command = new DeleteObjectCommand({
-            Bucket: process.env.S3_BUCKET_NAME, 
+            Bucket: process.env.S3_BUCKET_NAME,
             Key: key,
         });
         await s3Client.send(command);
@@ -72,6 +72,8 @@ const isSubmissionWindowOpen = async (academicYear) => {
 const createSubmission = async (req, res) => {
     const { academicYear, title, submissionType } = req.body;
 
+    //Add here logic if submission for that year already exist submission should not be allowed 
+
     // 1. Authorization & Validation
     const windowOpen = await isSubmissionWindowOpen(academicYear);
     if (!windowOpen) {
@@ -89,14 +91,27 @@ const createSubmission = async (req, res) => {
     }
 
     // Prevent duplicate submissions with the same title for the same department and year.
+    // const existingSubmission = await Submission.findOne({
+    //     department: fullUser.department._id,
+    //     academicYear,
+    //     title,
+    // });
+    // if (existingSubmission) {
+    //     return res.status(400).json({ message: `A submission with this title for ${academicYear} already exists.` });
+    // }
+
+    // Prevent duplicate submissions for the same department and academic year
     const existingSubmission = await Submission.findOne({
         department: fullUser.department._id,
         academicYear,
-        title,
     });
+
     if (existingSubmission) {
-        return res.status(400).json({ message: `A submission with this title for ${academicYear} already exists.` });
+        return res.status(400).json({
+            message: `Your department has already created a submission for the academic year ${academicYear}. Multiple submissions for the same year are not allowed.`,
+        });
     }
+
 
     // 2. Data Preparation: Build the submission structure
     const allIndicators = await Indicator.find({}).sort('indicatorCode');
@@ -200,7 +215,7 @@ const createSubmission = async (req, res) => {
  */
 const updateSubmission = async (req, res) => {
     console.log("Submission API WHILE SUPERUSER");
-    
+
     try {
         const submission = await Submission.findById(req.params.id).populate('school department');
         if (!submission) {
@@ -258,9 +273,9 @@ const updateSubmission = async (req, res) => {
             if (status === 'Under Review') {
                 submission.status = 'Under Review';
             }
-        
-        // --- QAA REVIEWER LOGIC ---
-        // QAA can only add review scores/remarks to 'Under Review' submissions.
+
+            // --- QAA REVIEWER LOGIC ---
+            // QAA can only add review scores/remarks to 'Under Review' submissions.
         } else if (role === 'qaa') {
             if (submission.status !== 'Under Review') {
                 return res.status(403).json({ message: 'This submission is not currently under review.' });
@@ -292,20 +307,20 @@ const updateSubmission = async (req, res) => {
             if (status && status === 'Pending Final Approval') {
                 submission.status = status;
             }
-        
-        // --- SUPERUSER LOGIC ---
-        // Superuser handles final approval and appeal decisions.
+
+            // --- SUPERUSER LOGIC ---
+            // Superuser handles final approval and appeal decisions.
         } else if (role === 'superuser') {
             if (!['Pending Final Approval', 'Appeal Submitted'].includes(submission.status)) {
                 return res.status(403).json({ message: 'This submission is not ready for final approval or appeal review.' });
             }
-            
+
             // Handle Appeal decisions
             if (submission.status === 'Appeal Submitted') {
                 appeal.indicators.forEach(appealedIndicator => {
                     submission.partB.criteria.forEach(c => c.subCriteria.forEach(sc => {
-                       const indicatorToUpdate = sc.indicators.find(i => i.indicatorCode === appealedIndicator.indicatorCode);
-                       if (indicatorToUpdate) indicatorToUpdate.finalScore = appealedIndicator.finalScore; // Update the final score
+                        const indicatorToUpdate = sc.indicators.find(i => i.indicatorCode === appealedIndicator.indicatorCode);
+                        if (indicatorToUpdate) indicatorToUpdate.finalScore = appealedIndicator.finalScore; // Update the final score
                     }));
                     const dbAppealIndicator = submission.appeal.indicators.find(i => i.indicatorCode === appealedIndicator.indicatorCode);
                     if (dbAppealIndicator) dbAppealIndicator.superuserDecisionComment = appealedIndicator.superuserDecisionComment;
@@ -315,8 +330,8 @@ const updateSubmission = async (req, res) => {
                 submission.appeal.closedOn = new Date();
                 submission.archiveFileKey = await createSubmissionArchive(submission); // Generate final archive
 
-            // Handle normal Final Approval
-            } else { 
+                // Handle normal Final Approval
+            } else {
                 // Merge superuser's final scores and remarks.
                 partB.criteria.forEach(reqCriterion => {
                     const dbCriterion = submission.partB.criteria.find(c => c.criteriaCode === reqCriterion.criteriaCode);
@@ -342,7 +357,7 @@ const updateSubmission = async (req, res) => {
             }
             submission.markModified('partB');
             submission.markModified('appeal'); // Also mark appeal as modified if changes were made.
-        } 
+        }
         else {
             return res.status(403).json({ message: 'Not authorized for this action' });
         }
@@ -363,7 +378,7 @@ const updateSubmission = async (req, res) => {
 const getMyDepartmentSubmissions = async (req, res) => {
     try {
         const submissions = await Submission.find({ department: req.user.department }).sort({ academicYear: -1 });
-        
+
         // Post-process submissions to add a calculated totalFinalScore for completed reports.
         const processedSubmissions = submissions.map(sub => {
             const submissionObject = sub.toObject();
@@ -384,7 +399,7 @@ const getMyDepartmentSubmissions = async (req, res) => {
                     });
                 });
             }
-            
+
             // Return the submission object with the new calculated property.
             return {
                 ...submissionObject,
@@ -440,7 +455,7 @@ const getSubmissionsForReview = async (req, res) => {
  */
 const getApprovedSubmissions = async (req, res) => {
     try {
-        const submissions = await Submission.find({ 
+        const submissions = await Submission.find({
             status: { $in: ['Completed', 'Appeal Closed', 'Approved'] } // 'Approved' is legacy, keeping for compatibility.
         })
             .populate('school', 'name')
@@ -467,7 +482,7 @@ const getSubmissionById = async (req, res) => {
         if (!submission) {
             return res.status(404).json({ message: 'Submission not found' });
         }
-        
+
         // Data integrity check to prevent crashes on the frontend.
         if (!submission.school || !submission.department) {
             return res.status(404).json({ message: 'Submission data is inconsistent and cannot be loaded.' });
@@ -493,12 +508,12 @@ const getSubmissionById = async (req, res) => {
  */
 const getSubmissionsForSuperuser = async (req, res) => {
     try {
-        const submissions = await Submission.find({ 
+        const submissions = await Submission.find({
             status: { $in: ['Pending Final Approval', 'Appeal Submitted'] }
         })
-        .populate('school', 'name')
-        .populate('department', 'name')
-        .sort({ status: 1, updatedAt: 1 }); // Sort to prioritize approvals, then by oldest.
+            .populate('school', 'name')
+            .populate('department', 'name')
+            .sort({ status: 1, updatedAt: 1 }); // Sort to prioritize approvals, then by oldest.
         res.json(submissions);
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
@@ -511,7 +526,7 @@ const getSubmissionsForSuperuser = async (req, res) => {
  * @access  Private (Department user)
  */
 const submitAppeal = async (req, res) => {
-    
+
     try {
         const { indicators } = req.body;
         const submission = await Submission.findById(req.params.id);
@@ -529,9 +544,9 @@ const submitAppeal = async (req, res) => {
         }
 
         // Business Rule: Check if the specific 'Appeal' window is open for this academic year.
-        const appealWindow = await SubmissionWindow.findOne({ 
+        const appealWindow = await SubmissionWindow.findOne({
             academicYear: submission.academicYear,
-            windowType: 'Appeal' 
+            windowType: 'Appeal'
         });
 
         const now = new Date();
