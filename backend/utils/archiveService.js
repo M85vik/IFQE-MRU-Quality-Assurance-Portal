@@ -25,7 +25,7 @@ const streamToBuffer = (stream) => new Promise((resolve, reject) => {
 const createSubmissionArchive = async (submission) => {
     const SUB_ID = submission._id;
     console.log(`[Archive Service | ${SUB_ID}] --- STARTING ARCHIVE ---`);
-
+    let start = new Date();
     // --- 1. Collect file keys ---
     const fileKeys = [];
     // ... (your file collection logic)
@@ -113,6 +113,11 @@ const createSubmissionArchive = async (submission) => {
         console.log(`[Archive Service | ${SUB_ID}] DB updated successfully.`);
         
         console.log(`[Archive Service | ${SUB_ID}] --- ARCHIVE PROCESS SUCCESSFUL ---`);
+        let end = new Date();
+        let duration= (end -start)/1000
+        console.log(`Time Taken : ${duration}s.`);
+        
+
         return archiveKey;
     } catch (error) {
         console.error(`[Archive Service | ${SUB_ID}] --- CRITICAL FAILURE IN ARCHIVE PROCESS ---`, error);
