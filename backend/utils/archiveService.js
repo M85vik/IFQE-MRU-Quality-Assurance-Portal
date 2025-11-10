@@ -114,8 +114,8 @@ const createSubmissionArchive = async (submission) => {
         
         console.log(`[Archive Service | ${SUB_ID}] --- ARCHIVE PROCESS SUCCESSFUL ---`);
         let end = new Date();
-
-        console.log(`Time Taken : ${end-start}ms.`);
+        let duration= (end -start)/1000
+        console.log(`Time Taken : ${duration}s.`);
         
 
         return archiveKey;
