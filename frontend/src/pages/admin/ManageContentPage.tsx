@@ -8,6 +8,7 @@ import Input from '../../components/shared/Input';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import { Megaphone, Edit, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Announcement {
   _id: string;
@@ -67,12 +68,18 @@ const ManageContentPage: React.FC = () => {
         setError('');
         setIsSubmitting(true);
         try {
+
+        
+             
             if (editingId) {
                 await apiClient.put(`/announcements/${editingId}`, formData);
+                  toast.success('Announcement updated successfully!');
             } else {
                 await apiClient.post('/announcements', formData);
+                  toast.success('Announcement created successfully!');
             }
             resetForm();
+           
             await fetchAnnouncements();
         } catch (err: any) {
             setError(err.response?.data?.message || 'Operation failed.');
@@ -95,16 +102,41 @@ const ManageContentPage: React.FC = () => {
         window.scrollTo(0, 0);
     };
     
-    const handleDelete = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this announcement?')) {
-            try {
-                await apiClient.delete(`/announcements/${id}`);
-                await fetchAnnouncements();
-            } catch (err: any) {
-                setError(err.response?.data?.message || 'Could not delete announcement.');
-            }
-        }
-    };
+    // const handleDelete = async (id: string) => {
+    //     if (window.confirm('Are you sure you want to delete this announcement?')) {
+    //         try {
+    //             await apiClient.delete(`/announcements/${id}`);
+    //             await fetchAnnouncements();
+    //         } catch (err: any) {
+    //             setError(err.response?.data?.message || 'Could not delete announcement.');
+    //         }
+    //     }
+    // };
+
+const handleDelete = async (id: string) => {
+  if (!window.confirm('Are you sure you want to delete this announcement?')) return;
+
+  try {
+  
+    const deletingToast = toast.loading('Deleting announcement...');
+
+   
+    await apiClient.delete(`/announcements/${id}`);
+
+   
+    await fetchAnnouncements();
+
+  
+    toast.success('Announcement deleted successfully!', { id: deletingToast });
+  } catch (err: any) {
+    const errorMessage = err.response?.data?.message || 'Could not delete announcement.';
+    setError(errorMessage);
+
+ 
+    toast.error(errorMessage);
+  }
+};
+
 
     const resetForm = () => {
         setFormData({ category: 'Workshop', title: '', summary: '', details: '', date: '', color: 'blue', isActive: true });

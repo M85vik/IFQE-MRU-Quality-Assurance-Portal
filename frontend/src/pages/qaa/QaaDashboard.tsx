@@ -47,6 +47,7 @@ const QaaDashboard: React.FC = () => {
     fetchFilterData();
   }, []);
 
+
   useEffect(() => {
     if (filters.school) {
       const fetchDepartments = async () => {
@@ -62,6 +63,7 @@ const QaaDashboard: React.FC = () => {
       setDepartments([]);
     }
   }, [filters.school]);
+
 
   useEffect(() => {
     const fetchQueue = async () => {
@@ -79,6 +81,7 @@ const QaaDashboard: React.FC = () => {
     fetchQueue();
   }, [filters]);
 
+
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters(prev => {
@@ -90,10 +93,12 @@ const QaaDashboard: React.FC = () => {
     });
   };
 
+
   const clearFilters = () => {
       setFilters({ academicYear: '', school: '', department: '' });
   };
 
+  
   const renderContent = () => {
     if (isLoading) return <div className="p-6"><Spinner /></div>;
     if (error) return <div className="p-6"><Alert message={error} type="error" /></div>;

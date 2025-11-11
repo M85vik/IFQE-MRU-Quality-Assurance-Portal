@@ -7,6 +7,7 @@ import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import { Check, Download } from 'lucide-react';
 import useSecureDownloader from '../../hooks/useSecureDownloader';
+import toast from 'react-hot-toast';
 
 interface Indicator {
     indicatorCode: string;
@@ -96,6 +97,10 @@ const FinalReviewPage: React.FC = () => {
     const handleFinalize = async () => {
         if (!submission) return;
         setIsSubmitting(true);
+
+        const toastId = toast.loading('Finalizing submission... Please wait.',
+            { icon: '⏳' }
+        );
         try {
             let payload: { partB: any; appeal?: any };
 
@@ -126,10 +131,13 @@ const FinalReviewPage: React.FC = () => {
             // --- FIX END ---
 
             await apiClient.put(`/submissions/${id}`, payload);
-            alert('Submission has been finalized successfully!');
+            // alert('Submission has been finalized successfully!');
+            toast.success('Submission has been finalized successfully!', { id: toastId });
             navigate('/app/superuser/dashboard');
         } catch (err: any) {
-            setError((err as Error).message);
+            const msg = (err as Error).message || 'Failed to finalize submission.';
+            setError(msg);
+            toast.error(msg, { id: toastId });
         } finally {
             setIsSubmitting(false);
         }
@@ -194,7 +202,7 @@ const FinalReviewPage: React.FC = () => {
 
                                                     <div>
 
-                                                        
+
                                                         {/* <Input
                                                             id={`finalScore-${ind.indicatorCode}`}
                                                             label="Final Score (0-4)"
@@ -210,33 +218,33 @@ const FinalReviewPage: React.FC = () => {
                                                         /> */}
 
 
-                                                      
-                                                            <label
-                                                                htmlFor={`finalScore-${ind.indicatorCode}`}
-                                                                className="block text-sm font-medium text-foreground mb-1"
-                                                            >
-                                                                Final Score (0–4)
-                                                            </label>
-                                                            <select
-                                                                id={`finalScore-${ind.indicatorCode}`}
-                                                                value={ind.finalScore ?? ''}
-                                                                onChange={(e) =>
-                                                                    handleStateChange(
-                                                                        ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'],
-                                                                        e.target.value === '' ? null : Number(e.target.value)
-                                                                    )
-                                                                }
-                                                                disabled={!isEditable || isSubmitting}
-                                                                className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted' : ''}`}
-                                                            >
-                                                                <option value="">Select score</option>
-                                                                {[0, 1, 2, 3, 4].map((score) => (
-                                                                    <option key={score} value={score}>
-                                                                        {score}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                
+
+                                                        <label
+                                                            htmlFor={`finalScore-${ind.indicatorCode}`}
+                                                            className="block text-sm font-medium text-foreground mb-1"
+                                                        >
+                                                            Final Score (0–4)
+                                                        </label>
+                                                        <select
+                                                            id={`finalScore-${ind.indicatorCode}`}
+                                                            value={ind.finalScore ?? ''}
+                                                            onChange={(e) =>
+                                                                handleStateChange(
+                                                                    ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'],
+                                                                    e.target.value === '' ? null : Number(e.target.value)
+                                                                )
+                                                            }
+                                                            disabled={!isEditable || isSubmitting}
+                                                            className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted' : ''}`}
+                                                        >
+                                                            <option value="">Select score</option>
+                                                            {[0, 1, 2, 3, 4].map((score) => (
+                                                                <option key={score} value={score}>
+                                                                    {score}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+
 
                                                     </div>
 

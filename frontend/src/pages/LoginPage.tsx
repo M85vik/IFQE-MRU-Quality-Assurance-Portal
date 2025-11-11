@@ -41,7 +41,8 @@ const LoginPage: React.FC = () => {
         <>
             <div
                 className="min-h-screen w-full flex justify-center items-center p-4 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg')" }}
+                // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg')" }}
+                style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg?w=1920&h=1080')" }}
             >
                 <motion.div
                     initial={{ opacity: 0, y: -20, scale: 0.95 }}

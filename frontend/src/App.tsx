@@ -36,6 +36,7 @@ import CriterionDetailPage from './pages/website/CriterionDetailPage';
 import DevelopingTeamPage from './pages/website/DevelopingTeamPage';
 import FacultyTeamPage from './pages/website/FacultyTeamPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage.jsx';
+import {Toaster} from 'react-hot-toast'
 const AppRootRedirector = () => {
     const { userInfo } = useAuthStore();
     if (!userInfo) return <Navigate to="/login" replace />;
@@ -102,6 +103,7 @@ function App() {
         {/* --- Catch-all 404 Route --- */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Toaster/>
     </Router>
   );
 }
