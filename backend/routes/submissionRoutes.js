@@ -21,6 +21,7 @@ const {
   updateSubmission,
   getSubmissionsForSuperuser,
   submitAppeal,
+   deleteSubmission 
 } = require('../controllers/submissionController');
 
 // Import middleware for authentication (protect) and role-based authorization (authorize).
@@ -100,6 +101,12 @@ router.route('/:id')
    *          to determine what fields a user can modify based on their role and the submission's status.
    */
   .put(protect, updateSubmission);
+
+
+
+
+router.delete('/:id', protect, authorize('admin', 'superuser'), deleteSubmission);
+
 
 // Export the configured router to be mounted in the main server file.
 module.exports = router;

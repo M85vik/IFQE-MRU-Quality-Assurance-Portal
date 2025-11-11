@@ -12,7 +12,8 @@ import {
   FileCheck2,
   AlertCircle,
   Archive,
-  Megaphone
+  Megaphone,
+  Trash2
 } from 'lucide-react';
 
 const NavItem = ({ to, icon, children, isCollapsed }: { to: string, icon: React.ReactNode, children: React.ReactNode, isCollapsed: boolean }) => (
@@ -98,6 +99,9 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
             </NavItem>
             <NavItem to="/app/admin/content" icon={<Megaphone size={20} />} isCollapsed={isCollapsed}>
               Manage Content
+            </NavItem>
+             <NavItem to="/app/admin/deletion" icon={<Trash2 size={20} />} isCollapsed={isCollapsed}>
+             Deletion
             </NavItem>
           </>
         )}
