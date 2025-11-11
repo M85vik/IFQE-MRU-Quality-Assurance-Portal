@@ -24,7 +24,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import MainLayout from './components/layout/MainLayout';
 import PrivateRoute from './components/shared/ProtectedRoute';
-
+import DeletionPanel from './pages/admin/DeletionPanel';
 // --- NEW: Public Website Page Imports (from the 'website' folder) ---
 import LandingPage from './pages/LandingPage';
 import AboutMRUPage from './pages/website/AboutMRUPage';
@@ -92,6 +92,8 @@ function App() {
             <Route path="admin/users" element={<UserManagementPage />} />
             <Route path="admin/windows" element={<ManageWindowsPage />} />
             <Route path="admin/content" element={<ManageContentPage />} />
+            <Route path="admin/deletion" element={<DeletionPanel />} />
+
           </Route>
         </Route>
         
