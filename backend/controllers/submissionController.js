@@ -206,7 +206,7 @@ const createSubmission = async (req, res) => {
     try {
         const createdSubmission = await submission.save();
 
-           try {
+        try {
             await logActivity(
                 user,
                 'Create Submission',
@@ -214,6 +214,9 @@ const createSubmission = async (req, res) => {
                 submission.academicYear,
                 req.ip
             );
+
+            console.log("LOG REGISTERED");
+            
         } catch (logError) {
             console.warn(`⚠️ Activity log failed for submission ${req.params.id}:`, logError.message);
         }
@@ -344,8 +347,10 @@ const updateSubmission = async (req, res) => {
                 submission.status = 'Appeal Closed';
                 submission.appeal.status = 'Closed';
                 submission.appeal.closedOn = new Date();
-                submission.archiveFileKey = await createSubmissionArchive(submission); // Generate final archive
 
+                if (!submission.archiveFileKey) {
+                    submission.archiveFileKey = await createSubmissionArchive(submission);
+                }
                 // Handle normal Final Approval
             } else {
                 // Merge superuser's final scores and remarks.

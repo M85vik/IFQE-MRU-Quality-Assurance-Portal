@@ -10,6 +10,7 @@ import Modal from '../../components/shared/Modal';
 import Scorecard from '../../components/shared/Scorecard';
 import IndicatorItem from './components/IndicatorItem';
 import PartATemplateViewer from './components/PartATemplateViewer';
+import toast from 'react-hot-toast';
 
 interface Indicator {
     indicatorCode: string;
@@ -121,7 +122,8 @@ const SubmissionForm: React.FC = () => {
             setIsSubmitting(true);
             try {
                 await submitForReview();
-                alert("Submission successful!");
+                // alert("Submission successful!");
+                   toast.success('Submission Successful!');
                 navigate('/app/department/dashboard');
             } catch (err) {
                 alert((err as Error).message);
@@ -143,7 +145,8 @@ const SubmissionForm: React.FC = () => {
         try {
             await saveDraft();
         } catch (err) {
-            alert(`Failed to save file deletion: ${(err as Error).message}`);
+            // alert(`Failed to save file deletion: ${(err as Error).message}`);
+            toast.error(`Failed to save file deletion: ${(err as Error).message}`)
             if (id) {
                 initializeForm(id);
             }

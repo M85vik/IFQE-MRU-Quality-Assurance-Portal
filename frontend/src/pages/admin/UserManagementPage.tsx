@@ -9,6 +9,7 @@ import Input from '../../components/shared/Input';
 import Alert from '../../components/shared/Alert';
 import Modal from '../../components/shared/Modal';
 import { UserPlus, Users, Trash2, Copy } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const UserManagementPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -122,6 +123,7 @@ useEffect(() => {
   const handleRoleChange = async (id: string, newRole: string) => {
     try {
       await apiClient.put(`/users/update-role/${id}`, { role: newRole });
+         toast.success('User Role Changed Successfully!');
       fetchUsers();
     } catch {
       setPageError('Failed to update user role.');
@@ -133,6 +135,8 @@ useEffect(() => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
       await apiClient.delete(`/users/${id}`);
+      toast.success("User Deleted Successfully!");
+
       fetchUsers();
     } catch {
       setPageError('Failed to delete user.');

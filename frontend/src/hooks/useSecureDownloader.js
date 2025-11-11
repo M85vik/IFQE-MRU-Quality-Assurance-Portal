@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import apiClient from '../api/axiosConfig';
-
+import toast from 'react-hot-toast';
 const useSecureDownloader = () => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [error, setError] = useState(null);
@@ -42,7 +42,8 @@ const useSecureDownloader = () => {
             const errorMessage = err.response?.data?.message || err.message || 'Download failed.';
             console.error("Download failed:", errorMessage);
             setError(errorMessage);
-            alert(`Download failed: ${errorMessage}`);
+            // alert(`Download failed: ${errorMessage}`);
+                toast.error(`Download failed: ${errorMessage}`)
         } finally {
             setIsDownloading(false);
         }

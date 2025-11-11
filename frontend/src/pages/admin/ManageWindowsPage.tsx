@@ -8,7 +8,7 @@ import Input from '../../components/shared/Input';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import { Edit, Trash2 } from 'lucide-react';
-
+import toast from 'react-hot-toast';
 interface SubmissionWindow {
   _id: string;
   academicYear: string;
@@ -57,8 +57,10 @@ const ManageWindowsPage: React.FC = () => {
         try {
             if (editingId) {
                 await updateSubmissionWindow(editingId, formData);
+                  toast.success(`${formData?.windowType} Updated Successfully!`);
             } else {
                 await createSubmissionWindow(formData);
+               toast.success(`${formData?.windowType} Created Successfully!`);
             }
             resetForm();
             await fetchWindows();
@@ -86,6 +88,7 @@ const ManageWindowsPage: React.FC = () => {
         if (window.confirm('Are you sure you want to delete this window?')) {
             try {
                 await deleteSubmissionWindow(id);
+                  toast.success('Window Deleted Successfully!');
                 await fetchWindows();
             } catch (err: any) {
                 setError(err.response?.data?.message || 'Could not delete window.');

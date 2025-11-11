@@ -10,6 +10,7 @@ import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
 import Modal from '../../components/shared/Modal';
 import { Send, Download, MessageSquare } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // Define a more specific type for our submission data
 interface Indicator {
@@ -108,7 +109,8 @@ const AppealPage: React.FC = () => {
         setIsSubmitting(true);
         try {
             await submitAppeal(id!, { indicators: appealData });
-            alert('Your appeal has been submitted successfully.');
+            // alert('Your appeal has been submitted successfully.');
+               toast.success('Your appeal has been submitted successfully!');
             navigate('/app/department/dashboard');
         } catch (err: any) {
             setModalError(err.message);

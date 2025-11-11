@@ -4,7 +4,7 @@ import Card from '../../components/shared/Card';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import { Search, FileText, Copy, ChevronDown, ChevronUp, RefreshCcw } from 'lucide-react';
-
+import toast from 'react-hot-toast';
 const ActivityLogPage = () => {
   const [logs, setLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
@@ -57,7 +57,9 @@ const ActivityLogPage = () => {
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
-    alert('Copied to clipboard!');
+    // alert('Copied to clipboard!');
+    toast.success('Copied to clipboard!');
+
   };
 
   const sortLogs = () => {

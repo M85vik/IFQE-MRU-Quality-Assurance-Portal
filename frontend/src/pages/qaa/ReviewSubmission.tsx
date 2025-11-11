@@ -6,6 +6,7 @@ import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
 import { Download, FileText, MessageSquare, CheckCircle, AlertTriangle } from 'lucide-react';
 import apiClient from '../../api/axiosConfig';
+import toast from 'react-hot-toast';
 
 interface Indicator {
     indicatorCode: string;
@@ -144,7 +145,8 @@ const ReviewSubmission: React.FC = () => {
     
     const handleSendForApproval = async () => {
         if (saveStatus === 'saving') {
-            alert("Please wait for the current changes to finish saving.");
+            // alert("Please wait for the current changes to finish saving.");
+            toast("Please wait for the current changes to finish saving.",{ icon: '⏳' })
             return;
         }
         if (!window.confirm(`Are you sure you want to send this submission for final approval?`)) return;
@@ -161,10 +163,12 @@ const ReviewSubmission: React.FC = () => {
                 partB: submissionWithDefaults.partB,
             };
             await apiClient.put(`/submissions/${id}`, reviewData);
-            alert(`Submission sent for final approval!`);
+            // alert(`Submission sent for final approval!`);
+            toast.success("Submission sent for final approval!")
             navigate('/app/qaa/dashboard');
         } catch (err: any) {
-            alert((err as Error).message);
+            // alert((err as Error).message);
+            toast.error((err as Error).message || 'Failed to send for final approval.' )
         } finally {
             setIsSubmitting(false);
         }

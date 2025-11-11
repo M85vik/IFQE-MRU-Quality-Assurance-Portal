@@ -5,6 +5,7 @@ import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import { Trash2, AlertTriangle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Submission {
   _id: string;
@@ -45,7 +46,9 @@ const DeletionPanel: React.FC = () => {
   const handleDelete = async () => {
     if (!targetSubmission) return;
     if (confirmation !== targetSubmission.title) {
-      alert('Entered name does not match. Deletion cancelled.');
+      // alert('Entered name does not match. Deletion cancelled.');
+      toast('Entered name does not match. Deletion cancelled.', { icon: '⚠️' });
+
       return;
     }
 
@@ -53,7 +56,8 @@ const DeletionPanel: React.FC = () => {
 
     try {
       await apiClient.delete(`/submissions/${targetSubmission._id}`);
-      alert('Submission deleted successfully.');
+      // alert('Submission deleted successfully.');
+         toast.success('Submission Deleted Successfully!');
       setSubmissions(submissions.filter(s => s._id !== targetSubmission._id));
       setTargetSubmission(null);
       setConfirmation('');
