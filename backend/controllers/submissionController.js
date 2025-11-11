@@ -18,7 +18,7 @@ const { DeleteObjectCommand, DeleteObjectsCommand } = require('@aws-sdk/client-s
 const s3Client = require('../config/s3Client');
 
 
-
+const logActivity = require("../utils/logActivity.js")
 
 require('../models/School');
 require('../models/Department');
@@ -74,7 +74,7 @@ const isSubmissionWindowOpen = async (academicYear) => {
  */
 const createSubmission = async (req, res) => {
     const { academicYear, title, submissionType } = req.body;
-
+    const user = req.user;
     //Add here logic if submission for that year already exist submission should not be allowed 
 
     // 1. Authorization & Validation
@@ -205,6 +205,19 @@ const createSubmission = async (req, res) => {
     // 4. Save to Database
     try {
         const createdSubmission = await submission.save();
+
+           try {
+            await logActivity(
+                user,
+                'Create Submission',
+                `Submission ID: ${user._id}, Department: ${submission.department}`,
+                submission.academicYear,
+                req.ip
+            );
+        } catch (logError) {
+            console.warn(`⚠️ Activity log failed for submission ${req.params.id}:`, logError.message);
+        }
+
         res.status(201).json(createdSubmission);
     } catch (error) {
         res.status(400).json({ message: 'Error creating submission', error: error.message });
@@ -217,7 +230,7 @@ const createSubmission = async (req, res) => {
  * @access  Private (Department, QAA, Superuser)
  */
 const updateSubmission = async (req, res) => {
-    console.log("Submission API WHILE SUPERUSER");
+
 
     try {
         const submission = await Submission.findById(req.params.id).populate('school department');
@@ -579,65 +592,6 @@ const submitAppeal = async (req, res) => {
 
 
 
-// const deleteSubmission = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const submission = await Submission.findById(id);
-
-//     if (!submission) {
-//       return res.status(404).json({ message: 'Submission not found.' });
-//     }
-
-//     if (!['admin', 'superuser'].includes(req.user.role)) {
-//       return res.status(403).json({ message: 'Not authorized to delete submissions.' });
-//     }
-
-//     // Collect ALL file keys from the submission
-//     const fileKeys = [];
-
-//     // Part A
-//     if (submission.partA?.summaryFileKey) fileKeys.push(submission.partA.summaryFileKey);
-//     submission.partA?.items?.forEach(item => item.fileKey && fileKeys.push(item.fileKey));
-
-//     // Part B
-//     submission.partB?.criteria?.forEach(c => {
-//       c.subCriteria?.forEach(sc => {
-//         sc.indicators?.forEach(i => {
-//           if (i.fileKey) fileKeys.push(i.fileKey);
-//           if (i.evidenceLinkFileKey) fileKeys.push(i.evidenceLinkFileKey);
-//         });
-//       });
-//     });
-
-//     // Archive ZIP
-//     if (submission.archiveFileKey) fileKeys.push(submission.archiveFileKey);
-
-//     // Delete from S3
-//     if (fileKeys.length > 0) {
-//       const command = new DeleteObjectsCommand({
-//         Bucket: process.env.S3_BUCKET_NAME,
-//         Delete: { Objects: fileKeys.map(key => ({ Key: key })) },
-//       });
-//       await s3Client.send(command);
-//       console.log(`Deleted ${fileKeys.length} files from S3 for submission ${id}`);
-//     }
-
-//     // Delete submission from MongoDB
-//     await Submission.findByIdAndDelete(id);
-
-//     res.status(200).json({ message: 'Submission and related files deleted successfully.' });
-//   } catch (error) {
-//     console.error('Error deleting submission:', error);
-//     res.status(500).json({ message: 'Failed to delete submission', error: error.message });
-//   }
-// };
-
-/**
- * @desc    Delete a submission and all related S3 files
- * @route   DELETE /api/submissions/:id
- * @access  Private (Admin, Superuser)
- */
-
 
 /**
  * @desc Delete a submission and all related S3 files atomically.
@@ -646,69 +600,83 @@ const submitAppeal = async (req, res) => {
  */
 
 const deleteSubmission = async (req, res) => {
-  try {
-    console.log(`🗑️ Deletion requested for submission ID: ${req.params.id} by user ${req.user?.email}`);
+    try {
+        const user = req.user;
+        console.log(`🗑️ Deletion requested for submission ID: ${req.params.id} by user ${req.user?.email}`);
 
-    // 1️⃣ Find submission
-    const submission = await Submission.findById(req.params.id);
-    if (!submission) {
-      return res.status(404).json({ message: 'Submission not found' });
-    }
+        // 1️⃣ Find submission
+        const submission = await Submission.findById(req.params.id);
+        if (!submission) {
+            return res.status(404).json({ message: 'Submission not found' });
+        }
 
-    // 2️⃣ Collect all S3 file keys
-    const fileKeys = [];
+        // 2️⃣ Collect all S3 file keys
+        const fileKeys = [];
 
-    // Part A
-    if (submission.partA?.summaryFileKey) fileKeys.push({ Key: submission.partA.summaryFileKey });
-    submission.partA?.items?.forEach(item => item.fileKey && fileKeys.push({ Key: item.fileKey }));
+        // Part A
+        if (submission.partA?.summaryFileKey) fileKeys.push({ Key: submission.partA.summaryFileKey });
+        submission.partA?.items?.forEach(item => item.fileKey && fileKeys.push({ Key: item.fileKey }));
 
-    // Part B
-    submission.partB?.criteria?.forEach(criteria => {
-      criteria.subCriteria?.forEach(sub => {
-        sub.indicators?.forEach(ind => {
-          if (ind.fileKey) fileKeys.push({ Key: ind.fileKey });
-          if (ind.evidenceLinkFileKey) fileKeys.push({ Key: ind.evidenceLinkFileKey });
+        // Part B
+        submission.partB?.criteria?.forEach(criteria => {
+            criteria.subCriteria?.forEach(sub => {
+                sub.indicators?.forEach(ind => {
+                    if (ind.fileKey) fileKeys.push({ Key: ind.fileKey });
+                    if (ind.evidenceLinkFileKey) fileKeys.push({ Key: ind.evidenceLinkFileKey });
+                });
+            });
         });
-      });
-    });
 
-    // Archive
-    if (submission.archiveFileKey) fileKeys.push({ Key: submission.archiveFileKey });
+        // Archive
+        if (submission.archiveFileKey) fileKeys.push({ Key: submission.archiveFileKey });
 
-    console.log(`🧾 Found ${fileKeys.length} files to delete from S3.`);
+        console.log(`🧾 Found ${fileKeys.length} files to delete from S3.`);
 
-    // 3️⃣ Delete from S3 first
-    if (fileKeys.length > 0) {
-      const command = new DeleteObjectsCommand({
-        Bucket: process.env.S3_BUCKET_NAME,
-        Delete: { Objects: fileKeys },
-      });
+        // 3️⃣ Delete from S3 first
+        if (fileKeys.length > 0) {
+            const command = new DeleteObjectsCommand({
+                Bucket: process.env.S3_BUCKET_NAME,
+                Delete: { Objects: fileKeys },
+            });
 
-      try {
-        await s3Client.send(command);
-        console.log('✅ S3 deletion successful.');
-      } catch (s3Error) {
-        console.error('❌ S3 deletion failed:', s3Error.message);
-        // Stop here — don't delete from DB
-        return res.status(500).json({
-          message: 'Failed to delete files from S3. Submission not removed from database.',
-          error: s3Error.message,
+            try {
+                await s3Client.send(command);
+                console.log('✅ S3 deletion successful.');
+            } catch (s3Error) {
+                console.error('❌ S3 deletion failed:', s3Error.message);
+                // Stop here — don't delete from DB
+                return res.status(500).json({
+                    message: 'Failed to delete files from S3. Submission not removed from database.',
+                    error: s3Error.message,
+                });
+            }
+        }
+
+        // 4️⃣ Delete from Mongo only if S3 succeeded
+        await Submission.findByIdAndDelete(req.params.id);
+        console.log('✅ Submission deleted from MongoDB.');
+
+
+        try {
+            await logActivity(
+                user,
+                'Deleted Submission',
+                `Submission ID: ${req.params.id}, Department: ${submission.department}`,
+                submission.academicYear,
+                req.ip
+            );
+        } catch (logError) {
+            console.warn(`⚠️ Activity log failed for submission ${req.params.id}:`, logError.message);
+        }
+
+        res.status(200).json({ message: 'Submission and all related files deleted successfully.' });
+    } catch (error) {
+        console.error('❌ Error deleting submission:', error);
+        res.status(500).json({
+            message: 'Failed to delete submission',
+            error: error.message,
         });
-      }
     }
-
-    // 4️⃣ Delete from Mongo only if S3 succeeded
-    await Submission.findByIdAndDelete(req.params.id);
-    console.log('✅ Submission deleted from MongoDB.');
-
-    res.status(200).json({ message: 'Submission and all related files deleted successfully.' });
-  } catch (error) {
-    console.error('❌ Error deleting submission:', error);
-    res.status(500).json({
-      message: 'Failed to delete submission',
-      error: error.message,
-    });
-  }
 };
 
 
@@ -723,5 +691,5 @@ module.exports = {
     getSubmissionById,
     getSubmissionsForSuperuser,
     submitAppeal,
-    deleteSubmission 
+    deleteSubmission
 };

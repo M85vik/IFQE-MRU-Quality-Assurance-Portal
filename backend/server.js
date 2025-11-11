@@ -33,6 +33,6 @@ app.use('/api/submission-windows', require('./routes/submissionWindowRoutes'));
 
 
 app.use('/api/announcements', require('./routes/announcementRoutes'));
-
+app.use('/api/activity', require('./routes/activityRoutes'));
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

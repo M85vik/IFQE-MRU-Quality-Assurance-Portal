@@ -43,24 +43,29 @@ const UserManagementPage: React.FC = () => {
   }, []);
 
   // --- Fetch departments when school selected
-  useEffect(() => {
-    if (role === 'department' && selectedSchool) {
-      const fetchDepartments = async () => {
-        setDepartments([]);
-        setSelectedDepartment('');
-        try {
-          const { data } = await apiClient.get(`/public/departments/${selectedSchool}`);
-          setDepartments(data);
-        } catch (err) {
-          setPageError('Could not load department data from the server.');
-        }
-      };
-      fetchDepartments();
-    } else {
-      setDepartments([]);
+useEffect(() => {
+  // Don't run if no school is selected yet
+  if (!selectedSchool) {
+    setDepartments([]);
+    setSelectedDepartment('');
+    return;
+  }
+
+  const fetchDepartments = async () => {
+    try {
+      setPageError('');
+      setDepartments([]); // clear old ones
       setSelectedDepartment('');
+      const { data } = await apiClient.get(`/public/departments/${selectedSchool}`);
+      setDepartments(data);
+    } catch (err) {
+      console.error('Error fetching departments:', err);
+      setPageError('Could not load department data from the server.');
     }
-  }, [selectedSchool, role]);
+  };
+
+  fetchDepartments();
+}, [selectedSchool]);
 
   // --- Fetch users
   const fetchUsers = async () => {
@@ -92,20 +97,18 @@ const UserManagementPage: React.FC = () => {
     setSuccess('');
     setIsProcessing(true);
 
-    const userData: any = { name, email, password, role };
-    if (role === 'department') {
-      if (!selectedSchool || !selectedDepartment) {
-        setModalError('School and Department are required for a department user.');
-        setIsProcessing(false);
-        return;
-      }
-      userData.school = selectedSchool;
-      userData.department = selectedDepartment;
-    }
+    if (!selectedSchool || !selectedDepartment) {
+   setModalError('Please select both School and Department for this user.');
+   setIsProcessing(false);
+   return;
+ }
+    const userData: any = { name, email, password, role,   school: selectedSchool,
+    department: selectedDepartment, };
 
     try {
       await registerUser(userData);
       setSuccess(`Successfully created user: ${name} (${role}).`);
+        setTimeout(() => setSuccess(''), 1500);
       resetForm();
       fetchUsers(); // refresh list
     } catch (err: any) {
@@ -194,7 +197,7 @@ const UserManagementPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <Input id="name" label="Full Name" type="text" value={name} onChange={(e) => setName(e.target.value)} required />
               <Input id="email" label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <Input id="password" label="Temporary Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input id="password" label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               <div>
                 <label htmlFor="role" className="block text-sm font-medium text-muted-foreground mb-1">Role</label>
                 <select id="role" value={role} onChange={(e) => setRole(e.target.value)} className="w-full px-3 py-2 border border-input bg-card rounded-md focus:ring-ring focus:border-ring">
@@ -205,8 +208,8 @@ const UserManagementPage: React.FC = () => {
                 </select>
               </div>
 
-              {role === 'department' && (
-                <>
+           
+              
                   <div className="md:col-span-2"></div>
                   <div>
                     <label htmlFor="school" className="block text-sm font-medium text-muted-foreground mb-1">School</label>
@@ -222,9 +225,7 @@ const UserManagementPage: React.FC = () => {
                       {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
                     </select>
                   </div>
-                </>
-              )}
-
+              
               <div className="md:col-span-2 text-right">
                 <Button type="submit" isLoading={isProcessing}>Create User</Button>
               </div>
@@ -264,12 +265,7 @@ const UserManagementPage: React.FC = () => {
                       <select
                         value={u.role}
                         onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                        disabled={u.role === 'admin' || u.role === 'superuser'}
-                        title={
-                          u.role === 'admin' || u.role === 'superuser'
-                            ? 'Role changes are disabled for admin/superuser accounts.'
-                            : ''
-                        }
+                      
                         className="border border-input rounded-md px-2 py-1"
                       >
                         <option value="department">department</option>
