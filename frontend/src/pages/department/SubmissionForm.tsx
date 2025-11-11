@@ -7,6 +7,7 @@ import Button from '../../components/shared/Button';
 import FileUploader from '../../components/shared/FileUploader';
 import { Save, Send, FileText, Download, ChevronDown } from 'lucide-react';
 import Modal from '../../components/shared/Modal';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Scorecard from '../../components/shared/Scorecard';
 import IndicatorItem from './components/IndicatorItem';
 import PartATemplateViewer from './components/PartATemplateViewer';
@@ -77,6 +78,8 @@ const SubmissionForm: React.FC = () => {
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [openSubCriterion, setOpenSubCriterion] = useState<string | null>(null);
 
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+
     const {
         submission,
         indicators,
@@ -118,20 +121,23 @@ const SubmissionForm: React.FC = () => {
     };
 
     const handleSubmitForReview = async () => {
-        if (window.confirm("Are you sure? You will not be able to edit after submission.")) {
-            setIsSubmitting(true);
-            try {
-                await submitForReview();
-                // alert("Submission successful!");
-                   toast.success('Submission Successful!');
-                navigate('/app/department/dashboard');
-            } catch (err) {
-                alert((err as Error).message);
-            } finally {
-                setIsSubmitting(false);
-            }
+        setConfirmDialogOpen(true);
+    };
+
+    const confirmSubmitForReview = async () => {
+        setConfirmDialogOpen(false);
+        setIsSubmitting(true);
+        try {
+            await submitForReview();
+            toast.success('Submission sent for review successfully!');
+            navigate('/app/department/dashboard');
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to submit for review.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
+
 
     const handleFileRemove = async (identifier: Record<string, any>, fileKey: string) => {
         if (identifier.partACode === 'SUMMARY') {
@@ -286,6 +292,16 @@ const SubmissionForm: React.FC = () => {
             <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title="Part A: Executive Summary Template">
                 <PartATemplateViewer />
             </Modal>
+
+            <ConfirmDialog
+                isOpen={confirmDialogOpen}
+                title="Submit for Review"
+                message="Once submitted, you won't be able to edit this submission. Do you want to continue?"
+                confirmLabel="Yes, Submit"
+                cancelLabel="Cancel"
+                onConfirm={confirmSubmitForReview}
+                onCancel={() => setConfirmDialogOpen(false)}
+            />
         </>
     );
 };

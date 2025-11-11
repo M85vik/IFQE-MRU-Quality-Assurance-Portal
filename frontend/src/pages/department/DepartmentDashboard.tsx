@@ -24,7 +24,7 @@ const DepartmentDashboard: React.FC = () => {
   const [error, setError] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [modalError, setModalError] = useState('');
-  const [newSubmissionData, setNewSubmissionData] = useState({ title: '', academicYear: '2025-2026', submissionType: 'Annual' });
+  const [newSubmissionData, setNewSubmissionData] = useState({ title: '', academicYear: '', submissionType: 'Annual' });
   const navigate = useNavigate();
 
   useEffect(() => {

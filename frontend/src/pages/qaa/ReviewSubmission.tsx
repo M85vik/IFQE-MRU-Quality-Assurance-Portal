@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useSecureDownloader from '../../hooks/useSecureDownloader';
 import Spinner from '../../components/shared/Spinner';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
 import { Download, FileText, MessageSquare, CheckCircle, AlertTriangle } from 'lucide-react';
@@ -68,7 +69,7 @@ const ReviewSubmission: React.FC = () => {
     const [error, setError] = useState('');
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
     const initialLoad = useRef(true);
-
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     // --- FIX START: Create a helper function to apply default scores ---
     const getSubmissionWithDefaults = (sub: Submission): Submission => {
         const subWithDefaults = JSON.parse(JSON.stringify(sub)); // Deep clone
@@ -143,42 +144,46 @@ const ReviewSubmission: React.FC = () => {
         });
     };
     
-    const handleSendForApproval = async () => {
-        if (saveStatus === 'saving') {
-            // alert("Please wait for the current changes to finish saving.");
-            toast("Please wait for the current changes to finish saving.",{ icon: '⏳' })
-            return;
-        }
-        if (!window.confirm(`Are you sure you want to send this submission for final approval?`)) return;
-        
-        setIsSubmitting(true);
-        try {
-            if (!submission) throw new Error("Submission data is missing.");
-            
-            // --- FIX: Apply defaults before final submission too ---
-            const submissionWithDefaults = getSubmissionWithDefaults(submission);
+   
 
-            const reviewData = { 
-                status: 'Pending Final Approval',
-                partB: submissionWithDefaults.partB,
-            };
-            await apiClient.put(`/submissions/${id}`, reviewData);
-            // alert(`Submission sent for final approval!`);
-            toast.success("Submission sent for final approval!")
-            navigate('/app/qaa/dashboard');
-        } catch (err: any) {
-            // alert((err as Error).message);
-            toast.error((err as Error).message || 'Failed to send for final approval.' )
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+
+     const handleSendForApproval = async () => {
+    if (saveStatus === 'saving') {
+      toast('Please wait for the current changes to finish saving.', {
+        icon: '⏳',
+      });
+      return;
+    }
+    setConfirmDialogOpen(true); // open confirmation modal
+  };
+
+  // ✅ runs only after confirm dialog "Yes"
+  const confirmSendForApproval = async () => {
+    setConfirmDialogOpen(false);
+    setIsSubmitting(true);
+    try {
+      if (!submission) throw new Error('Submission data is missing.');
+      const submissionWithDefaults = getSubmissionWithDefaults(submission);
+      const reviewData = {
+        status: 'Pending Final Approval',
+        partB: submissionWithDefaults.partB,
+      };
+      await apiClient.put(`/submissions/${id}`, reviewData);
+      toast.success('Submission sent for final approval!');
+      navigate('/app/qaa/dashboard');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to send for final approval.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
     if (isLoading) return <div className="flex justify-center items-center h-full"><Spinner size="lg" /></div>;
     if (error) return <Alert message={error} type="error" />;
     if (!submission) return <Alert message="Submission data not found." />;
 
     return (
+        <>
         <div className="space-y-6">
             <div className="bg-card p-4 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4 sticky top-0 z-20 border border-border">
                 <div>
@@ -272,9 +277,30 @@ const ReviewSubmission: React.FC = () => {
                             </div>
                         </div>
                     ))}
+
+
+
                 </div>
+
+                
             ))}
+
+
+            
+                  
         </div>
+           <ConfirmDialog
+        isOpen={confirmDialogOpen}
+        title="Send for Final Approval"
+        message="Are you sure you want to send this submission for final approval? Once submitted, no further edits can be made."
+        confirmLabel="Yes, Send"
+        cancelLabel="Cancel"
+        onConfirm={confirmSendForApproval}
+        onCancel={() => setConfirmDialogOpen(false)}
+      />
+
+        </>
+             
     );
 };
 
