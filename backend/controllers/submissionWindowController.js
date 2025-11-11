@@ -7,7 +7,7 @@
 
 
 const SubmissionWindow = require('../models/SubmissionWindow');
-
+const logActivity = require("../utils/logActivity")
 /**
  * A helper function to safely parse a date string in 'YYYY-MM-DD' format into a UTC Date object.
  * This ensures consistent date handling regardless of the server's local timezone.
@@ -21,11 +21,11 @@ const parseDateString = (dateString) => {
 
     const parts = dateString.split('-');
     if (parts.length !== 3) return null;
-    
+
     const year = parseInt(parts[0], 10);
     // The month in JavaScript's Date constructor is 0-indexed (0=Jan, 11=Dec),
     // so we must subtract 1 from the parsed month.
-    const month = parseInt(parts[1], 10) - 1; 
+    const month = parseInt(parts[1], 10) - 1;
     const day = parseInt(parts[2], 10);
 
     // Ensure all parts are valid numbers.
@@ -60,6 +60,7 @@ const getSubmissionWindows = async (req, res) => {
  */
 const createSubmissionWindow = async (req, res) => {
     const { academicYear, startDate, endDate, windowType } = req.body;
+    const user = req.user
     try {
         const start = parseDateString(startDate);
         const end = parseDateString(endDate);
@@ -67,12 +68,23 @@ const createSubmissionWindow = async (req, res) => {
         if (!start || !end) {
             return res.status(400).json({ message: 'Invalid date format. Please use YYYY-MM-DD.' });
         }
-        
+
         // Business Logic: Set the end date to the very end of the day (23:59:59.999).
         // This makes the window inclusive of the entire final day.
         end.setUTCHours(23, 59, 59, 999);
 
         const newWindow = await SubmissionWindow.create({ academicYear, startDate: start, endDate: end, windowType });
+        try {
+            await logActivity(
+                user,
+                'Create Submission Window',
+                `Submission Window ID: ${newWindow._id}, Window Type: ${windowType}`,
+                academicYear,
+                req.ip
+            );
+        } catch (logError) {
+            console.warn(`⚠️ Activity log failed for submission window ${newWindow._id}:`, logError.message);
+        }
         res.status(201).json(newWindow);
     } catch (error) {
         // This error is often triggered by the unique compound index on {academicYear, windowType}
@@ -89,6 +101,7 @@ const createSubmissionWindow = async (req, res) => {
  */
 const updateSubmissionWindow = async (req, res) => {
     const { academicYear, startDate, endDate, windowType } = req.body;
+    const user =req.user
     try {
         const window = await SubmissionWindow.findById(req.params.id);
 
@@ -96,7 +109,7 @@ const updateSubmissionWindow = async (req, res) => {
             // Update fields only if they are provided in the request body.
             window.academicYear = academicYear || window.academicYear;
             window.windowType = windowType || window.windowType;
-            
+
             if (startDate) {
                 const start = parseDateString(startDate);
                 if (start) window.startDate = start;
@@ -109,16 +122,27 @@ const updateSubmissionWindow = async (req, res) => {
                     window.endDate = end;
                 }
             }
-            
+
             // Save the updated document. This will trigger Mongoose validation.
             const updatedWindow = await window.save();
+            try {
+                await logActivity(
+                    user,
+                    'Update Submission Window',
+                    `Submission Window ID: ${window._id}, Window Type: ${windowType}`,
+                    academicYear,
+                    req.ip
+                );
+            } catch (logError) {
+                console.warn(`⚠️ Activity log failed for submissionWindow ${window._id}:`, logError.message);
+            }
             res.json(updatedWindow);
         } else {
             res.status(404).json({ message: 'Submission window not found' });
         }
     } catch (error) {
         // This can also be triggered by the unique index if the update creates a conflict.
-        console.error(`Error updating submission window ${req.params.id}:`, error);
+        console.error(`Error updating submissionWindow ${req.params.id}:`, error);
         res.status(400).json({ message: 'Error updating submission window. The update may have caused a duplicate entry.', error: error.message });
     }
 };
@@ -131,9 +155,25 @@ const updateSubmissionWindow = async (req, res) => {
 const deleteSubmissionWindow = async (req, res) => {
     try {
         const window = await SubmissionWindow.findById(req.params.id);
-
+        const user = req.user
         if (window) {
             await window.deleteOne(); // Use .deleteOne() on the document instance.
+            const now = new Date();
+            const year = now.getFullYear(); // e.g., 2025
+            const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
+
+            try {
+                await logActivity(
+                    user,
+                    'Delete Submission Window',
+                    `Submission Window ID: ${window._id}, Department: NA`,
+                    academicYear,
+                    req.ip
+                );
+            } catch (logError) {
+                console.warn(`⚠️ Activity log failed for submissionWindow ${window._id}:`, logError.message);
+            }
+
             res.json({ message: 'Submission window removed successfully' });
         } else {
             res.status(404).json({ message: 'Submission window not found' });
@@ -150,19 +190,19 @@ const deleteSubmissionWindow = async (req, res) => {
  * @access Private (department, qaa, admin)
  */
 const getCurrentOpenWindow = async (req, res) => {
-  try {
-    const now = new Date();
-    const openWindow = await SubmissionWindow.findOne({
-      windowType: 'Appeal',
-      startDate: { $lte: now },
-      endDate: { $gte: now }
-    });
+    try {
+        const now = new Date();
+        const openWindow = await SubmissionWindow.findOne({
+            windowType: 'Appeal',
+            startDate: { $lte: now },
+            endDate: { $gte: now }
+        });
 
-    res.json(openWindow || null);
-  } catch (error) {
-    console.error('Error fetching current appeal window:', error);
-    res.status(500).json({ message: 'Server Error' });
-  }
+        res.json(openWindow || null);
+    } catch (error) {
+        console.error('Error fetching current appeal window:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
 };
 
 

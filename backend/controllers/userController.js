@@ -6,7 +6,7 @@
 
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
-
+const logActivity = require("../utils/logActivity")
 /**
  * @desc    Register a new user.
  * @route   POST /api/users/register
@@ -31,6 +31,24 @@ const registerUser = async (req, res) => {
     // 2. Create a new user in the database with the provided details.
     // The password will be automatically hashed by the Mongoose pre-save hook in the User model.
     const user = await User.create({ name, email, password, role, department, school });
+
+    const now = new Date();
+    const year = now.getFullYear(); // e.g., 2025
+    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
+
+
+
+    try {
+      await logActivity(
+       req.user,
+        'Create User',
+        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
+        `created ${academicYear}`,
+        req.ip
+      );
+    } catch (logError) {
+      console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
+    }
 
     // 3. If user creation is successful, send back the user's details and a JWT.
     if (user) {
@@ -74,6 +92,26 @@ const loginUser = async (req, res) => {
     // `matchPassword` is a custom method defined on the User model.
     if (user && (await user.matchPassword(password))) {
       // 3. If credentials are valid, send back user data and a new JWT.
+
+      const now = new Date();
+    const year = now.getFullYear(); // e.g., 2025
+    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
+
+const sanitizedUser = user.toObject();
+delete sanitizedUser.password;
+
+    try {
+      await logActivity(
+       sanitizedUser,
+        'User LoggedIn',
+        `User ID: ${user._id}, Department: ${user?.department || 'NA'}`,
+        `created ${academicYear}`,
+        req.ip
+      );
+    } catch (logError) {
+      console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
+    }
+
       res.json({
         _id: user._id,
         name: user.name,
@@ -116,15 +154,15 @@ const getUserProfile = async (req, res) => {
 
 
 
-const getAllUsers= async (req,res)=>{
-try {  
-const users = await User.find({}).select('-password -__v');
-  return res.status(200).json(users);
-} catch (error) {
-   console.error(`Error in Getting Users: ${error.message}`);
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select('-password -__v');
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error(`Error in Getting Users: ${error.message}`);
     res.status(500).json({ message: 'Error Fetching All Users.' });
-}
-  
+  }
+
 }
 
 
@@ -137,37 +175,68 @@ const updateUserRole = async (req, res) => {
   if (!role) {
     return res.status(400).json({ message: 'Role is required.' });
   }
-try {
-  
+  try {
+
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'User not found.' });
-  
+
     user.role = role;
     await user.save();
-  
+
+
+    const now = new Date();
+    const year = now.getFullYear(); // e.g., 2025
+    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
+    try {
+      await logActivity(
+        req.user,
+        'Update User',
+        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
+        `updated ${academicYear}`,
+        req.ip
+      );
+    } catch (logError) {
+      console.warn(`⚠️ Activity log failed for User ${req.params.id}:`, logError.message);
+    }
+
     return res.status(200).json({ message: 'Role updated successfully.', user });
-} catch (error) {
-   console.error(`Error Updating User: ${error.message}`);
+  } catch (error) {
+    console.error(`Error Updating User: ${error.message}`);
     res.status(500).json({ message: 'Error Updating User.' });
-}
+  }
 };
 
 // ✅ Delete user
 const deleteUser = async (req, res) => {
   const { id } = req.params;
- try {
-   const user = await User.findById(id);
-   if (!user) return res.status(404).json({ message: 'User not found.' });
- 
-   await user.deleteOne();
-   return res.status(200).json({ message: 'User deleted successfully.' });
- } catch (error) {
-   console.error(`Error Deleting User: ${error.message}`);
+  try {
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    await user.deleteOne();
+    const now = new Date();
+    const year = now.getFullYear(); // e.g., 2025
+    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
+    try {
+      await logActivity(
+        req.user,
+        'Deleted User',
+        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
+        `deleted ${academicYear}`,
+        req.ip
+      );
+    } catch (logError) {
+      console.warn(`⚠️ Activity log failed for User ${req.params.id}:`, logError.message);
+    }
+
+    return res.status(200).json({ message: 'User deleted successfully.' });
+  } catch (error) {
+    console.error(`Error Deleting User: ${error.message}`);
     res.status(500).json({ message: 'Error Deleting User.' });
-  
- }
+
+  }
 };
 
 
 // Export the controller functions to be used in the user routes file.
-module.exports = { registerUser, loginUser, getUserProfile,getAllUsers,updateUserRole,deleteUser};
+module.exports = { registerUser, loginUser, getUserProfile, getAllUsers, updateUserRole, deleteUser };

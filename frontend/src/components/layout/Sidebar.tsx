@@ -100,9 +100,14 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <NavItem to="/app/admin/content" icon={<Megaphone size={20} />} isCollapsed={isCollapsed}>
               Manage Content
             </NavItem>
-             <NavItem to="/app/admin/deletion" icon={<Trash2 size={20} />} isCollapsed={isCollapsed}>
-             Deletion
+            <NavItem to="/app/admin/deletion" icon={<Trash2 size={20} />} isCollapsed={isCollapsed}>
+              Deletion
             </NavItem>
+
+            <NavItem to="/app/admin/activity-logs" icon={<FileText size={20} />} isCollapsed={isCollapsed}>
+              Activity Logs
+            </NavItem>
+
           </>
         )}
       </nav>

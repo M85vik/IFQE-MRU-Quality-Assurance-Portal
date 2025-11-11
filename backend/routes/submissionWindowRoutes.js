@@ -60,6 +60,7 @@ router.route('/')
     .post(createSubmissionWindow);
 
 // Chains the PUT and DELETE methods for routes that target a specific window by its ID.
+
 router.route('/:id')
     /**
      * @route   PUT /api/submission-windows/:id

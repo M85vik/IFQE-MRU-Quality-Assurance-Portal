@@ -35,7 +35,7 @@ import CriteriaOverviewPage from './pages/website/CriteriaOverviewPage';
 import CriterionDetailPage from './pages/website/CriterionDetailPage';
 import DevelopingTeamPage from './pages/website/DevelopingTeamPage';
 import FacultyTeamPage from './pages/website/FacultyTeamPage';
-
+import ActivityLogPage from './pages/admin/ActivityLogPage.jsx';
 const AppRootRedirector = () => {
     const { userInfo } = useAuthStore();
     if (!userInfo) return <Navigate to="/login" replace />;
@@ -93,6 +93,8 @@ function App() {
             <Route path="admin/windows" element={<ManageWindowsPage />} />
             <Route path="admin/content" element={<ManageContentPage />} />
             <Route path="admin/deletion" element={<DeletionPanel />} />
+            <Route path="admin/activity-logs" element={<ActivityLogPage />} />
+
 
           </Route>
         </Route>
