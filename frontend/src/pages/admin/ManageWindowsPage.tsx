@@ -7,6 +7,7 @@ import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import { Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 interface SubmissionWindow {
@@ -29,7 +30,10 @@ const ManageWindowsPage: React.FC = () => {
     });
     const [editingId, setEditingId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+ const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    targetId: '',
+  });
     const fetchWindows = async () => {
         try {
             setIsLoading(true);
@@ -84,18 +88,23 @@ const ManageWindowsPage: React.FC = () => {
         window.scrollTo(0, 0);
     };
     
-    const handleDelete = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this window?')) {
-            try {
-                await deleteSubmissionWindow(id);
-                  toast.success('Window Deleted Successfully!');
-                await fetchWindows();
-            } catch (err: any) {
-                setError(err.response?.data?.message || 'Could not delete window.');
-            }
-        }
-    };
+     const handleDelete = (id: string) => {
+    setConfirmDialog({ isOpen: true, targetId: id });
+  };
 
+  // 👇 Called when user confirms deletion
+  const confirmDelete = async () => {
+    const { targetId } = confirmDialog;
+    setConfirmDialog({ isOpen: false, targetId: '' });
+    try {
+      const toastId = toast.loading('Deleting window...');
+      await deleteSubmissionWindow(targetId);
+      toast.success('Window Deleted Successfully!', { id: toastId });
+      await fetchWindows();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Could not delete window.');
+    }
+  };
     const resetForm = () => {
         setFormData({ academicYear: '', startDate: '', endDate: '', windowType: 'Submission' });
         setEditingId(null);
@@ -175,6 +184,16 @@ const ManageWindowsPage: React.FC = () => {
                 )}
               </div>
             </Card>
+
+               <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete Window"
+        message="Are you sure you want to delete this window? This action cannot be undone."
+        confirmLabel="Yes, Delete"
+        cancelLabel="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, targetId: '' })}
+      />
         </div>
     );
 };

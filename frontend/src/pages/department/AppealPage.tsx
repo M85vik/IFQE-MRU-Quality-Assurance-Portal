@@ -8,6 +8,7 @@ import useSecureDownloader from '../../hooks/useSecureDownloader';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Modal from '../../components/shared/Modal';
 import { Send, Download, MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -56,7 +57,7 @@ const AppealPage: React.FC = () => {
     const [modalError, setModalError] = useState('');
     const [appealedIndicators, setAppealedIndicators] = useState<Record<string, string>>({});
     const { downloadFile, isDownloading } = useSecureDownloader();
-
+    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, appealData: [] as any[] });
     useEffect(() => {
         const fetchSubmission = async () => {
             setIsLoading(true);
@@ -82,35 +83,40 @@ const AppealPage: React.FC = () => {
             if (newAppealed[indicatorCode] !== undefined) {
                 delete newAppealed[indicatorCode];
             } else {
-                newAppealed[indicatorCode] = ''; 
+                newAppealed[indicatorCode] = '';
             }
             return newAppealed;
         });
     };
-    
+
     const handleCommentChange = (indicatorCode: string, comment: string) => {
         setAppealedIndicators(prev => ({ ...prev, [indicatorCode]: comment }));
     };
 
-    const handleSubmitAppeal = async () => {
+    const handleOpenConfirmDialog = () => {
         const appealData = Object.entries(appealedIndicators)
             .filter(([, comment]) => comment.trim() !== '')
             .map(([indicatorCode, departmentComment]) => ({ indicatorCode, departmentComment }));
 
         if (appealData.length === 0 || appealData.length !== Object.keys(appealedIndicators).length) {
-            setModalError('You must select at least one indicator and provide a justification comment for each selection to submit an appeal.');
+            setModalError(
+                'You must select at least one indicator and provide a justification comment for each selection to submit an appeal.'
+            );
             return;
         }
 
-        if (!window.confirm(`You are about to appeal ${appealData.length} indicator(s). This action can only be performed once. Do you want to continue?`)) {
-            return;
-        }
+        // ✅ Open confirmation modal
+        setConfirmDialog({ isOpen: true, appealData });
+    };
+
+    const confirmSubmitAppeal = async () => {
+        const { appealData } = confirmDialog;
+        setConfirmDialog({ isOpen: false, appealData: [] });
 
         setIsSubmitting(true);
         try {
             await submitAppeal(id!, { indicators: appealData });
-            // alert('Your appeal has been submitted successfully.');
-               toast.success('Your appeal has been submitted successfully!');
+            toast.success('Your appeal has been submitted successfully!');
             navigate('/app/department/dashboard');
         } catch (err: any) {
             setModalError(err.message);
@@ -118,7 +124,7 @@ const AppealPage: React.FC = () => {
             setIsSubmitting(false);
         }
     };
-    
+
     if (isLoading) return <Spinner size="lg" />;
     if (error) return <Alert message={error} type="error" />;
     if (!submission) return null;
@@ -128,21 +134,21 @@ const AppealPage: React.FC = () => {
     return (
         <>
             <div className="space-y-6">
-                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card p-4 rounded-lg border border-border sticky top-0 z-10">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card p-4 rounded-lg border border-border sticky top-0 z-10">
                     <div>
                         <h1 className="text-2xl font-bold">Appeal Submission: {submission.title}</h1>
                         <p className="text-muted-foreground">Select indicators you wish to appeal and provide a clear justification.</p>
                     </div>
-                    <Button onClick={handleSubmitAppeal} isLoading={isSubmitting} disabled={appealedCount === 0}>
+                    <Button onClick={handleOpenConfirmDialog} isLoading={isSubmitting} disabled={appealedCount === 0}>
                         <Send className="mr-2" size={18} />
                         Submit Appeal ({appealedCount})
                     </Button>
                 </div>
 
-                 {submission.partB.criteria.map((criterion) => (
+                {submission.partB.criteria.map((criterion) => (
                     <div key={criterion._id} className="bg-card rounded-lg border border-border overflow-hidden">
                         {criterion.subCriteria.map((sc) => (
-                             <div key={sc._id} className="p-4">
+                            <div key={sc._id} className="p-4">
                                 {sc.indicators.map((ind) => (
                                     <div key={ind._id} className="py-4 border-b last:border-b-0">
                                         <div className="flex justify-between items-start gap-4">
@@ -152,7 +158,7 @@ const AppealPage: React.FC = () => {
                                             </div>
                                             <input type="checkbox" checked={appealedIndicators[ind.indicatorCode] !== undefined} onChange={() => handleToggleAppeal(ind.indicatorCode)} className="form-checkbox h-5 w-5 text-primary-DEFAULT rounded mt-1" />
                                         </div>
-                                        
+
                                         {/* --- NEW: Reviewer Remarks --- */}
                                         {(ind.reviewRemark || ind.superuserRemark) && (
                                             <div className="mt-3 space-y-2">
@@ -160,17 +166,17 @@ const AppealPage: React.FC = () => {
                                                 {ind.superuserRemark && <div className="bg-purple-50 text-purple-800 p-3 rounded-lg text-sm flex items-start"><MessageSquare size={16} className="mr-3 mt-1 flex-shrink-0" /><div><span className="font-bold">Superuser's Remark:</span> {ind.superuserRemark}</div></div>}
                                             </div>
                                         )}
-                                        
+
                                         {/* --- NEW: Download Buttons --- */}
                                         <div className="flex items-center space-x-2 mt-3">
-                                            {ind.fileKey && <Button onClick={() => downloadFile(ind.fileKey)} size="sm" variant="outline" isLoading={isDownloading}><Download size={14} className="mr-2"/> View Main Doc</Button>}
-                                            {ind.evidenceLinkFileKey && <Button onClick={() => downloadFile(ind.evidenceLinkFileKey)} size="sm" variant="outline" isLoading={isDownloading}><Download size={14} className="mr-2"/> View Evidence Doc</Button>}
+                                            {ind.fileKey && <Button onClick={() => downloadFile(ind.fileKey)} size="sm" variant="outline" isLoading={isDownloading}><Download size={14} className="mr-2" /> View Main Doc</Button>}
+                                            {ind.evidenceLinkFileKey && <Button onClick={() => downloadFile(ind.evidenceLinkFileKey)} size="sm" variant="outline" isLoading={isDownloading}><Download size={14} className="mr-2" /> View Evidence Doc</Button>}
                                         </div>
 
                                         {appealedIndicators[ind.indicatorCode] !== undefined && (
                                             <div className="mt-4">
                                                 <label className="block text-sm font-medium text-foreground mb-1">Your Justification for Appeal:</label>
-                                                <textarea value={appealedIndicators[ind.indicatorCode]} onChange={(e) => handleCommentChange(ind.indicatorCode, e.target.value)} rows={3} className="w-full p-2 border border-input rounded-md bg-background" placeholder={`Explain why you are appealing the score for ${ind.indicatorCode}...`}/>
+                                                <textarea value={appealedIndicators[ind.indicatorCode]} onChange={(e) => handleCommentChange(ind.indicatorCode, e.target.value)} rows={3} className="w-full p-2 border border-input rounded-md bg-background" placeholder={`Explain why you are appealing the score for ${ind.indicatorCode}...`} />
                                             </div>
                                         )}
                                     </div>
@@ -178,11 +184,21 @@ const AppealPage: React.FC = () => {
                             </div>
                         ))}
                     </div>
-                 ))}
+                ))}
             </div>
             <Modal isOpen={!!modalError} onClose={() => setModalError('')} title="Appeal Submission Error">
                 <Alert message={modalError} type="error" />
             </Modal>
+
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                title="Submit Appeal"
+                message={`You are about to appeal ${confirmDialog.appealData.length} indicator(s). This action can only be performed once. Do you want to continue?`}
+                confirmLabel="Yes, Submit"
+                cancelLabel="Cancel"
+                onConfirm={confirmSubmitAppeal}
+                onCancel={() => setConfirmDialog({ isOpen: false, appealData: [] })}
+            />
         </>
     );
 };

@@ -6,6 +6,7 @@ import apiClient from '../../api/axiosConfig';
 import Card from '../../components/shared/Card';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
+import ConfirmDialog from '../../components/shared/ConfirmDialog'
 import Alert from '../../components/shared/Alert';
 import Modal from '../../components/shared/Modal';
 import { UserPlus, Users, Trash2, Copy } from 'lucide-react';
@@ -29,6 +30,10 @@ const UserManagementPage: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [CopySuccess, setCopySuccess] = useState('');
   const [CopyError, setCopyError] = useState('');
+const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    targetId: '',
+  });
 
   // --- Fetch schools
   useEffect(() => {
@@ -131,17 +136,25 @@ useEffect(() => {
   };
 
   // --- Delete user
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
-    try {
-      await apiClient.delete(`/users/${id}`);
-      toast.success("User Deleted Successfully!");
+  const handleDelete = (id: string) => {
+    setConfirmDialog({ isOpen: true, targetId: id });
+  };
 
-      fetchUsers();
+  // --- Confirm deletion
+  const confirmDelete = async () => {
+    const { targetId } = confirmDialog;
+    setConfirmDialog({ isOpen: false, targetId: '' });
+    try {
+      const toastId = toast.loading('Deleting user...');
+      await apiClient.delete(`/users/${targetId}`);
+      toast.success('User Deleted Successfully!', { id: toastId });
+      await fetchUsers();
     } catch {
       setPageError('Failed to delete user.');
+      toast.error('Failed to delete user.');
     }
   };
+
 
   const handleCopyAll = () => {
     if (!users.length) {
@@ -293,6 +306,15 @@ useEffect(() => {
             </table>
           </div>
         </Card>
+         <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete User"
+        message="Are you sure you want to delete this user? This action cannot be undone."
+        confirmLabel="Yes, Delete"
+        cancelLabel="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDialog({ isOpen: false, targetId: '' })}
+      />
       </div>
 
       {/* --- Error Modal --- */}

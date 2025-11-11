@@ -25,26 +25,26 @@ export default function HeroSection() {
 
       {/* Hero Content */}
       <motion.div
-        className="z-20 relative px-8 sm:px-16 py-20 max-w-4xl mx-auto backdrop-blur-lg mt-12"
+        className="z-20 relative px-8 sm:px-16 py-20 max-w-full  mx-auto backdrop-blur-lg mt-15 h-[80%]"
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.8 }}
       >
-
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-blue-900 drop-shadow mb-6 mt-5"
+          className="text-7xl sm:text-5xl md:text-6xl font-extrabold text-blue-900 drop-shadow mb-6 mt-5"
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.7 }}
         >
-          {/* Institutional Framework<span className="text-pink-600">Institutional Framework for Quality Enhancement</span> */}
-          <h1 className='text-pink-600'>Institutional Framework for Quality Enhancement</h1>
+          Institutional Framework for{' '}
+          <span className="text-pink-600">Quality Enhancement</span>
         </motion.h1>
-        <h2 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-6">
+
+        <h2 className="text-5xl sm:text-3xl font-bold text-blue-700 mb-6">
           Redefining Academic Excellence
         </h2>
         <motion.p
-          className="text-lg text-gray-700 font-medium mb-12 max-w-xl mx-auto"
+          className="text-xl text-gray-700 font-medium mb-12 max-w-xl mx-auto"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.7 }}
