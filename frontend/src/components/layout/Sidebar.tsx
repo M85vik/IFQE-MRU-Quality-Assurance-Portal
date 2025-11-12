@@ -115,4 +115,4 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
   );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);

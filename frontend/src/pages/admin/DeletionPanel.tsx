@@ -127,16 +127,16 @@ const DeletionPanel: React.FC = () => {
       <Card className="p-0">
         <div className="px-6 py-4 border-b border-border bg-muted/70 rounded-t-lg">
           <h2 className="text-xl font-semibold">Submissions ({selectedYear})</h2>
-          <p className="text-sm text-muted-foreground">Permanently delete submissions and all S3 files.</p>
+          <p className="text-base text-muted-foreground">Permanently delete submissions and all S3 files.</p>
         </div>
         {renderTable()}
       </Card>
 
       {targetSubmission && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-lg shadow-lg p-6 max-w-md w-full space-y-4">
-            <h3 className="text-lg font-semibold text-red-600">Confirm Deletion</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="bg-card rounded-lg shadow-lg p-6 max-w-3xl w-full space-y-4">
+            <h3 className="text-2xl font-semibold text-red-600">Confirm Deletion</h3>
+            <p className="text-base text-muted-foreground">
               To confirm deletion of <strong>{targetSubmission.title}</strong>, type its exact title below:
             </p>
             <input

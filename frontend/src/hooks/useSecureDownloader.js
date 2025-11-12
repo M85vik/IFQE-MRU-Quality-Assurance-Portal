@@ -11,23 +11,23 @@ const useSecureDownloader = () => {
             setError('No file to download.');
             return;
         }
-        
+
         setIsDownloading(true);
         setError(null);
-        
+
         try {
 
             //archive download fix 
             // const { data } = await apiClient.get(`/files/download-url?fileKey=${fileKey}`);
-             const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}`);
+            const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}`);
             if (data && data.downloadUrl) {
-                
+
                 const link = document.createElement('a');
                 link.href = data.downloadUrl;
 
                 const name = fileKey.split('/').pop() || fileName;
                 link.setAttribute('download', name);
-
+              
                 document.body.appendChild(link);
 
                 link.click();
@@ -43,7 +43,7 @@ const useSecureDownloader = () => {
             console.error("Download failed:", errorMessage);
             setError(errorMessage);
             // alert(`Download failed: ${errorMessage}`);
-                toast.error(`Download failed: ${errorMessage}`)
+            toast.error(`Download failed: ${errorMessage}`)
         } finally {
             setIsDownloading(false);
         }

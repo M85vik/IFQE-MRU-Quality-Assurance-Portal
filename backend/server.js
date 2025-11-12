@@ -4,9 +4,11 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const apiMetricsMiddleware = require('./middleware/apiMetrics');
 
 dotenv.config();
 connectDB();
+
 
 const app = express();
 
@@ -18,6 +20,7 @@ app.use(cors({ origin:[FRONTEND_URL] }));
 
 app.use(express.json());
 
+app.use(apiMetricsMiddleware); // 👈 Add here before routes
 app.get('/', (req, res) => {
   res.send('IFQE Portal API is running...');
 });
@@ -34,5 +37,10 @@ app.use('/api/submission-windows', require('./routes/submissionWindowRoutes'));
 
 app.use('/api/announcements', require('./routes/announcementRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
+
+app.use('/api/dev', require('./routes/devRoutes'));
+app.use('/api/metrics', require('./routes/metricsRoutes'));
+app.use('/api/system', require('./routes/systemRoutes'));
+
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

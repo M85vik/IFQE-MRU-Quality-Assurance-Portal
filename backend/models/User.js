@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
    */
   role: {
     type: String,
-    enum: ['department', 'qaa', 'admin', 'superuser'],
+    enum: ['department', 'qaa', 'admin', 'superuser', 'developer'],
     required: true,
   },
   /** A reference to the department the user belongs to (if applicable). */

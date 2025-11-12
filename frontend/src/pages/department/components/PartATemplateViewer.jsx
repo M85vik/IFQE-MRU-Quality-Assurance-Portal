@@ -6,7 +6,7 @@ import { Download, FileText } from 'lucide-react';
 const PartATemplateViewer = () => {
     const { downloadFile, isDownloading } = useSecureDownloader();
   
-    const templateFileKey = 'templates/PartA_Executive_Summary_Template.docx';
+    const templateFileKey = 'templates/PartA_Template.xlsx';
 
     const templateSections = [
         { code: "1", title: "About the University (Word limit: 350-500 words)" },
