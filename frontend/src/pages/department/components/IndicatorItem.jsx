@@ -132,7 +132,7 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
             {indicator.requiresEvidenceLink && (
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
-                  Upload Evidence Link Document
+                  Upload Evidence Document
                 </label>
                 <FileUploader
                   submissionId={submission._id}

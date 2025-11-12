@@ -13,6 +13,27 @@ const crypto = require('crypto'); // Used for generating secure random filenames
 const s3Client = require('../config/s3Client'); // The configured S3 client instance.
 const Submission = require('../models/Submission');
 const SubmissionWindow = require('../models/SubmissionWindow');
+const S3Metric = require('../models/S3Metric');
+
+
+
+
+const logS3Metric = async (operation, user, fileKey, fileSizeBytes = 0) => {
+  try {
+    const fileSizeMB = +(fileSizeBytes / (1024 * 1024)).toFixed(2);
+    await S3Metric.create({
+      operation,
+      userId: user._id,
+      fileKey,
+      fileSizeMB
+    });
+  } catch (err) {
+    console.error("Failed to record S3 metric:", err.message);
+  }
+};
+
+
+
 
 /**
  * Generates a cryptographically random string to be used as a filename.
@@ -103,6 +124,11 @@ const getUploadUrl = async (req, res) => {
     // getSignedUrl creates the temporary, secure URL. It's valid for 300 seconds (5 minutes).
     const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
 
+
+
+      await logS3Metric("PUT", user, key);
+
+
     // --- 4. Send the URL and Key to the Client ---
     // The client will use 'uploadUrl' to PUT the file, and then send the 'fileKey' back
     // to another endpoint to be saved in the MongoDB submission document.
@@ -135,10 +161,13 @@ const getDownloadUrl = async (req, res) => {
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,
       Key: fileKey,
+       ResponseContentDisposition: 'attachment', // forces download
     });
 
     try {
       const downloadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+       await logS3Metric("GET", user, fileKey);
+     
       return res.json({ downloadUrl }); // ✅ Return immediately after responding
     } catch (error) {
       console.error('Could not generate template download URL:', error);
@@ -175,10 +204,12 @@ const getDownloadUrl = async (req, res) => {
   const command = new GetObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileKey,
+     ResponseContentDisposition: 'attachment', // forces download
   });
 
   try {
     const downloadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+      await logS3Metric("GET", user, fileKey);
     res.json({ downloadUrl });
   } catch (error) {
     console.error("Error generating S3 download URL:", error);
@@ -225,6 +256,7 @@ const deleteFile = async (req, res) => {
 
     try {
         await s3Client.send(command);
+          await logS3Metric("DELETE", user, fileKey);
         res.json({ message: 'File deleted successfully.' });
     } catch (error) {
         console.error("S3 Deletion Error:", error);

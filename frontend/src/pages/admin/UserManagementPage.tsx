@@ -222,6 +222,7 @@ useEffect(() => {
                   <option value="qaa">QAA Reviewer</option>
                   <option value="superuser">Superuser</option>
                   <option value="admin">Admin</option>
+                    <option value="developer">Developer</option>
                 </select>
               </div>
 
@@ -289,6 +290,7 @@ useEffect(() => {
                         <option value="qaa">qaa</option>
                         <option value="superuser">superuser</option>
                         <option value="admin">admin</option>
+                        <option value="developer">Developer</option>
                       </select>
                     </td>
 

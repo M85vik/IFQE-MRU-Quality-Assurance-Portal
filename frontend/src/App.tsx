@@ -36,18 +36,20 @@ import CriterionDetailPage from './pages/website/CriterionDetailPage';
 import DevelopingTeamPage from './pages/website/DevelopingTeamPage';
 import FacultyTeamPage from './pages/website/FacultyTeamPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage.jsx';
-import {Toaster} from 'react-hot-toast'
+import DeveloperDashboard from './pages/dev/DeveloperDashboard';
+import { Toaster } from 'react-hot-toast'
 const AppRootRedirector = () => {
-    const { userInfo } = useAuthStore();
-    if (!userInfo) return <Navigate to="/login" replace />;
+  const { userInfo } = useAuthStore();
+  if (!userInfo) return <Navigate to="/login" replace />;
 
-    switch (userInfo.role) {
-        case 'department': return <Navigate to="/app/department/dashboard" replace />;
-        case 'qaa': return <Navigate to="/app/qaa/dashboard" replace />;
-        case 'admin': return <Navigate to="/app/admin/dashboard" replace />;
-        case 'superuser': return <Navigate to="/app/superuser/approval-queue" replace />;
-        default: return <Navigate to="/unauthorized" replace />;
-    }
+  switch (userInfo.role) {
+    case 'department': return <Navigate to="/app/department/dashboard" replace />;
+    case 'qaa': return <Navigate to="/app/qaa/dashboard" replace />;
+    case 'admin': return <Navigate to="/app/admin/dashboard" replace />;
+    case 'superuser': return <Navigate to="/app/superuser/approval-queue" replace />;
+    case 'developer': return <Navigate to="/app/developer/dashboard" replace />;
+    default: return <Navigate to="/unauthorized" replace />;
+  }
 };
 
 function App() {
@@ -62,32 +64,32 @@ function App() {
         <Route path="/leadership-messages" element={<LeadershipMessagesPage />} />
         <Route path="/criteria" element={<CriteriaOverviewPage />} />
         <Route path="/criteria/:criterionId" element={<CriterionDetailPage />} />
-        <Route path="/developing-team" element={<DevelopingTeamPage />} /> 
+        <Route path="/developing-team" element={<DevelopingTeamPage />} />
         <Route path="/faculty-team" element={<FacultyTeamPage />} />
-        
+
         {/* --- Authentication & System Routes --- */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        
+
         {/* --- Protected Portal Application Routes --- */}
         <Route path="/app" element={<PrivateRoute />}>
           <Route element={<MainLayout />}>
             <Route index element={<AppRootRedirector />} />
-            
+
             <Route path="department/dashboard" element={<DepartmentDashboard />} />
             <Route path="department/submission/:id" element={<SubmissionForm />} />
             <Route path="department/appeal/:id" element={<AppealPage />} />
-            <Route path="department/appeals" element={<AppealDashboard />} />   
+            <Route path="department/appeals" element={<AppealDashboard />} />
             <Route path="department/archives" element={<ArchivesPage />} />
 
             <Route path="qaa/dashboard" element={<QaaDashboard />} />
             <Route path="qaa/review/:id" element={<ReviewSubmission />} />
-            
+
             <Route path="superuser/dashboard" element={<Navigate to="/app/superuser/approval-queue" replace />} />
             <Route path="superuser/approval-queue" element={<SuperuserDashboard queueType="approval" />} />
             <Route path="superuser/appeal-queue" element={<SuperuserDashboard queueType="appeal" />} />
             <Route path="superuser/review/:id" element={<FinalReviewPage />} />
-            
+
             <Route path="admin/dashboard" element={<AdminDashboard />} />
             <Route path="admin/comparison" element={<AnalyticsComparisonPage />} />
             <Route path="admin/users" element={<UserManagementPage />} />
@@ -95,15 +97,22 @@ function App() {
             <Route path="admin/content" element={<ManageContentPage />} />
             <Route path="admin/deletion" element={<DeletionPanel />} />
             <Route path="admin/activity-logs" element={<ActivityLogPage />} />
+            <Route path="developer/dashboard" element={<DeveloperDashboard />} />
 
 
           </Route>
         </Route>
-        
+
         {/* --- Catch-all 404 Route --- */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <Toaster/>
+      <Toaster  toastOptions={{
+          style: {
+            fontSize: '18px',
+            padding: '16px 24px',
+            minWidth: '350px',
+          },
+        }} />
     </Router>
   );
 }
