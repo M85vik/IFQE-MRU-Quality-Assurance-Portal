@@ -3,6 +3,7 @@ import apiClient from '../../api/axiosConfig';
 import Card from '../../components/shared/Card';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
+import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Alert from '../../components/shared/Alert';
 import { Trash2, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -23,7 +24,7 @@ const DeletionPanel: React.FC = () => {
   const [error, setError] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [targetSubmission, setTargetSubmission] = useState<Submission | null>(null);
-
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const availableYears = ['2025-2026', '2024-2025', '2023-2024'];
 
   useEffect(() => {
@@ -43,28 +44,33 @@ const DeletionPanel: React.FC = () => {
     }
   };
 
-  const handleDelete = async () => {
+ const handleRequestDelete = (submission: Submission) => {
+    setTargetSubmission(submission);
+    setConfirmation('');
+    setShowConfirmDialog(true);
+  };
+
+  // ✅ Called when confirmed from dialog
+  const handleConfirmDelete = async () => {
     if (!targetSubmission) return;
     if (confirmation !== targetSubmission.title) {
-      // alert('Entered name does not match. Deletion cancelled.');
-      toast('Entered name does not match. Deletion cancelled.', { icon: '⚠️' });
-
+      toast.error('Entered title does not match. Deletion cancelled.');
       return;
     }
 
-    if (!window.confirm('This will permanently delete this submission and all related files. Continue?')) return;
-
     try {
       await apiClient.delete(`/submissions/${targetSubmission._id}`);
-      // alert('Submission deleted successfully.');
-         toast.success('Submission Deleted Successfully!');
-      setSubmissions(submissions.filter(s => s._id !== targetSubmission._id));
+      toast.success('Submission deleted successfully!');
+      setSubmissions((prev) => prev.filter((s) => s._id !== targetSubmission._id));
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to delete submission.');
+    } finally {
+      setShowConfirmDialog(false);
       setTargetSubmission(null);
       setConfirmation('');
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to delete submission.');
     }
   };
+
 
   const renderTable = () => {
     if (isLoading) return <div className="p-6"><Spinner /></div>;
@@ -95,7 +101,7 @@ const DeletionPanel: React.FC = () => {
                     variant="outline"
                     size="sm"
                     className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
-                    onClick={() => setTargetSubmission(sub)}
+                     onClick={() => handleRequestDelete(sub)} 
                   >
                     <Trash2 size={16} className="mr-2" /> Delete
                   </Button>
@@ -132,34 +138,39 @@ const DeletionPanel: React.FC = () => {
         {renderTable()}
       </Card>
 
-      {targetSubmission && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-lg shadow-lg p-6 max-w-3xl w-full space-y-4">
-            <h3 className="text-2xl font-semibold text-red-600">Confirm Deletion</h3>
-            <p className="text-base text-muted-foreground">
-              To confirm deletion of <strong>{targetSubmission.title}</strong>, type its exact title below:
+     
+       <ConfirmDialog
+        isOpen={showConfirmDialog}
+        title="Confirm Permanent Deletion"
+        message={
+          <>
+            <p>
+              You are about to <strong className="text-red-600">permanently delete</strong> the
+              submission:
+            </p>
+            <p className="mt-1 text-lg font-semibold text-foreground">
+              {targetSubmission?.title}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Type the exact title below to confirm:
             </p>
             <input
-              className="w-full border p-2 rounded-md"
+              className="w-full mt-2 border p-2 rounded-md"
               placeholder="Enter submission title"
               value={confirmation}
               onChange={(e) => setConfirmation(e.target.value)}
             />
-            <div className="flex justify-end gap-3">
-              <Button variant="secondary" onClick={() => setTargetSubmission(null)}>
-                Cancel
-              </Button>
-              <Button
-                variant="outline"
-                className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
-                onClick={handleDelete}
-              >
-                Delete Permanently
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          </>
+        }
+        confirmLabel="Delete Permanently"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          setShowConfirmDialog(false);
+          setTargetSubmission(null);
+          setConfirmation('');
+        }}
+      />
     </div>
   );
 };

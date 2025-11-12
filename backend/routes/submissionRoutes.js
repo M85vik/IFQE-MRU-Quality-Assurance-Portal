@@ -94,6 +94,8 @@ router.route('/:id')
    *          submission owner (department) and reviewers (qaa, admin, superuser) to access it.
    */
   .get(protect, getSubmissionById)
+
+  
   /**
    * @route   PUT /api/submissions/:id
    * @desc    Updates a single submission. The specific update logic is highly role-dependent.
