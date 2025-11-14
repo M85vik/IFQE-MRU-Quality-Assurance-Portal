@@ -20,7 +20,7 @@ const leaders = [
     name: 'Prof. (Dr.) Deepa Arora',
     title: 'Director, Quality Assurance & Accreditation',
     message: "The IFQE is more than a mechanism for evaluation; it's a testament to our university's allegiance to quality. This structured, dual-approach model empowers us to make data-informed decisions while valuing the rich academic experiences across our institution.",
-    imageUrl: './portraits/Dr.Deepa.png',
+    imageUrl: './portraits/Deepa-Arora.jpg',
   },
 ];
 

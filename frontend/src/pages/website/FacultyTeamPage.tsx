@@ -11,7 +11,7 @@ const committee = [
     department: 'Quality Assurance & Accreditation, MRU',
     linkedin: 'https://www.linkedin.com/in/dr-deepa-arora-4466881a5?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app',
     email: 'iqac@mru.edu.in',
-    imageUrl: '/portraits/Dr.Deepa.png',
+    imageUrl: '/portraits/Deepa-Arora.jpg',
   },
   {
     name: 'Dr. Prashant Bhardwaj',
