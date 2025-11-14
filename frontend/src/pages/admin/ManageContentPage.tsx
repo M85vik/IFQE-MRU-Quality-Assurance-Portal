@@ -26,7 +26,7 @@ const ManageContentPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [formData, setFormData] = useState({
-        category: 'Workshop',
+        category: 'Announcement',
         title: '',
         summary: '',
         details: '',
@@ -139,7 +139,7 @@ const ManageContentPage: React.FC = () => {
 
 
     const resetForm = () => {
-        setFormData({ category: 'Workshop', title: '', summary: '', details: '', date: '', color: 'blue', isActive: true });
+        setFormData({ category: 'Announcement', title: '', summary: '', details: '', date: '', color: 'blue', isActive: true });
         setEditingId(null);
         setError('');
     };
@@ -158,7 +158,7 @@ const ManageContentPage: React.FC = () => {
                             <div>
                                 <label htmlFor="category" className="block text-sm font-medium text-muted-foreground mb-1">Category</label>
                                 <select id="category" name="category" value={formData.category} onChange={handleFormChange} className="w-full p-2 border border-input bg-background rounded-md">
-                                    <option value="Workshop">Workshop</option>
+                                    <option value="Announcement">Announcement</option>
                                     <option value="Deadline">Deadline</option>
                                     <option value="System Update">System Update</option>
                                     <option value="Result">Result</option>

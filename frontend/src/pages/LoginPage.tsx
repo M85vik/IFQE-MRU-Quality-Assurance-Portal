@@ -81,7 +81,11 @@ const LoginPage: React.FC = () => {
                                 </Button>
                             </div>
                         </form>
+                          <div className='text-center  rounded-xl text-slate-500 '>
+                        <button onClick={()=>  navigate('/')}>Back to Homepage</button>
                     </div>
+                    </div>
+                  
                 </motion.div>
             </div>
 

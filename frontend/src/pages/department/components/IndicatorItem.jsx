@@ -116,7 +116,7 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
             {/* Upload Main Document */}
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-1">
-                Upload Main Document
+                Upload Data Template
               </label>
               <FileUploader
                 submissionId={submission._id}
