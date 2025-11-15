@@ -10,7 +10,7 @@ const AnnouncementSchema = new mongoose.Schema({
     /** The category of the announcement, used for filtering or display styling. */
     category: {
         type: String,
-        enum: ['Workshop', 'Deadline', 'System Update', 'Result'],
+        enum: ['Announcement', 'Deadline', 'System Update', 'Result'],
         required: true
     },
     /** The main title of the announcement. */

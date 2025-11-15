@@ -40,6 +40,15 @@ const ActivityLogPage = () => {
     return () => clearInterval(interval);
   }, [year]);
 
+ 
+
+const roleColors = {
+  admin: 'bg-red-100 text-red-700',
+  superuser: 'bg-purple-100 text-purple-800',
+  qaa: 'bg-green-100 text-green-800',
+  developer: 'bg-amber-200 text-amber-600',
+};
+
   // --- Search Filter ---
   useEffect(() => {
     const filtered = logs.filter(log =>
@@ -118,10 +127,12 @@ const ActivityLogPage = () => {
 
                   <td className="px-6 py-3 text-sm text-muted-foreground">
                     <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                      log.user?.role === 'admin' ? 'bg-blue-100 text-blue-800' :
-                      log.user?.role === 'superuser' ? 'bg-purple-100 text-purple-800' :
-                      log.user?.role === 'qaa' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
+                      // log.user?.role === 'admin' ? 'bg-red-100 text-red-700' :
+                      // log.user?.role === 'superuser' ? 'bg-purple-100 text-purple-800' :
+                      // log.user?.role === 'qaa' ? 'bg-green-100 text-green-800' :
+                      // log.user?.role==='developer'? 'bg-amber-200 text-amber-600' :
+                      // 'bg-blue-100  text-blue-800'
+                        roleColors[log.user?.role] || 'bg-blue-100 text-blue-800'
                     }`}>
                       {log.user?.role || '-'}
                     </span>
