@@ -41,8 +41,19 @@ const createAnnouncement = async (req, res) => {
             date,
             color,
         });
+        
 
         const createdAnnouncement = await announcement.save();
+      
+        
+        // try {
+        //     const created = await announcement.save();
+        //     console.log("Created:", created);
+        // } catch (err) {
+        //     console.error("Mongoose Error:", err);
+        // }
+
+
         const now = new Date();
         const year = now.getFullYear(); // e.g., 2025
         const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
@@ -52,7 +63,7 @@ const createAnnouncement = async (req, res) => {
                 user,
                 'Create Announcement',
                 `Announcement ID: ${announcement._id}, Department: NA`,
-                   `created ${academicYear}`,
+                `created ${academicYear}`,
                 req.ip
             );
         } catch (logError) {
@@ -70,7 +81,7 @@ const createAnnouncement = async (req, res) => {
 // @access  Private/Admin
 const updateAnnouncement = async (req, res) => {
     const { category, title, summary, details, date, color, isActive } = req.body;
-    const user= req.user;
+    const user = req.user;
     try {
         const announcement = await Announcement.findById(req.params.id);
 
@@ -94,7 +105,7 @@ const updateAnnouncement = async (req, res) => {
                     user,
                     'Update Announcement',
                     `Announcement ID: ${announcement._id}, Department: NA`,
-                     `created ${academicYear}`,
+                    `created ${academicYear}`,
                     req.ip
                 );
             } catch (logError) {
@@ -116,7 +127,7 @@ const updateAnnouncement = async (req, res) => {
 const deleteAnnouncement = async (req, res) => {
     try {
         const announcement = await Announcement.findById(req.params.id);
-        const user=req.user;
+        const user = req.user;
         if (announcement) {
             await announcement.deleteOne();
             const now = new Date();
