@@ -19,7 +19,7 @@ if(!FRONTEND_URL) throw new Error("Front URL Environment Varibale Not loaded.");
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://ifqe-mru-qa-portal.netlify.app',
-  'http://localhost:5001'
+  'http://localhost:5173'
 ];
 
 app.use(cors({
