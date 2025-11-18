@@ -16,7 +16,25 @@ const app = express();
 const FRONTEND_URL= process.env.FRONTEND_URL
 if(!FRONTEND_URL) throw new Error("Front URL Environment Varibale Not loaded.");
 
-app.use(cors({ origin:[FRONTEND_URL] }));
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://ifqe-mru-qa-portal.netlify.app',
+  'http://localhost:5001'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS: " + origin));
+    }
+  },
+  credentials: true // if sending cookies or auth headers
+}));
 
 app.use(express.json());
 
