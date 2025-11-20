@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  LineChart, Line, CartesianGrid
 } from 'recharts';
-import { Cpu, Database, Server, Cloud, Activity } from 'lucide-react';
+import { Cpu, Database, Server, Cloud, Activity, Trash2 } from 'lucide-react';
 import CountUp from 'react-countup';
 import apiClient from '../../api/axiosConfig';
 
@@ -48,6 +49,9 @@ const DeveloperDashboard: React.FC = () => {
   const [s3Data, setS3Data] = useState<any[]>([]);
   const [health, setHealth] = useState({ cpu: 0, mem: 0, uptime: 0 });
 
+  /* ---------------------------------------------------- */
+  /* Fetch all metrics */
+  /* ---------------------------------------------------- */
   const fetchMetrics = useCallback(async () => {
     try {
       const [summaryRes, chartsRes, systemRes] = await Promise.all([
@@ -56,10 +60,21 @@ const DeveloperDashboard: React.FC = () => {
         apiClient.get('/system/health'),
       ]);
 
-      setSummary(summaryRes.data.summary || {});
+      const sum = summaryRes.data?.summary || {};
+
+      setSummary({
+        totalRoutes: sum.totalRoutes,
+        totalRequests: sum.totalRequests,
+        totalS3Ops: sum.totalS3Ops,
+        uploads: sum.uploads,
+        downloads: sum.downloads,
+        deletes: sum.deletes,
+        uptime: sum.uptime
+      });
+
       setApiData(chartsRes.data.apiChart || []);
       setS3Data(chartsRes.data.s3Chart || []);
-      setHealth(systemRes.data);
+      setHealth(systemRes.data || { cpu: 0, mem: 0, uptime: 0 });
     } catch (err) {
       console.error('Failed to load developer metrics:', err);
     }
@@ -67,21 +82,16 @@ const DeveloperDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchMetrics();
-    const interval = setInterval(fetchMetrics, 60000); // refresh every 60 seconds
+    const interval = setInterval(fetchMetrics, 60000);
     return () => clearInterval(interval);
   }, [fetchMetrics]);
 
   return (
     <div className="p-8 space-y-10 bg-gray-50 min-h-screen">
+
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
-          Developer Dashboard
-        </h1>
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">Developer Dashboard</h1>
         <p className="text-gray-500 mt-2">
           Monitor API performance, S3 usage, and real-time system health — all in one place.
         </p>
@@ -94,20 +104,15 @@ const DeveloperDashboard: React.FC = () => {
         <StatCard icon={Database} label="Total S3 Ops" value={summary.totalS3Ops} color="bg-indigo-600" />
         <StatCard icon={Cloud} label="Uploads" value={summary.uploads} color="bg-emerald-500" />
         <StatCard icon={Cloud} label="Downloads" value={summary.downloads} color="bg-pink-500" />
-        <StatCard icon={Server} label="System Uptime (hrs)" value={summary.uptime} color="bg-orange-500" />
-
+        <StatCard icon={Trash2} label="Deletes" value={summary.deletes} color="bg-red-500" />
       </div>
 
-
-      {/* Charts */}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
         {/* API Route Performance */}
-        <motion.div
-          className="bg-white rounded-xl shadow p-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <motion.div className="bg-white rounded-xl shadow p-6"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <h2 className="text-lg font-semibold mb-4 text-gray-800 flex items-center">
             <Activity className="mr-2 text-blue-500" /> API Route Performance
           </h2>
@@ -123,15 +128,11 @@ const DeveloperDashboard: React.FC = () => {
           <p className="text-xs text-gray-500 mt-2 text-right">Average response time per API route</p>
         </motion.div>
 
-        {/* S3 Operations */}
-        <motion.div
-          className="bg-white rounded-xl shadow p-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
+        {/* S3 Operations Chart */}
+        <motion.div className="bg-white rounded-xl shadow p-6"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <h2 className="text-lg font-semibold mb-4 text-gray-800 flex items-center">
-            <Cloud className="mr-2 text-indigo-500" /> S3 Uploads vs Downloads
+            <Cloud className="mr-2 text-indigo-500" /> S3 Uploads / Downloads / Deletes
           </h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={s3Data}>
@@ -141,19 +142,17 @@ const DeveloperDashboard: React.FC = () => {
               <Tooltip />
               <Line type="monotone" dataKey="uploads" stroke="#22c55e" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="downloads" stroke="#f97316" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="deletes" stroke="#ef4444" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
           <p className="text-xs text-gray-500 mt-2 text-right">Monthly S3 operation trends</p>
         </motion.div>
+
       </div>
 
       {/* System Health */}
-      <motion.div
-        className="bg-white rounded-xl shadow p-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
+      <motion.div className="bg-white rounded-xl shadow p-6"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
         <h2 className="text-lg font-semibold mb-4 text-gray-800 flex items-center">
           <Cpu className="mr-2 text-green-500" /> System Health
         </h2>
@@ -162,23 +161,19 @@ const DeveloperDashboard: React.FC = () => {
             <HealthBar label="CPU Usage" percent={health.cpu} color="bg-green-500" />
             <HealthBar label="Memory Usage" percent={health.mem} color="bg-blue-500" />
           </div>
+
           <div className="text-right">
             <p className="text-gray-700 font-medium">Uptime</p>
             <h3 className="text-3xl font-bold text-gray-900 mt-1">
               <CountUp end={health.uptime} duration={1.2} /> hrs
             </h3>
-            <p className="text-gray-500 text-sm mt-1">Approximate system runtime</p>
           </div>
         </div>
       </motion.div>
 
-      {/* API Route Metrics Table (Full View) */}
-      <motion.div
-        className="bg-white rounded-xl shadow p-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55 }}
-      >
+      {/* API routes table */}
+      <motion.div className="bg-white rounded-xl shadow p-6"
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
         <h2 className="text-lg font-semibold mb-4 text-gray-800 flex items-center">
           <Activity className="mr-2 text-pink-500" /> All API Routes
         </h2>
@@ -199,64 +194,35 @@ const DeveloperDashboard: React.FC = () => {
               </thead>
               <tbody>
 
+                {[...apiData].sort((a, b) => b.hits - a.hits).map((item, index) => (
+                  <tr key={index} className={`hover:bg-gray-50 transition ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                    <td className="px-4 py-3 text-gray-800 font-mono text-base break-all">{item.route}</td>
+                    <td className="px-4 py-3 text-center font-semibold text-gray-700">{item.hits}</td>
 
-                {[...apiData]
-                  .sort((a, b) => b.hits - a.hits)
-                  .map((item, index) => (
-                    <tr
-                      key={index}
-                      className={`hover:bg-gray-50 transition ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                        }`}
-                    >
-                      {/* Full route path — no truncation */}
-                      <td className="px-4 py-3 text-gray-800 font-mono text-base break-all">
-                        {item.route}
-                      </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`font-semibold ${
+                        item.avgTime > 1000 ? 'text-red-500' :
+                        item.avgTime > 400 ? 'text-yellow-500' : 'text-green-600'
+                      }`}>
+                        {item.avgTime} ms
+                      </span>
+                    </td>
 
-                      {/* Hits */}
-                      <td className="px-4 py-3 text-center font-semibold text-gray-700">
-                        {item.hits}
-                      </td>
+                    <td className="px-4 py-3 text-center">
+                      {item.avgTime > 1000 ? (
+                        <span className="px-2 py-1 bg-red-100 text-red-700 text-base rounded-md">Slow</span>
+                      ) : item.avgTime > 400 ? (
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-base rounded-md">Moderate</span>
+                      ) : (
+                        <span className="px-2 py-1 bg-green-100 text-green-700 text-base rounded-md">Fast</span>
+                      )}
+                    </td>
 
-                      {/* Avg Response (color-coded) */}
-                      <td className="px-4 py-3 text-center">
-                        <span
-                          className={`font-semibold ${item.avgTime > 1000
-                            ? 'text-red-500'
-                            : item.avgTime > 400
-                              ? 'text-yellow-500'
-                              : 'text-green-600'
-                            }`}
-                        >
-                          {item.avgTime} ms
-                        </span>
-                      </td>
-
-                      {/* Performance status */}
-                      <td className="px-4 py-3 text-center">
-                        {item.avgTime > 1000 ? (
-                          <span className="px-2 py-1 bg-red-100 text-red-700 text-base rounded-md">
-                            Slow
-                          </span>
-                        ) : item.avgTime > 400 ? (
-                          <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-base rounded-md">
-                            Moderate
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 bg-green-100 text-green-700 text-base rounded-md">
-                            Fast
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Timestamp */}
-                      <td className="px-4 py-3 text-center text-gray-500 text-base">
-                        {item.updatedAt
-                          ? new Date(item.updatedAt).toLocaleString()
-                          : '—'}
-                      </td>
-                    </tr>
-                  ))}
+                    <td className="px-4 py-3 text-center text-gray-500 text-base">
+                      {item.updatedAt ? new Date(item.updatedAt).toLocaleString() : '—'}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -266,7 +232,6 @@ const DeveloperDashboard: React.FC = () => {
           Showing all recorded API endpoints and performance metrics
         </p>
       </motion.div>
-
 
     </div>
   );
