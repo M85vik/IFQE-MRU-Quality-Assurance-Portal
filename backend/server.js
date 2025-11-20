@@ -60,5 +60,7 @@ app.use('/api/dev', require('./routes/devRoutes'));
 app.use('/api/metrics', require('./routes/metricsRoutes'));
 app.use('/api/system', require('./routes/systemRoutes'));
 
+app.use("/api/announcement-email",require("./routes/announcementEmailRoutes"));
+
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

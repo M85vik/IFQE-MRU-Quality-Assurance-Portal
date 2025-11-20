@@ -56,6 +56,18 @@ const ManageContentPage: React.FC = () => {
         fetchAnnouncements();
     }, []);
 
+
+    const sendAnnouncementEmail = async (id: string) => {
+        try {
+            const toastId = toast.loading("Sending emails...");
+            const { data } = await apiClient.post(`/announcement-email/send/${id}`);
+            toast.success(data.message, { id: toastId });
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || "Email sending failed.");
+        }
+    };
+
+
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
         if (type === 'checkbox') {
@@ -105,37 +117,28 @@ const ManageContentPage: React.FC = () => {
         window.scrollTo(0, 0);
     };
 
-    // const handleDelete = async (id: string) => {
-    //     if (window.confirm('Are you sure you want to delete this announcement?')) {
-    //         try {
-    //             await apiClient.delete(`/announcements/${id}`);
-    //             await fetchAnnouncements();
-    //         } catch (err: any) {
-    //             setError(err.response?.data?.message || 'Could not delete announcement.');
-    //         }
-    //     }
-    // };
+
 
     const handleDelete = (id: string) => {
-    setConfirmDialog({ isOpen: true, targetId: id });
-  };
+        setConfirmDialog({ isOpen: true, targetId: id });
+    };
 
-  // 👇 Executes after confirmation
-  const confirmDelete = async () => {
-    const { targetId } = confirmDialog;
-    setConfirmDialog({ isOpen: false, targetId: '' });
+    // 👇 Executes after confirmation
+    const confirmDelete = async () => {
+        const { targetId } = confirmDialog;
+        setConfirmDialog({ isOpen: false, targetId: '' });
 
-    try {
-      const toastId = toast.loading('Deleting announcement...');
-      await apiClient.delete(`/announcements/${targetId}`);
-      toast.success('Announcement deleted successfully!', { id: toastId });
-      await fetchAnnouncements();
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Could not delete announcement.';
-      setError(errorMessage);
-      toast.error(errorMessage);
-    }
-  };
+        try {
+            const toastId = toast.loading('Deleting announcement...');
+            await apiClient.delete(`/announcements/${targetId}`);
+            toast.success('Announcement deleted successfully!', { id: toastId });
+            await fetchAnnouncements();
+        } catch (err: any) {
+            const errorMessage = err.response?.data?.message || 'Could not delete announcement.';
+            setError(errorMessage);
+            toast.error(errorMessage);
+        }
+    };
 
 
     const resetForm = () => {
@@ -189,6 +192,9 @@ const ManageContentPage: React.FC = () => {
                             <div className="flex space-x-2">
                                 <Button type="submit" isLoading={isSubmitting}>{editingId ? 'Update' : 'Create'}</Button>
                                 {editingId && <Button type="button" variant="secondary" onClick={resetForm}>Cancel</Button>}
+
+
+                                
                             </div>
                         </div>
                     </form>
@@ -220,9 +226,17 @@ const ManageContentPage: React.FC = () => {
                                                     {ann.isActive ? 'Active' : 'Inactive'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                                <Button variant="outline" size="sm" onClick={() => handleEdit(ann)}><Edit size={14} /></Button>
-                                                <Button variant="outline" size="sm" onClick={() => handleDelete(ann._id)} className="text-destructive border-destructive/50 hover:bg-destructive/10"><Trash2 size={14} /></Button>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right  text-sm font-medium space-x-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => sendAnnouncementEmail(ann._id)}
+                                                    className="text-blue-600 border-blue-300 gap-1 hover:bg-blue-50"
+                                                >
+                                                    <Megaphone size={14} /> Email
+                                                </Button>
+                                                <Button variant="outline" size="sm" className='gap-1' onClick={() => handleEdit(ann)}><Edit size={14}  /> Edit</Button>
+                                                <Button variant="outline" size="sm" onClick={() => handleDelete(ann._id)} className="text-destructive border-destructive/50 hover:bg-destructive/10 gap-1"><Trash2 size={14} />Delete</Button>
                                             </td>
                                         </tr>
                                     ))}
@@ -233,15 +247,15 @@ const ManageContentPage: React.FC = () => {
                 </div>
             </Card>
 
-              <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        title="Delete Announcement"
-        message="Are you sure you want to delete this announcement? This action cannot be undone."
-        confirmLabel="Yes, Delete"
-        cancelLabel="Cancel"
-        onConfirm={confirmDelete}
-        onCancel={() => setConfirmDialog({ isOpen: false, targetId: '' })}
-      />
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                title="Delete Announcement"
+                message="Are you sure you want to delete this announcement? This action cannot be undone."
+                confirmLabel="Yes, Delete"
+                cancelLabel="Cancel"
+                onConfirm={confirmDelete}
+                onCancel={() => setConfirmDialog({ isOpen: false, targetId: '' })}
+            />
         </div>
     );
 };
