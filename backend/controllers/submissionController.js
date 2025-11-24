@@ -447,17 +447,24 @@ const getMyDepartmentSubmissions = async (req, res) => {
 const getSubmissionsForReview = async (req, res) => {
     try {
         const { academicYear, school, department } = req.query;
+
+           const reviewerSchool = req.user?.school;
+
+        if (!reviewerSchool) {
+            return res.status(403).json({ message: "Reviewer does not have a school assigned." });
+        }
+
+
         // Base filter for submissions that are ready for review.
         const filter = {
             status: 'Under Review',
-            school: { $ne: null },
+            school: reviewerSchool,
             department: { $ne: null }
         };
 
         // Add optional query parameters to the filter.
         if (academicYear) filter.academicYear = academicYear;
-        if (school) filter.school = school;
-        if (department) filter.department = department;
+      
 
         const submissions = await Submission.find(filter)
             .populate('school', 'name')
