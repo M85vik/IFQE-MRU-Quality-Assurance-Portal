@@ -5,6 +5,7 @@
  * @module controllers/submissionController
  */
 
+
 // --- Model Imports ---
 const Submission = require('../models/Submission');
 const Indicator = require('../models/Indicator');
@@ -691,6 +692,40 @@ const deleteSubmission = async (req, res) => {
     }
 };
 
+const getSubmissionStatus = async (req, res) => {
+ 
+    try {
+       const { academicYear } = req.query;
+
+
+        if (!academicYear) {
+            return res.status(400).json({
+                message: "Provide Academic Year!!"
+            });
+        }
+
+        const submissions = await Submission.find(
+            { academicYear },
+            { title: 1, status: 1, academicYear: 1, updatedAt: 1 }
+        );
+
+   
+        
+
+        res.status(200).json({
+            message: "Submission status fetched successfully",
+            data: submissions,
+        });
+
+    } catch (error) {
+        console.error("❌ Error Getting Submission Status :", error);
+        res.status(500).json({
+            message: "Failed to Get Submission Status",
+            error: error.message,
+        });
+    }
+};
+
 
 
 // Export all controller functions for use in the routes file.
@@ -703,5 +738,6 @@ module.exports = {
     getSubmissionById,
     getSubmissionsForSuperuser,
     submitAppeal,
-    deleteSubmission
+    deleteSubmission,
+    getSubmissionStatus
 };

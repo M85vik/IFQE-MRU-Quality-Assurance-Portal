@@ -7,6 +7,7 @@ import {
 import { Cpu, Database, Server, Cloud, Activity, Trash2 } from 'lucide-react';
 import CountUp from 'react-countup';
 import apiClient from '../../api/axiosConfig';
+import { P } from 'framer-motion/dist/types.d-Cjd591yU';
 
 /* ---------------------- Small Stat Card ---------------------- */
 const StatCard = React.memo(({ icon: Icon, label, value, color }: any) => (
@@ -48,7 +49,19 @@ const DeveloperDashboard: React.FC = () => {
   const [apiData, setApiData] = useState<any[]>([]);
   const [s3Data, setS3Data] = useState<any[]>([]);
   const [health, setHealth] = useState({ cpu: 0, mem: 0, uptime: 0 });
+  const [submissionStatus, setSubmissionStatus] = useState<any[]>([]);
+  const [academicYear, setAcademicYear] = useState("2024-2025");
 
+
+  const fetchSubmissionStatus = useCallback(async () => {
+    try {
+      const response = await apiClient.get(`/submissions/status?academicYear=${academicYear}`)
+      setSubmissionStatus(response.data?.data || []);
+
+    } catch (error) {
+      console.error("Failed to fetch submission status:", error);
+    }
+  }, [academicYear])
   /* ---------------------------------------------------- */
   /* Fetch all metrics */
   /* ---------------------------------------------------- */
@@ -58,6 +71,7 @@ const DeveloperDashboard: React.FC = () => {
         apiClient.get('/metrics/developer-summary'),
         apiClient.get('/metrics/charts'),
         apiClient.get('/system/health'),
+
       ]);
 
       const sum = summaryRes.data?.summary || {};
@@ -82,9 +96,10 @@ const DeveloperDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchMetrics();
+    fetchSubmissionStatus();
     const interval = setInterval(fetchMetrics, 60000);
     return () => clearInterval(interval);
-  }, [fetchMetrics]);
+  }, [fetchMetrics, fetchSubmissionStatus,academicYear]);
 
   return (
     <div className="p-8 space-y-10 bg-gray-50 min-h-screen">
@@ -200,10 +215,9 @@ const DeveloperDashboard: React.FC = () => {
                     <td className="px-4 py-3 text-center font-semibold text-gray-700">{item.hits}</td>
 
                     <td className="px-4 py-3 text-center">
-                      <span className={`font-semibold ${
-                        item.avgTime > 1000 ? 'text-red-500' :
-                        item.avgTime > 400 ? 'text-yellow-500' : 'text-green-600'
-                      }`}>
+                      <span className={`font-semibold ${item.avgTime > 1000 ? 'text-red-500' :
+                          item.avgTime > 400 ? 'text-yellow-500' : 'text-green-600'
+                        }`}>
                         {item.avgTime} ms
                       </span>
                     </td>
@@ -231,6 +245,72 @@ const DeveloperDashboard: React.FC = () => {
         <p className="text-base text-gray-500 mt-3 text-right">
           Showing all recorded API endpoints and performance metrics
         </p>
+      </motion.div>
+
+      <motion.div className='bg-white rounded-xl shadow p-6 mt-10'
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.65 }}
+      >
+
+        <div className='flex items-center justify-between mb-4'>
+          <h2 className='text-lg font-semibold text-gray-800'>
+            Submission Status Overview
+          </h2>
+
+
+          <select
+            value={academicYear}
+            onChange={(e) => {
+              setAcademicYear(e.target.value)
+            }}
+            className='border border-gray-300 rounded-lg px-3 py-2 text-gray-700  bg-white focus:ring focus:ring-blue-200'
+
+          >
+
+            <option value="2024-2025">2024-2025</option>
+            <option value="2025-2026">2025-2026</option>
+            <option value="2026-2027">2026-2027</option>
+            <option value="2027-2028">2027-2028</option>
+          </select>
+        </div>
+
+        {
+          submissionStatus.length === 0 ? (
+            <p className='text-gray-500 text-center py-8'>No records found.</p>
+          ) : (
+            <div className='overflow-x-auto max-h-[400px] border rounded-lg'>
+
+              <table className='min-w-full text-base'>
+
+                <thead className='bg-gray-100 sticky top-0 z-10'>
+                  <tr>
+                    <th className="px-3 py-2">Title</th>
+                    <th className="px-3 py-2 text-center">Status</th>
+                    <th className="px-3 py-2 text-center">Academic Year</th>
+                    <th className="px-3 py-2 text-center">Last Updated</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {submissionStatus.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-3 py-2">{item.title}</td>
+                      <td className="px-3 py-2 text-center capitalize">{item.status}</td>
+                      <td className="px-3 py-2 text-center">{item.academicYear}</td>
+                      <td className="px-3 py-2 text-center text-gray-500">
+                        {item.updatedAt ? new Date(item.updatedAt).toLocaleString() : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+
+              </table>
+            </div>
+          )
+        }
+
+
       </motion.div>
 
     </div>

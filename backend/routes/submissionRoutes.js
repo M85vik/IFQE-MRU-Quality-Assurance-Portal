@@ -21,7 +21,8 @@ const {
   updateSubmission,
   getSubmissionsForSuperuser,
   submitAppeal,
-   deleteSubmission 
+  deleteSubmission, 
+  getSubmissionStatus
 } = require('../controllers/submissionController');
 
 // Import middleware for authentication (protect) and role-based authorization (authorize).
@@ -31,6 +32,8 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 // --- Route Definitions ---
 
 // Defines routes for the base '/api/submissions' endpoint.
+router.get('/status', protect,authorize('admin', 'developer'), getSubmissionStatus)
+
 router.route('/')
   /**
    * @route   POST /api/submissions
@@ -108,6 +111,7 @@ router.route('/:id')
 
 
 router.delete('/:id', protect, authorize('admin', 'superuser'), deleteSubmission);
+
 
 
 // Export the configured router to be mounted in the main server file.
