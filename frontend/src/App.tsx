@@ -37,7 +37,7 @@ import DevelopingTeamPage from './pages/website/DevelopingTeamPage';
 import FacultyTeamPage from './pages/website/FacultyTeamPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage.jsx';
 import DeveloperDashboard from './pages/dev/DeveloperDashboard';
-import TestReportPage from "./pages/TestReportPage";
+
 import { useLocation } from 'react-router-dom';
 import { MemoryHUD } from 'react-performance-hud';
 import PublishResultsPage from './pages/admin/PublishResultsPage';
@@ -82,7 +82,7 @@ function App() {
         <Route path="/criteria/:criterionId" element={<CriterionDetailPage />} />
         <Route path="/developing-team" element={<DevelopingTeamPage />} />
         <Route path="/faculty-team" element={<FacultyTeamPage />} />
-        <Route path="/test-report" element={<TestReportPage />} />
+      
         {/* --- Authentication & System Routes --- */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />

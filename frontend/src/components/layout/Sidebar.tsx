@@ -61,7 +61,7 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
               Appeals
             </NavItem>
             <NavItem to="/app/department/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
-              My Results
+              Results
             </NavItem>
             <NavItem to="/app/department/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed}>
               Archives

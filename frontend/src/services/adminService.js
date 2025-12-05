@@ -30,11 +30,21 @@ export const getIndicatorComparisonData = async (year) => {
 
 
 export async function getPublicationStatus(academicYear) {
-  const res = await apiClient.get(`/result-publication?academicYear=${academicYear}`);
-  return res.data;
+  try {
+  
+    const res = await apiClient.get(`/result-publication?academicYear=${academicYear}`);
+    return res.data;
+} catch (error) {
+      throw new Error(error.response?.data?.message || 'Could not fetch publishing data.')
+}
 }
 
 export async function updatePublicationStatus(academicYear, isPublished) {
-  const res = await apiClient.put(`/result-publication`, { academicYear, isPublished });
-  return res.data;
+  try {
+  
+    const res = await apiClient.put(`/result-publication`, { academicYear, isPublished });
+    return res.data;
+} catch (error) {
+   throw new Error(error.response?.data?.message || 'Could not update publishing status.')
+}
 }
