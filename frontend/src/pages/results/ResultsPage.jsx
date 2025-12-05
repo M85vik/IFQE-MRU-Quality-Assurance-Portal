@@ -86,37 +86,89 @@ export default function InternalResultsPage() {
     );
 }
 
+
+// function ResultTable({ school }) {
+//     return (
+//         <div className="overflow-x-auto">
+//             <table className="min-w-full border border-gray-300 rounded-md">
+//                 <thead className="bg-blue-600 text-white text-sm">
+//                     <tr>
+//                         <th className="px-3 py-2">S.No</th>
+//                         <th className="px-3 py-2">Criteria</th>
+//                         <th className="px-3 py-2">Marks</th>
+//                         <th className="px-3 py-2">Weighted</th>
+//                         <th className="px-3 py-2">% Achieved</th>
+//                     </tr>
+//                 </thead>
+//                 <tbody>
+//                     {school.criteria.map((c) => (
+//                         <tr key={c.code} className="odd:bg-gray-100">
+//                             <td className="px-3 py-2">{c.sNo}</td>
+//                             <td className="px-3 py-2">{c.name}</td>
+//                             <td className="px-3 py-2 text-center">{c.marksAwarded}/{c.maxMarks}</td>
+//                             <td className="px-3 py-2 text-center">{c.weightedScore}</td>
+//                             <td className="px-3 py-2 text-center">{c.percentage}%</td>
+//                         </tr>
+//                     ))}
+//                     <tr className="bg-blue-100 font-bold">
+//                         <td colSpan={4} className="px-3 py-2 text-right">Final Score:</td>
+//                         <td className="px-3 py-2 text-center text-blue-700">
+//                             {school.finalScore.totalWeightedScore} / {school.finalScore.outOf}
+//                         </td>
+//                     </tr>
+//                 </tbody>
+//             </table>
+//         </div>
+//     );
+// }
+
+
 function ResultTable({ school }) {
-    return (
-        <div className="overflow-x-auto">
-            <table className="min-w-full border border-gray-300 rounded-md">
-                <thead className="bg-blue-600 text-white text-sm">
-                    <tr>
-                        <th className="px-3 py-2">S.No</th>
-                        <th className="px-3 py-2">Criteria</th>
-                        <th className="px-3 py-2">Marks</th>
-                        <th className="px-3 py-2">Weighted</th>
-                        <th className="px-3 py-2">% Achieved</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {school.criteria.map((c) => (
-                        <tr key={c.code} className="odd:bg-gray-100">
-                            <td className="px-3 py-2">{c.sNo}</td>
-                            <td className="px-3 py-2">{c.name}</td>
-                            <td className="px-3 py-2 text-center">{c.marksAwarded}/{c.maxMarks}</td>
-                            <td className="px-3 py-2 text-center">{c.weightedScore}</td>
-                            <td className="px-3 py-2 text-center">{c.percentage}%</td>
-                        </tr>
-                    ))}
-                    <tr className="bg-blue-100 font-bold">
-                        <td colSpan={4} className="px-3 py-2 text-right">Final Score:</td>
-                        <td className="px-3 py-2 text-center text-blue-700">
-                            {school.finalScore.totalWeightedScore} / {school.finalScore.outOf}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    );
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
+        <thead className="bg-[#0077C8] text-white text-sm">
+          <tr>
+            <th className="p-3">S. No.</th>
+            <th className="p-3 text-left">Criteria</th>
+            <th className="p-3 text-center">Weightage</th>
+            <th className="p-3 text-center">Max Marks</th>
+            <th className="p-3 text-center">Marks Awarded</th>
+            <th className="p-3 text-center">% Achieved</th>
+            <th className="p-3 text-center">Weighted</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {school.criteria.map((row) => (
+            <tr key={row.code} className="even:bg-gray-50 hover:bg-blue-50 transition">
+              <td className="p-3 text-center">{row.sNo}</td>
+              <td className="p-3">{row.name}</td>
+              <td className="p-3 text-center">{row.weightage}%</td>
+              <td className="p-3 text-center">{row.maxMarks}</td>
+              <td className="p-3 text-center">{row.marksAwarded}</td>
+              <td className="p-3 text-center">
+                <span className="px-3 py-1 rounded-md bg-[#D0E9FF] text-[#0B2A52] font-semibold">
+                  {row.percentage}%
+                </span>
+              </td>
+              <td className="p-3 text-center font-bold text-[#0B2A52]">
+                {row.weightedScore}
+              </td>
+            </tr>
+          ))}
+
+          {/* Final Score Row */}
+          <tr className="bg-[#E0F3FF] font-bold border-t">
+            <td colSpan={6} className="p-3 text-right text-[#0B2A52]">
+              FINAL SCORE
+            </td>
+            <td className="p-3 text-center text-[#0077C8] text-lg">
+              {school.finalScore.totalWeightedScore} / {school.finalScore.outOf}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
 }
