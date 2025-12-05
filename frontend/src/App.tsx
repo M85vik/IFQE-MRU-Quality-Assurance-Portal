@@ -37,6 +37,12 @@ import DevelopingTeamPage from './pages/website/DevelopingTeamPage';
 import FacultyTeamPage from './pages/website/FacultyTeamPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage.jsx';
 import DeveloperDashboard from './pages/dev/DeveloperDashboard';
+import TestReportPage from "./pages/TestReportPage";
+import { useLocation } from 'react-router-dom';
+import { MemoryHUD } from 'react-performance-hud';
+import PublishResultsPage from './pages/admin/PublishResultsPage';
+import ResultsPage from "./pages/results/ResultsPage";
+
 import { Toaster } from 'react-hot-toast'
 const AppRootRedirector = () => {
   const { userInfo } = useAuthStore();
@@ -52,9 +58,19 @@ const AppRootRedirector = () => {
   }
 };
 
+const PerformanceMonitor = () => {
+  const location = useLocation();
+  return <MemoryHUD dependency={location.pathname} />;
+};
+
+
+
 function App() {
+
   return (
     <Router>
+      <PerformanceMonitor />
+
       <Routes>
         {/* --- Public Website Routes --- */}
         <Route path="/" element={<LandingPage />} />
@@ -66,7 +82,7 @@ function App() {
         <Route path="/criteria/:criterionId" element={<CriterionDetailPage />} />
         <Route path="/developing-team" element={<DevelopingTeamPage />} />
         <Route path="/faculty-team" element={<FacultyTeamPage />} />
-
+        <Route path="/test-report" element={<TestReportPage />} />
         {/* --- Authentication & System Routes --- */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
@@ -80,6 +96,7 @@ function App() {
             <Route path="department/submission/:id" element={<SubmissionForm />} />
             <Route path="department/appeal/:id" element={<AppealPage />} />
             <Route path="department/appeals" element={<AppealDashboard />} />
+            <Route path="department/results" element={<ResultsPage />} />
             <Route path="department/archives" element={<ArchivesPage />} />
 
             <Route path="qaa/dashboard" element={<QaaDashboard />} />
@@ -89,6 +106,7 @@ function App() {
             <Route path="superuser/approval-queue" element={<SuperuserDashboard queueType="approval" />} />
             <Route path="superuser/appeal-queue" element={<SuperuserDashboard queueType="appeal" />} />
             <Route path="superuser/review/:id" element={<FinalReviewPage />} />
+            <Route path="superuser/results" element={<ResultsPage />} />
 
             <Route path="admin/dashboard" element={<AdminDashboard />} />
             <Route path="admin/comparison" element={<AnalyticsComparisonPage />} />
@@ -97,6 +115,9 @@ function App() {
             <Route path="admin/content" element={<ManageContentPage />} />
             <Route path="admin/deletion" element={<DeletionPanel />} />
             <Route path="admin/activity-logs" element={<ActivityLogPage />} />
+            <Route path="admin/publish-results" element={<PublishResultsPage />} />
+            <Route path="admin/results" element={<ResultsPage />} />
+
             <Route path="developer/dashboard" element={<DeveloperDashboard />} />
 
 
@@ -106,13 +127,13 @@ function App() {
         {/* --- Catch-all 404 Route --- */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <Toaster  toastOptions={{
-          style: {
-            fontSize: '18px',
-            padding: '16px 24px',
-            minWidth: '350px',
-          },
-        }} />
+      <Toaster toastOptions={{
+        style: {
+          fontSize: '16px',
+          padding: '16px 16px',
+          minWidth: '400px',
+        },
+      }} />
     </Router>
   );
 }

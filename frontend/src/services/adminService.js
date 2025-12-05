@@ -26,3 +26,15 @@ export const getIndicatorComparisonData = async (year) => {
         throw new Error(error.response?.data?.message || 'Could not fetch indicator comparison data.');
     }
 };
+
+
+
+export async function getPublicationStatus(academicYear) {
+  const res = await apiClient.get(`/result-publication?academicYear=${academicYear}`);
+  return res.data;
+}
+
+export async function updatePublicationStatus(academicYear, isPublished) {
+  const res = await apiClient.put(`/result-publication`, { academicYear, isPublished });
+  return res.data;
+}

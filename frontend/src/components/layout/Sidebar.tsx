@@ -60,6 +60,9 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <NavItem to="/app/department/appeals" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed}>
               Appeals
             </NavItem>
+            <NavItem to="/app/department/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
+              My Results
+            </NavItem>
             <NavItem to="/app/department/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed}>
               Archives
             </NavItem>
@@ -80,6 +83,9 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <NavItem to="/app/superuser/appeal-queue" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed}>
               Appeal Queue
             </NavItem>
+            <NavItem to="/app/superuser/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
+              Results
+            </NavItem>
           </>
         )}
 
@@ -91,6 +97,10 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <NavItem to="/app/admin/comparison" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed}>
               Indicator Comparison
             </NavItem>
+            <NavItem to="/app/admin/results" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed}>
+              Results
+            </NavItem>
+
             <NavItem to="/app/admin/users" icon={<UserPlus size={20} />} isCollapsed={isCollapsed}>
               User Management
             </NavItem>
@@ -107,6 +117,13 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <NavItem to="/app/admin/activity-logs" icon={<FileText size={20} />} isCollapsed={isCollapsed}>
               Activity Logs
             </NavItem>
+
+            <NavItem to="/app/admin/publish-results" icon={<FileCheck2 size={20} />} isCollapsed={isCollapsed}>
+              Publish Results
+            </NavItem>
+
+
+
 
           </>
         )}
