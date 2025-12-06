@@ -325,7 +325,7 @@ const DeveloperDashboard: React.FC = () => {
 
       </motion.div>
 
-      <motion.div className="bg-white rounded-xl shadow p-6"
+      {/* <motion.div className="bg-white rounded-xl shadow p-6"
   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
   <h2 className="text-lg font-semibold mb-4 text-gray-800">
     Archive Activity Logs
@@ -350,6 +350,52 @@ const DeveloperDashboard: React.FC = () => {
             </td>
             <td className="px-3 py-2 text-center">{log.fileCount}</td>
             <td className="px-3 py-2 text-center">{log.timeTakenSec}</td>
+            <td className="px-3 py-2 text-center text-gray-500">
+              {new Date(log.createdAt).toLocaleString()}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</motion.div> */}
+
+
+<motion.div className="bg-white rounded-xl shadow p-6"
+  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+  <h2 className="text-lg font-semibold mb-4 text-gray-800">
+    Archive Activity Logs
+  </h2>
+
+  <div className="overflow-x-auto max-h-[350px] border rounded-lg">
+    <table className="min-w-full text-sm">
+      <thead className="bg-gray-100 sticky top-0">
+        <tr>
+          <th className="px-3 py-2">Submission</th>
+          <th className="px-3 py-2 text-center">Files</th>
+          <th className="px-3 py-2 text-center">Size (MB)</th>
+          <th className="px-3 py-2 text-center">Time (sec)</th>
+          <th className="px-3 py-2 text-center">Archived On</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {archiveLogs.map((log, idx) => (
+          <tr key={idx} className="hover:bg-gray-50">
+            <td className="px-3 py-2 font-medium">
+              {log.submissionTitle} <br />
+              <span className="text-xs text-gray-500">{log.school} / {log.department}</span>
+            </td>
+
+            <td className="px-3 py-2 text-center">{log.fileCount}</td>
+
+            {/* SIZE COLUMN - NEW */}
+            <td className="px-3 py-2 text-center text-gray-700 font-semibold">
+              {log.zipSizeMB ? `${log.zipSizeMB} MB` : "—"}
+            </td>
+
+            <td className="px-3 py-2 text-center">{log.timeTakenSec}</td>
+
             <td className="px-3 py-2 text-center text-gray-500">
               {new Date(log.createdAt).toLocaleString()}
             </td>
