@@ -1,4 +1,4 @@
-const { GetObjectCommand } = require('@aws-sdk/client-s3');
+const { GetObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
 const { Upload } = require("@aws-sdk/lib-storage");
 const s3Client = require('../config/s3Client');
 const archiver = require('archiver');
@@ -108,6 +108,7 @@ const createSubmissionArchive = async (submission) => {
 
         console.log(`[Archive Service | ${SUB_ID}] Upload successful.`);
 
+
         // --- 5. Update database ---
         submission.archiveFileKey = archiveKey;
         await submission.save();
@@ -117,6 +118,25 @@ const createSubmissionArchive = async (submission) => {
         let end = new Date();
         let duration = (end - start) / 1000
         console.log(`Time Taken : ${duration}s.`);
+
+        // --- SAFE ZIP SIZE CHECK (Does NOT break the main process) ---
+        let zipSizeMB = 0;
+        try {
+            const headResult = await s3Client.send(
+                new HeadObjectCommand({
+                    Bucket: S3_BUCKET_NAME,
+                    Key: archiveKey,
+                })
+            );
+
+            zipSizeMB = Number((headResult.ContentLength / (1024 * 1024)).toFixed(2));
+            console.log(`[Archive Service | ${SUB_ID}] Final ZIP Size: ${zipSizeMB} MB`);
+
+        } catch (sizeErr) {
+            console.warn(`[Archive Service | ${SUB_ID}] Failed to fetch ZIP size:`, sizeErr.message);
+        }
+
+
 
 
         // --- SAVE LOG SAFELY ---
@@ -129,6 +149,7 @@ const createSubmissionArchive = async (submission) => {
                 fileCount: fileKeys.length,
                 timeTakenSec: duration,
                 archiveKey: archiveKey,
+                 zipSizeMB,
                 createdBy: submission.updatedByRole || 'superuser'
             });
             console.log(`[Archive Service | ${SUB_ID}] ArchiveLog saved.`);
@@ -137,7 +158,7 @@ const createSubmissionArchive = async (submission) => {
         }
 
 
-       
+
 
 
         return archiveKey;
