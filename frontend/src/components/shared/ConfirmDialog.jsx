@@ -31,7 +31,9 @@ const ConfirmDialog = ({
     <Modal isOpen={isOpen} onClose={onCancel} title={title}>
       <div className="flex items-start space-x-3">
         <AlertTriangle className="text-yellow-500 flex-shrink-0 mt-1" size={22} />
-        <p className="text-foreground/80 leading-relaxed">{message}</p>
+        <div className="text-foreground/80 leading-relaxed">
+          {message}
+        </div>
       </div>
 
       <div className="flex justify-end space-x-3 mt-6">
