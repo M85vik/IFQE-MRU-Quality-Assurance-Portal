@@ -51,6 +51,7 @@ const DeveloperDashboard: React.FC = () => {
   const [health, setHealth] = useState({ cpu: 0, mem: 0, uptime: 0 });
   const [submissionStatus, setSubmissionStatus] = useState<any[]>([]);
   const [academicYear, setAcademicYear] = useState("2024-2025");
+  const [archiveLogs, setArchiveLogs] = useState<any[]>([]);
 
 
   const fetchSubmissionStatus = useCallback(async () => {
@@ -94,12 +95,23 @@ const DeveloperDashboard: React.FC = () => {
     }
   }, []);
 
+  const fetchArchiveLogs = useCallback(async () => {
+  try {
+    const res = await apiClient.get("/metrics/archive-logs");
+    setArchiveLogs(res.data.logs || []);
+  } catch (err) {
+    console.error("Logs Fetch Failed:", err);
+  }
+}, []);
+
+
   useEffect(() => {
     fetchMetrics();
     fetchSubmissionStatus();
+      fetchArchiveLogs();
     const interval = setInterval(fetchMetrics, 60000);
     return () => clearInterval(interval);
-  }, [fetchMetrics, fetchSubmissionStatus,academicYear]);
+  }, [fetchMetrics, fetchSubmissionStatus,academicYear,   fetchArchiveLogs]);
 
   return (
     <div className="p-8 space-y-10 bg-gray-50 min-h-screen">
@@ -312,6 +324,42 @@ const DeveloperDashboard: React.FC = () => {
 
 
       </motion.div>
+
+      <motion.div className="bg-white rounded-xl shadow p-6"
+  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+  <h2 className="text-lg font-semibold mb-4 text-gray-800">
+    Archive Activity Logs
+  </h2>
+
+  <div className="overflow-x-auto max-h-[350px] border rounded-lg">
+    <table className="min-w-full text-sm">
+      <thead className="bg-gray-100 sticky top-0">
+        <tr>
+          <th className="px-3 py-2">Submission</th>
+          <th className="px-3 py-2 text-center">Files</th>
+          <th className="px-3 py-2 text-center">Time (sec)</th>
+          <th className="px-3 py-2 text-center">Archived On</th>
+        </tr>
+      </thead>
+      <tbody>
+        {archiveLogs.map((log, idx) => (
+          <tr key={idx} className="hover:bg-gray-50">
+            <td className="px-3 py-2 font-medium">
+              {log.submissionTitle} <br/>
+              <span className="text-xs text-gray-500">{log.school} / {log.department}</span>
+            </td>
+            <td className="px-3 py-2 text-center">{log.fileCount}</td>
+            <td className="px-3 py-2 text-center">{log.timeTakenSec}</td>
+            <td className="px-3 py-2 text-center text-gray-500">
+              {new Date(log.createdAt).toLocaleString()}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</motion.div>
+
 
     </div>
   );

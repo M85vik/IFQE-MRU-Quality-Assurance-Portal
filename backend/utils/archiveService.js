@@ -3,6 +3,7 @@ const { Upload } = require("@aws-sdk/lib-storage");
 const s3Client = require('../config/s3Client');
 const archiver = require('archiver');
 const { PassThrough, Readable } = require('stream');
+const ArchiveLog = require('../models/ArchiveLog');
 
 // --- HELPER FUNCTIONS (No changes) ---
 
@@ -86,7 +87,7 @@ const createSubmissionArchive = async (submission) => {
                 const response = await s3Client.send(getObjectCommand);
                 const fileBuffer = await streamToBuffer(toNodeStream(response.Body));
                 archive.append(fileBuffer, { name: file.name });
-                 console.log(`[Archive Service | ${SUB_ID}] Appended file ${i + 1}/${fileKeys.length}: ${file.name}`);
+                console.log(`[Archive Service | ${SUB_ID}] Appended file ${i + 1}/${fileKeys.length}: ${file.name}`);
             } catch (err) {
                 console.error(`[Archive Service | ${SUB_ID}] Skipping file ${file.key} due to error:`, err.name);
                 archive.append(`File not found: ${file.key}`, { name: `MISSING_FILE - ${file.name.replace(/\//g, '_')}.txt` });
@@ -111,12 +112,33 @@ const createSubmissionArchive = async (submission) => {
         submission.archiveFileKey = archiveKey;
         await submission.save();
         console.log(`[Archive Service | ${SUB_ID}] DB updated successfully.`);
-        
+
         console.log(`[Archive Service | ${SUB_ID}] --- ARCHIVE PROCESS SUCCESSFUL ---`);
         let end = new Date();
-        let duration= (end -start)/1000
+        let duration = (end - start) / 1000
         console.log(`Time Taken : ${duration}s.`);
-        
+
+
+        // --- SAVE LOG SAFELY ---
+        try {
+            await ArchiveLog.create({
+                submissionId: submission._id,
+                submissionTitle: submission.title,
+                school: submission.school?.name,
+                department: submission.department?.name,
+                fileCount: fileKeys.length,
+                timeTakenSec: duration,
+                archiveKey: archiveKey,
+                createdBy: submission.updatedByRole || 'superuser'
+            });
+            console.log(`[Archive Service | ${SUB_ID}] ArchiveLog saved.`);
+        } catch (logErr) {
+            console.warn(`[Archive Service | ${SUB_ID}] FAILED to save ArchiveLog:`, logErr.message);
+        }
+
+
+       
+
 
         return archiveKey;
     } catch (error) {

@@ -5,7 +5,7 @@
 const os = require("os");
 const ApiMetric = require("../models/ApiMetric");
 const S3Metric = require("../models/S3Metric");
-
+const ArchiveLog = require('../models/ArchiveLog');
 const getSystemUptime = () => Math.floor(os.uptime() / 3600);
 
 
@@ -120,4 +120,14 @@ exports.getDeveloperCharts = async (req, res) => {
     console.error("Error fetching developer chart data:", error);
     res.status(500).json({ message: "Failed to fetch developer chart data" });
   }
+};
+
+
+exports.getArchiveLogs = async (req, res) => {
+    try {
+        const logs = await ArchiveLog.find().sort({ createdAt: -1 }).limit(50);
+        res.json({ logs });
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching archive logs", error: err.message });
+    }
 };
