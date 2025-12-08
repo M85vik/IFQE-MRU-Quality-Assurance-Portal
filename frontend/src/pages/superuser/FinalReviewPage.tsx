@@ -48,6 +48,7 @@ interface Submission {
     academicYear: string;
     status: 'Pending Final Approval' | 'Appeal Submitted';
     department: { name: string };
+    school:{name:string}
     partB: {
         criteria: Criterion[];
     };
@@ -157,7 +158,7 @@ const FinalReviewPage: React.FC = () => {
                     <h1 className="text-2xl font-bold text-foreground">
                         {isAppealReview ? 'Reviewing Appeal:' : 'Finalizing Submission:'} {submission.title}
                     </h1>
-                    <p className="text-muted-foreground">{submission.department.name} - {submission.academicYear}</p>
+                    <p className="text-muted-foreground">{submission.school.name} - {submission.academicYear}</p>
                 </div>
                 <Button onClick={handleFinalize} isLoading={isSubmitting}>
                     <Check className="mr-2" size={18} />

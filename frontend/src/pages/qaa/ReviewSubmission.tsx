@@ -39,6 +39,7 @@ interface Submission {
     academicYear: string;
     status: string;
     department: { name: string };
+    school:{name:string};
     partA: { summaryFileKey?: string };
     partB: { criteria: Criterion[] };
 }
@@ -187,7 +188,7 @@ const ReviewSubmission: React.FC = () => {
         <div className="space-y-6">
             <div className="bg-card p-4 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4 sticky top-0 z-20 border border-border">
                 <div>
-                    <h1 className="text-2xl font-bold text-foreground">Reviewing: {submission.department.name} ({submission.academicYear})</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Reviewing: {submission.school.name} ({submission.academicYear})</h1>
                     <p className="text-muted-foreground">Status: <span className="font-semibold">{submission.status}</span></p>
                 </div>
                 <div className="flex items-center gap-4">
