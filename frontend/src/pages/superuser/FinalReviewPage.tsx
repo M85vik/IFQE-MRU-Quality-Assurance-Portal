@@ -48,7 +48,7 @@ interface Submission {
     academicYear: string;
     status: 'Pending Final Approval' | 'Appeal Submitted';
     department: { name: string };
-    school:{name:string}
+    school: { name: string }
     partB: {
         criteria: Criterion[];
     };
@@ -56,6 +56,21 @@ interface Submission {
         indicators: AppealIndicator[];
     };
 }
+
+
+// Indicators that are NOT out of 4
+const INDICATOR_MAX_SCORES: Record<string, number> = {
+    "2.3.1": 12,
+    "2.3.2": 12,
+    "2.3.3": 12,
+    "2.3.4": 12,
+    "4.2.1": 16
+
+};
+
+
+
+
 
 const FinalReviewPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -95,54 +110,110 @@ const FinalReviewPage: React.FC = () => {
         });
     };
 
+    // const handleFinalize = async () => {
+    //     if (!submission) return;
+    //     setIsSubmitting(true);
+
+    //     const toastId = toast.loading('Finalizing submission... Please wait.',
+    //         { icon: '⏳' }
+    //     );
+    //     try {
+    //         let payload: { partB: any; appeal?: any };
+
+    //         // --- FIX START: Construct the correct payload for an appeal review ---
+    //         if (submission.status === 'Appeal Submitted') {
+    //             const updatedAppealIndicators = submission.appeal.indicators.map(appealedInd => {
+    //                 let finalScore;
+    //                 // Find the updated score from the partB state
+    //                 submission.partB.criteria.forEach(c => {
+    //                     c.subCriteria.forEach(sc => {
+    //                         const indicator = sc.indicators.find(i => i.indicatorCode === appealedInd.indicatorCode);
+    //                         if (indicator) {
+    //                             finalScore = indicator.finalScore;
+    //                         }
+    //                     });
+    //                 });
+    //                 return { ...appealedInd, finalScore };
+    //             });
+
+    //             payload = {
+    //                 partB: submission.partB, // Send the full partB for remarks
+    //                 appeal: { indicators: updatedAppealIndicators },
+    //             };
+    //         } else {
+    //             // This is for a normal final review
+    //             payload = { partB: submission.partB };
+    //         }
+    //         // --- FIX END ---
+
+    //         await apiClient.put(`/submissions/${id}`, payload);
+    //         // alert('Submission has been finalized successfully!');
+    //         toast.success('Submission has been finalized successfully!', { id: toastId });
+    //         navigate('/app/superuser/dashboard');
+    //     } catch (err: any) {
+    //         const msg = (err as Error).message || 'Failed to finalize submission.';
+    //         setError(msg);
+    //         toast.error(msg, { id: toastId });
+    //     } finally {
+    //         setIsSubmitting(false);
+    //     }
+    // };
+
     const handleFinalize = async () => {
         if (!submission) return;
         setIsSubmitting(true);
+        const toastId = toast.loading('Finalizing submission... Please wait.');
 
-        const toastId = toast.loading('Finalizing submission... Please wait.',
-            { icon: '⏳' }
-        );
         try {
+            // Always clamp scores before sending
+            submission.partB.criteria.forEach(c =>
+                c.subCriteria.forEach(sc =>
+                    sc.indicators.forEach(ind => {
+                        const maxScore = INDICATOR_MAX_SCORES[ind.indicatorCode] ?? 4;
+                        if (ind.finalScore != null) {
+                            ind.finalScore = Math.min(ind.finalScore, maxScore);
+                        }
+                    })
+                )
+            );
+
             let payload: { partB: any; appeal?: any };
 
-            // --- FIX START: Construct the correct payload for an appeal review ---
             if (submission.status === 'Appeal Submitted') {
                 const updatedAppealIndicators = submission.appeal.indicators.map(appealedInd => {
-                    let finalScore;
-                    // Find the updated score from the partB state
-                    submission.partB.criteria.forEach(c => {
+                    let finalScore: number | undefined;
+
+                    submission.partB.criteria.forEach(c =>
                         c.subCriteria.forEach(sc => {
-                            const indicator = sc.indicators.find(i => i.indicatorCode === appealedInd.indicatorCode);
-                            if (indicator) {
-                                finalScore = indicator.finalScore;
-                            }
-                        });
-                    });
+                            const ind = sc.indicators.find(i => i.indicatorCode === appealedInd.indicatorCode);
+                            if (ind) finalScore = ind.finalScore;
+                        })
+                    );
+
                     return { ...appealedInd, finalScore };
                 });
 
                 payload = {
-                    partB: submission.partB, // Send the full partB for remarks
-                    appeal: { indicators: updatedAppealIndicators },
+                    partB: submission.partB,
+                    appeal: { indicators: updatedAppealIndicators }
                 };
             } else {
-                // This is for a normal final review
                 payload = { partB: submission.partB };
             }
-            // --- FIX END ---
 
             await apiClient.put(`/submissions/${id}`, payload);
-            // alert('Submission has been finalized successfully!');
-            toast.success('Submission has been finalized successfully!', { id: toastId });
+            toast.success('Submission finalized successfully!', { id: toastId });
             navigate('/app/superuser/dashboard');
+
         } catch (err: any) {
-            const msg = (err as Error).message || 'Failed to finalize submission.';
+            const msg = err.message || 'Failed to finalize submission.';
             setError(msg);
             toast.error(msg, { id: toastId });
         } finally {
             setIsSubmitting(false);
         }
     };
+
 
     if (isLoading) return <Spinner size="lg" />;
     if (error) return <Alert message={error} type="error" />;
@@ -220,7 +291,7 @@ const FinalReviewPage: React.FC = () => {
 
 
 
-                                                        <label
+                                                        {/* <label
                                                             htmlFor={`finalScore-${ind.indicatorCode}`}
                                                             className="block text-sm font-medium text-foreground mb-1"
                                                         >
@@ -244,7 +315,41 @@ const FinalReviewPage: React.FC = () => {
                                                                     {score}
                                                                 </option>
                                                             ))}
-                                                        </select>
+                                                        </select> */}
+
+
+
+                                                        <label
+                                                            htmlFor={`finalScore-${ind.indicatorCode}`}
+                                                            className="block text-sm font-medium text-foreground mb-1"
+                                                        >
+                                                            Final Score (Max: {INDICATOR_MAX_SCORES[ind.indicatorCode] ?? 4})
+                                                        </label>
+
+                                                        {(() => {
+                                                            const maxScore = INDICATOR_MAX_SCORES[ind.indicatorCode] ?? 4;
+
+                                                            return (
+                                                                <select
+                                                                    id={`finalScore-${ind.indicatorCode}`}
+                                                                    value={ind.finalScore ?? ''}
+                                                                    onChange={(e) =>
+                                                                        handleStateChange(
+                                                                            ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'],
+                                                                            e.target.value === '' ? null : Number(e.target.value)
+                                                                        )
+                                                                    }
+                                                                    disabled={!isEditable || isSubmitting}
+                                                                    className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted' : ''}`}
+                                                                >
+                                                                    <option value="">Select score</option>
+                                                                    {Array.from({ length: maxScore + 1 }, (_, n) => maxScore - n).map(v => (
+                                                                        <option key={v} value={v}>{v}</option>
+                                                                    ))}
+                                                                </select>
+                                                            );
+                                                        })()}
+
 
 
                                                     </div>
