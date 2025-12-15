@@ -53,22 +53,35 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
             criteriaCode: "$partB.criteria.criteriaCode"
           },
           totalScore: {
-            $sum: {
-              $ifNull: [
-                "$partB.criteria.subCriteria.indicators.finalScore",
-                {
-                  $ifNull: [
-                    "$partB.criteria.subCriteria.indicators.reviewerScore",
-                    {
-                      $ifNull: [
-                        "$partB.criteria.subCriteria.indicators.selfAssessedScore",
-                        0
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
+            // $sum: {
+            //   $ifNull: [
+            //     "$partB.criteria.subCriteria.indicators.finalScore",
+            //     {
+            //       $ifNull: [
+            //         "$partB.criteria.subCriteria.indicators.reviewScore",
+            //         {
+            //           $ifNull: [
+            //             "$partB.criteria.subCriteria.indicators.selfAssessedScore",
+            //             0
+            //           ]
+            //         }
+            //       ]
+            //     }
+            //   ]
+            // }
+
+           $sum: {
+  $ifNull: [
+    "$partB.criteria.subCriteria.indicators.finalScore",
+    {
+      $ifNull: [
+        "$partB.criteria.subCriteria.indicators.reviewScore",
+        0
+      ]
+    }
+  ]
+}
+
           }
         }
       },
@@ -162,7 +175,7 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
 exports.getMySchoolReport = async (req, res) => {
   try {
     const { academicYear } = req.query;
-    const schoolId = req.user.school; 
+    const schoolId = req.user.school;
 
 
     if (!academicYear) {
@@ -187,8 +200,8 @@ exports.getMySchoolReport = async (req, res) => {
       });
     }
 
-   
-    
+
+
 
     return res.status(200).json(result);
 

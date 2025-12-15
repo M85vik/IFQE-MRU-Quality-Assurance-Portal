@@ -109,7 +109,7 @@ const DeveloperDashboard: React.FC = () => {
     fetchMetrics();
     fetchSubmissionStatus();
       fetchArchiveLogs();
-    const interval = setInterval(fetchMetrics, 60000);
+    const interval = setInterval(fetchMetrics, 70000);
     return () => clearInterval(interval);
   }, [fetchMetrics, fetchSubmissionStatus,academicYear,   fetchArchiveLogs]);
 
