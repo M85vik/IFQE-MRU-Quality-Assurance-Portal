@@ -1,3 +1,158 @@
+// import React from 'react';
+// import { NavLink, Link } from 'react-router-dom';
+// import useAuthStore from '../../store/authStore';
+// import {
+//   LayoutDashboard,
+//   FileText,
+//   BarChart2,
+//   UserPlus,
+//   Calendar,
+//   BarChartHorizontal,
+//   ShieldQuestion,
+//   FileCheck2,
+//   AlertCircle,
+//   Archive,
+//   Megaphone,
+//   Trash2
+// } from 'lucide-react';
+
+// const NavItem = ({ to, icon, children, isCollapsed }: { to: string, icon: React.ReactNode, children: React.ReactNode, isCollapsed: boolean }) => (
+//   <NavLink
+//     to={to}
+//     end
+//     className={({ isActive }) =>
+//       `flex items-center space-x-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all group ${isCollapsed ? 'justify-center' : ''
+//       } ${isActive
+//         ? 'bg-[#083D77] text-[#FAF8F1]'
+//         : 'text-[#083D77] hover:bg-[#083D77]/10 hover:text-[#083D77]'
+//       }`
+//     }
+//   >
+//     <div className="transition-transform group-hover:scale-110">{icon}</div>
+//     {!isCollapsed && <span className="whitespace-nowrap">{children}</span>}
+//   </NavLink>
+// );
+
+// const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
+//   const { userInfo } = useAuthStore();
+
+//   return (
+//     <aside
+//       className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out border-r border-[#083D77]/30 
+//       ${isCollapsed ? 'w-20' : 'w-64'} bg-[#FAF8F1] text-[#083D77]`}
+//     >
+//       <div className="h-16 flex items-center justify-center px-4 border-b border-[#083D77]/30">
+//         <Link to="/app" className="text-2xl font-bold whitespace-nowrap text-[#083D77]">
+//           {isCollapsed ? (
+//             <ShieldQuestion className="text-[#083D77]" />
+//           ) : (
+//             <span>IFQE Portal</span>
+//           )}
+//         </Link>
+//       </div>
+
+//       <nav className="flex-1 p-4 space-y-2">
+//         {userInfo?.role === 'department' && (
+//           <>
+//             <NavItem to="/app/department/dashboard" icon={<LayoutDashboard size={20} />} isCollapsed={isCollapsed}>
+//               Dashboard
+//             </NavItem>
+//             <NavItem to="/app/department/appeals" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed}>
+//               Appeals
+//             </NavItem>
+//             <NavItem to="/app/department/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
+//               Results
+//             </NavItem>
+
+//             <NavItem
+//   to="/app/department/submission-reviews"
+//   icon={<FileText size={20} />}
+//   isCollapsed={isCollapsed}
+// >
+//   Submission Reviews
+// </NavItem>
+
+
+//             <NavItem to="/app/department/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed}>
+//               Archives
+//             </NavItem>
+
+            
+//           </>
+//         )}
+
+//         {userInfo?.role === 'qaa' && (
+//           <NavItem to="/app/qaa/dashboard" icon={<FileText size={20} />} isCollapsed={isCollapsed}>
+//             Review Queue
+//           </NavItem>
+//         )}
+
+//         {userInfo?.role === 'superuser' && (
+//           <>
+//             <NavItem to="/app/superuser/approval-queue" icon={<FileCheck2 size={20} />} isCollapsed={isCollapsed}>
+//               Approval Queue
+//             </NavItem>
+//             <NavItem to="/app/superuser/appeal-queue" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed}>
+//               Appeal Queue
+//             </NavItem>
+//             <NavItem to="/app/superuser/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
+//               Results
+//             </NavItem>
+//           </>
+//         )}
+
+//         {userInfo?.role === 'admin' && (
+//           <>
+//             <NavItem to="/app/admin/dashboard" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
+//               Analytics Overview
+//             </NavItem>
+//             <NavItem to="/app/admin/comparison" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed}>
+//               Indicator Comparison
+//             </NavItem>
+//             <NavItem to="/app/admin/results" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed}>
+//               Results
+//             </NavItem>
+
+//             <NavItem to="/app/admin/users" icon={<UserPlus size={20} />} isCollapsed={isCollapsed}>
+//               User Management
+//             </NavItem>
+//             <NavItem to="/app/admin/windows" icon={<Calendar size={20} />} isCollapsed={isCollapsed}>
+//               Manage Windows
+//             </NavItem>
+//             <NavItem to="/app/admin/content" icon={<Megaphone size={20} />} isCollapsed={isCollapsed}>
+//               Manage Content
+//             </NavItem>
+//             <NavItem to="/app/admin/deletion" icon={<Trash2 size={20} />} isCollapsed={isCollapsed}>
+//               Deletion
+//             </NavItem>
+
+//             <NavItem to="/app/admin/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed}>
+//               Archive Files
+//             </NavItem>
+
+
+//             <NavItem to="/app/admin/activity-logs" icon={<FileText size={20} />} isCollapsed={isCollapsed}>
+//               Activity Logs
+//             </NavItem>
+
+//             <NavItem to="/app/admin/publish-results" icon={<FileCheck2 size={20} />} isCollapsed={isCollapsed}>
+//               Publish Results
+//             </NavItem>
+
+
+
+
+//           </>
+//         )}
+//       </nav>
+//     </aside>
+//   );
+// };
+
+// export default React.memo(Sidebar);
+
+
+
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
@@ -16,136 +171,155 @@ import {
   Trash2
 } from 'lucide-react';
 
-const NavItem = ({ to, icon, children, isCollapsed }: { to: string, icon: React.ReactNode, children: React.ReactNode, isCollapsed: boolean }) => (
+type NavItemProps = {
+  to: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  isCollapsed: boolean;
+  onClick?: () => void;
+};
+
+const NavItem = ({
+  to,
+  icon,
+  children,
+  isCollapsed,
+  onClick
+}: NavItemProps) => (
   <NavLink
     to={to}
     end
+    onClick={onClick}
     className={({ isActive }) =>
-      `flex items-center space-x-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all group ${isCollapsed ? 'justify-center' : ''
-      } ${isActive
+      `
+      flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all group
+      ${isCollapsed ? 'justify-center' : ''}
+      ${isActive
         ? 'bg-[#083D77] text-[#FAF8F1]'
-        : 'text-[#083D77] hover:bg-[#083D77]/10 hover:text-[#083D77]'
-      }`
+        : 'text-[#083D77] hover:bg-[#083D77]/10'
+      }
+    `
     }
   >
-    <div className="transition-transform group-hover:scale-110">{icon}</div>
+    <div className="transition-transform group-hover:scale-110">
+      {icon}
+    </div>
     {!isCollapsed && <span className="whitespace-nowrap">{children}</span>}
   </NavLink>
 );
 
-const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
+type SidebarProps = {
+  isCollapsed: boolean;
+  isMobileOpen: boolean;
+  onCloseMobile: () => void;
+};
+
+const Sidebar = ({
+  isCollapsed,
+  isMobileOpen,
+  onCloseMobile
+}: SidebarProps) => {
   const { userInfo } = useAuthStore();
 
   return (
-    <aside
-      className={`flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out border-r border-[#083D77]/30 
-      ${isCollapsed ? 'w-20' : 'w-64'} bg-[#FAF8F1] text-[#083D77]`}
-    >
-      <div className="h-16 flex items-center justify-center px-4 border-b border-[#083D77]/30">
-        <Link to="/app" className="text-2xl font-bold whitespace-nowrap text-[#083D77]">
-          {isCollapsed ? (
-            <ShieldQuestion className="text-[#083D77]" />
-          ) : (
-            <span>IFQE Portal</span>
+    <>
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      <aside
+        className={`
+          fixed md:static inset-y-0 left-0 z-40
+          flex flex-col flex-shrink-0
+          bg-[white] text-[#083D77]
+          border-r border-[#083D77]/30
+          transition-all duration-300 ease-in-out
+          w-64
+          ${isCollapsed ? 'md:w-20' : 'md:w-64'}
+          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}
+      >
+        {/* Logo */}
+        <div className="h-16 flex items-center justify-center border-b border-[#083D77]/30">
+          <Link to="/app" className="text-xl font-bold">
+            {isCollapsed ? 'IFQE' : 'IFQE Portal'}
+          </Link>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {userInfo?.role === 'department' && (
+            <>
+              <NavItem to="/app/department/dashboard" icon={<LayoutDashboard size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Dashboard
+              </NavItem>
+              <NavItem to="/app/department/appeals" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Appeals
+              </NavItem>
+              <NavItem to="/app/department/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Results
+              </NavItem>
+              <NavItem to="/app/department/submission-reviews" icon={<FileText size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Submission Reviews
+              </NavItem>
+              <NavItem to="/app/department/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Archives
+              </NavItem>
+            </>
           )}
-        </Link>
-      </div>
 
-      <nav className="flex-1 p-4 space-y-2">
-        {userInfo?.role === 'department' && (
-          <>
-            <NavItem to="/app/department/dashboard" icon={<LayoutDashboard size={20} />} isCollapsed={isCollapsed}>
-              Dashboard
+          {userInfo?.role === 'qaa' && (
+            <NavItem to="/app/qaa/dashboard" icon={<FileText size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+              Review Queue
             </NavItem>
-            <NavItem to="/app/department/appeals" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed}>
-              Appeals
-            </NavItem>
-            <NavItem to="/app/department/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
-              Results
-            </NavItem>
+          )}
 
-            <NavItem
-  to="/app/department/submission-reviews"
-  icon={<FileText size={20} />}
-  isCollapsed={isCollapsed}
->
-  Submission Reviews
-</NavItem>
+          {userInfo?.role === 'superuser' && (
+            <>
+              <NavItem to="/app/superuser/approval-queue" icon={<FileCheck2 size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Approval Queue
+              </NavItem>
+              <NavItem to="/app/superuser/appeal-queue" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Appeal Queue
+              </NavItem>
+              <NavItem to="/app/superuser/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Results
+              </NavItem>
+            </>
+          )}
 
-
-            <NavItem to="/app/department/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed}>
-              Archives
-            </NavItem>
-
-            
-          </>
-        )}
-
-        {userInfo?.role === 'qaa' && (
-          <NavItem to="/app/qaa/dashboard" icon={<FileText size={20} />} isCollapsed={isCollapsed}>
-            Review Queue
-          </NavItem>
-        )}
-
-        {userInfo?.role === 'superuser' && (
-          <>
-            <NavItem to="/app/superuser/approval-queue" icon={<FileCheck2 size={20} />} isCollapsed={isCollapsed}>
-              Approval Queue
-            </NavItem>
-            <NavItem to="/app/superuser/appeal-queue" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed}>
-              Appeal Queue
-            </NavItem>
-            <NavItem to="/app/superuser/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
-              Results
-            </NavItem>
-          </>
-        )}
-
-        {userInfo?.role === 'admin' && (
-          <>
-            <NavItem to="/app/admin/dashboard" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
-              Analytics Overview
-            </NavItem>
-            <NavItem to="/app/admin/comparison" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed}>
-              Indicator Comparison
-            </NavItem>
-            <NavItem to="/app/admin/results" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed}>
-              Results
-            </NavItem>
-
-            <NavItem to="/app/admin/users" icon={<UserPlus size={20} />} isCollapsed={isCollapsed}>
-              User Management
-            </NavItem>
-            <NavItem to="/app/admin/windows" icon={<Calendar size={20} />} isCollapsed={isCollapsed}>
-              Manage Windows
-            </NavItem>
-            <NavItem to="/app/admin/content" icon={<Megaphone size={20} />} isCollapsed={isCollapsed}>
-              Manage Content
-            </NavItem>
-            <NavItem to="/app/admin/deletion" icon={<Trash2 size={20} />} isCollapsed={isCollapsed}>
-              Deletion
-            </NavItem>
-
-            <NavItem to="/app/admin/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed}>
-              Archive Files
-            </NavItem>
-
-
-            <NavItem to="/app/admin/activity-logs" icon={<FileText size={20} />} isCollapsed={isCollapsed}>
-              Activity Logs
-            </NavItem>
-
-            <NavItem to="/app/admin/publish-results" icon={<FileCheck2 size={20} />} isCollapsed={isCollapsed}>
-              Publish Results
-            </NavItem>
-
-
-
-
-          </>
-        )}
-      </nav>
-    </aside>
+          {userInfo?.role === 'admin' && (
+            <>
+              <NavItem to="/app/admin/dashboard" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Analytics Overview
+              </NavItem>
+              <NavItem to="/app/admin/comparison" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Indicator Comparison
+              </NavItem>
+              <NavItem to="/app/admin/users" icon={<UserPlus size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                User Management
+              </NavItem>
+              <NavItem to="/app/admin/windows" icon={<Calendar size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Manage Windows
+              </NavItem>
+              <NavItem to="/app/admin/content" icon={<Megaphone size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Manage Content
+              </NavItem>
+              <NavItem to="/app/admin/deletion" icon={<Trash2 size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Deletion
+              </NavItem>
+              <NavItem to="/app/admin/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Archive Files
+              </NavItem>
+            </>
+          )}
+        </nav>
+      </aside>
+    </>
   );
 };
 
