@@ -23,3 +23,14 @@
     }
 }
 
+
+
+:root {
+  --navbar-height: 4rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --navbar-height: 5rem;
+  }
+}

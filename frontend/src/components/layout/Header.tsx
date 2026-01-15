@@ -27,9 +27,9 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, toggleMobileMenu }) => {
       <div className="flex items-center">
         <Button
           onClick={toggleMobileMenu}
-          variant="ghost"
+       
           size="sm"
-          className="md:hidden hover:opacity-80 transition"
+          className="md:hidden  transition "
           aria-label="Toggle Menu"
         >
           <Menu size={20} color="#FAF8F1" />
@@ -37,9 +37,9 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, toggleMobileMenu }) => {
 
         <Button
           onClick={toggleSidebar}
-          variant="ghost"
+          
           size="sm"
-          className="hidden md:inline-flex hover:opacity-80 transition"
+          className="hidden md:inline-flex  transition"
           aria-label="Toggle Sidebar"
         >
           <Menu size={20} color="#FAF8F1" />
@@ -58,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, toggleMobileMenu }) => {
 
         <Button
           onClick={handleLogout}
-          variant="ghost"
+         
           size="sm"
           className="hover:bg-[#FAF8F1]/10 transition"
           aria-label="Logout"
