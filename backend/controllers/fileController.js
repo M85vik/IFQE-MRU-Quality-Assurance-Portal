@@ -57,7 +57,7 @@ const generateFileName = (bytes = 16) => crypto.randomBytes(bytes).toString('hex
 const getUploadUrl = async (req, res) => {
   const { submissionId, indicatorCode, partACode, fileType, isEvidenceLink } = req.body;
   const user = req.user;
-
+console.log("key ",process.env.AWS_REGION,)
   // --- 1. Authorization & Validation ---
   // A series of checks to ensure the user is allowed to perform this action.
 
@@ -146,6 +146,7 @@ const getUploadUrl = async (req, res) => {
  * @query   {string} fileKey - The unique S3 key of the file to download.
  * @returns {json} 200 - { downloadUrl }
  */
+
 
 const getDownloadUrl = async (req, res) => {
 

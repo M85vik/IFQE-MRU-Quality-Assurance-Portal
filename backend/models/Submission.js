@@ -58,7 +58,19 @@ const CriteriaSubmissionSchema = new mongoose.Schema({
 const SubmissionSchema = new mongoose.Schema({
   title: { type: String, required: true },
   submissionType: { type: String, enum: ['Annual', 'Mid-term', 'Special'], default: 'Annual' },
-  archiveFileKey: { type: String }, // S3 key for a final archived version of the report
+  // archiveFileKey: { type: String }, 
+  archive: {
+    status: {
+      type: String,
+      enum: ['Not Generated', 'In Progress', 'Completed', 'Failed'],
+      default: 'Not Generated'
+    },
+    fileKey: String,
+    generatedAt: Date,
+    generatedBy: String,
+    error: String
+  }
+  ,
   submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', required: true },
   school: { type: mongoose.Schema.Types.ObjectId, ref: 'School', required: true },

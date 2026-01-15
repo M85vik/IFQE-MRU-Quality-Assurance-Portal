@@ -37,12 +37,13 @@ import DevelopingTeamPage from './pages/website/DevelopingTeamPage';
 import FacultyTeamPage from './pages/website/FacultyTeamPage';
 import ActivityLogPage from './pages/admin/ActivityLogPage.jsx';
 import DeveloperDashboard from './pages/dev/DeveloperDashboard';
-
+import ArchivingPanel from './pages/admin/ArchivingPanel';
+import SubmissionViewDashboard from './pages/department/SubmissionViewDashboard';
 import { useLocation } from 'react-router-dom';
 import { MemoryHUD } from 'react-performance-hud';
 import PublishResultsPage from './pages/admin/PublishResultsPage';
 import ResultsPage from "./pages/results/ResultsPage";
-
+import SubmissionViewPage from './pages/department/SubmissionViewPage';
 import { Toaster } from 'react-hot-toast'
 const AppRootRedirector = () => {
   const { userInfo } = useAuthStore();
@@ -82,7 +83,7 @@ function App() {
         <Route path="/criteria/:criterionId" element={<CriterionDetailPage />} />
         <Route path="/developing-team" element={<DevelopingTeamPage />} />
         <Route path="/faculty-team" element={<FacultyTeamPage />} />
-      
+
         {/* --- Authentication & System Routes --- */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
@@ -98,6 +99,17 @@ function App() {
             <Route path="department/appeals" element={<AppealDashboard />} />
             <Route path="department/results" element={<ResultsPage />} />
             <Route path="department/archives" element={<ArchivesPage />} />
+            <Route
+  path="department/submission-reviews"
+  element={<SubmissionViewDashboard />}
+/>
+
+<Route
+  path="department/submission-view/:id"
+  element={<SubmissionViewPage />}
+/>
+
+            
 
             <Route path="qaa/dashboard" element={<QaaDashboard />} />
             <Route path="qaa/review/:id" element={<ReviewSubmission />} />
@@ -117,6 +129,7 @@ function App() {
             <Route path="admin/activity-logs" element={<ActivityLogPage />} />
             <Route path="admin/publish-results" element={<PublishResultsPage />} />
             <Route path="admin/results" element={<ResultsPage />} />
+            <Route path="admin/archives" element={<ArchivingPanel />} />
 
             <Route path="developer/dashboard" element={<DeveloperDashboard />} />
 

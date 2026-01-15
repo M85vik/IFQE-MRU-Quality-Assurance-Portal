@@ -63,9 +63,21 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <NavItem to="/app/department/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed}>
               Results
             </NavItem>
+
+            <NavItem
+  to="/app/department/submission-reviews"
+  icon={<FileText size={20} />}
+  isCollapsed={isCollapsed}
+>
+  Submission Reviews
+</NavItem>
+
+
             <NavItem to="/app/department/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed}>
               Archives
             </NavItem>
+
+            
           </>
         )}
 
@@ -113,6 +125,11 @@ const Sidebar = ({ isCollapsed }: { isCollapsed: boolean }) => {
             <NavItem to="/app/admin/deletion" icon={<Trash2 size={20} />} isCollapsed={isCollapsed}>
               Deletion
             </NavItem>
+
+            <NavItem to="/app/admin/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed}>
+              Archive Files
+            </NavItem>
+
 
             <NavItem to="/app/admin/activity-logs" icon={<FileText size={20} />} isCollapsed={isCollapsed}>
               Activity Logs
