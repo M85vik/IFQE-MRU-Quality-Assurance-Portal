@@ -588,9 +588,7 @@ const updateSubmission = async (req, res) => {
                 submission.appeal.status = 'Closed';
                 submission.appeal.closedOn = new Date();
 
-                if (!submission.archiveFileKey) {
-                    submission.archiveFileKey = await createSubmissionArchive(submission);
-                }
+              
             } else {
                 // Final approval
                 for (const reqCriterion of partB.criteria) {
@@ -906,7 +904,7 @@ const deleteSubmission = async (req, res) => {
                 
             });
 
-            console.log("command :", command)
+          
             try {
                 await s3Client.send(command);
                 console.log('✅ S3 deletion successful.');
