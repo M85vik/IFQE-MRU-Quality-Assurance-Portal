@@ -620,7 +620,9 @@ const updateSubmission = async (req, res) => {
                 }
 
                 submission.status = 'Completed';
-                submission.archiveFileKey = await createSubmissionArchive(submission);
+                submission.archive = {
+                    status: 'Not Generated'
+                };
             }
 
             submission.markModified('partB');
@@ -886,6 +888,14 @@ const deleteSubmission = async (req, res) => {
         // Archive
         if (submission.archiveFileKey) fileKeys.push({ Key: submission.archiveFileKey });
 
+
+
+        //after new archive logics 
+           // 🆕 New archive system
+    if (submission.archive?.fileKey) {
+      fileKeys.push({ Key: submission.archive.fileKey });
+    }
+
         console.log(`🧾 Found ${fileKeys.length} files to delete from S3.`);
 
         // 3️⃣ Delete from S3 first
@@ -893,8 +903,10 @@ const deleteSubmission = async (req, res) => {
             const command = new DeleteObjectsCommand({
                 Bucket: process.env.S3_BUCKET_NAME,
                 Delete: { Objects: fileKeys },
+                
             });
 
+            console.log("command :", command)
             try {
                 await s3Client.send(command);
                 console.log('✅ S3 deletion successful.');

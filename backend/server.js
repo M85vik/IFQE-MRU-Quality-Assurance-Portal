@@ -6,7 +6,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const apiMetricsMiddleware = require('./middleware/apiMetrics');
 const reportRoutes = require("./routes/reportRoutes");
-
+const archiveRoutes= require('./routes/archiveSubmissionRoutes')
 dotenv.config();
 connectDB();
 
@@ -64,6 +64,6 @@ app.use('/api/system', require('./routes/systemRoutes'));
 app.use("/api/announcement-email",require("./routes/announcementEmailRoutes"));
 app.use("/api/reports", reportRoutes);
 app.use("/api/result-publication", require("./routes/resultPublicationRoutes"));
-
+app.use('/api/archives', archiveRoutes);
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
