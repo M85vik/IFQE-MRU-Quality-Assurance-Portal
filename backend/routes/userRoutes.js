@@ -13,7 +13,7 @@ const router = express.Router();
 // Import controller functions that handle the logic for user actions.
 // Note: The logic for these functions was previously in a file named 'authController.js'.
 // Please ensure the path and filename are correct for your project structure.
-const { registerUser, loginUser, getUserProfile,getAllUsers, updateUserRole,deleteUser} = require('../controllers/userController');
+const { registerUser, loginUser, getUserProfile,getAllUsers, updateUserRole,deleteUser, updateUserPassword} = require('../controllers/userController');
 
 // Import middleware for authentication (protect) and role-based authorization (authorize).
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -59,6 +59,8 @@ router.get("/all-users", protect,getAllUsers)
 
 router.put("/update-role/:id", protect, updateUserRole);
 router.delete("/:id", protect, deleteUser);
+
+router.post("/update-password/:id", protect, authorize('admin'), updateUserPassword);
 
 
 // Export the configured router to be mounted in the main server file.

@@ -2,8 +2,9 @@
  * @fileoverview This file contains the controller functions for user authentication,
  * including registration, login, and fetching user profiles.
  * @module controllers/authController
- */
+*/
 
+const crypto = require('crypto');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const logActivity = require("../utils/logActivity")
@@ -31,7 +32,8 @@ const registerUser = async (req, res) => {
     // 2. Create a new user in the database with the provided details.
     // The password will be automatically hashed by the Mongoose pre-save hook in the User model.
     const user = await User.create({ name, email, password, role, department, school });
-
+  
+   
     const now = new Date();
     const year = now.getFullYear(); // e.g., 2025
     const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
@@ -206,6 +208,65 @@ const updateUserRole = async (req, res) => {
   }
 };
 
+
+
+
+const updateUserPassword = async (req, res) => {
+  const { id } = req.params;
+  const { password, masterKey } = req.body;
+
+  if (!password) {
+    return res.status(400).json({
+      message: 'Password is Required.',
+    });
+  }
+
+  const MASTER_KEY = process.env.MASTER_KEY;
+  if (
+    !masterKey ||
+    !crypto.timingSafeEqual(
+      Buffer.from(masterKey),
+      Buffer.from(MASTER_KEY)
+    )
+  ) {
+    return res.status(403).json({ message: 'Invalid master key.' });
+  }
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    user.password = password;
+    await user.save();
+
+    const year = new Date().getFullYear();
+    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`;
+
+    try {
+      await logActivity(
+        req.user,
+        'Update User Password',
+        `User ID: ${user._id}, Department: ${req.user?.department || 'NA'}`,
+        `updated ${academicYear}`,
+        req.ip
+      );
+    } catch (logError) {
+      console.warn('⚠️ Activity log failed:', logError.message);
+    }
+
+    return res.status(200).json({
+      message: 'Password updated successfully.',
+    });
+  } catch (error) {
+    console.error('Error Updating User:', error.message);
+    return res.status(500).json({
+      message: 'Internal server error.',
+    });
+  }
+};
+
 // ✅ Delete user
 const deleteUser = async (req, res) => {
   const { id } = req.params;
@@ -239,4 +300,4 @@ const deleteUser = async (req, res) => {
 
 
 // Export the controller functions to be used in the user routes file.
-module.exports = { registerUser, loginUser, getUserProfile, getAllUsers, updateUserRole, deleteUser };
+module.exports = { registerUser, loginUser, getUserProfile, getAllUsers, updateUserRole, updateUserPassword,deleteUser };

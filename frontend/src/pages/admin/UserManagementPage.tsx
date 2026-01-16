@@ -9,8 +9,9 @@ import Input from '../../components/shared/Input';
 import ConfirmDialog from '../../components/shared/ConfirmDialog'
 import Alert from '../../components/shared/Alert';
 import Modal from '../../components/shared/Modal';
-import { UserPlus, Users, Trash2, Copy } from 'lucide-react';
+import { UserPlus, Users, Trash2, Copy, KeyRound } from 'lucide-react';
 import toast from 'react-hot-toast';
+import UpdatePasswordDialog from '../../components/shared/UpdatePasswordDialog';
 
 const UserManagementPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -30,10 +31,17 @@ const UserManagementPage: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [CopySuccess, setCopySuccess] = useState('');
   const [CopyError, setCopyError] = useState('');
-const [confirmDialog, setConfirmDialog] = useState({
+  const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     targetId: '',
   });
+
+  const [passwordDialog, setPasswordDialog] = useState({
+  isOpen: false,
+  userId: '',
+  userName: '',
+});
+
 
   // --- Fetch schools
   useEffect(() => {
@@ -49,29 +57,29 @@ const [confirmDialog, setConfirmDialog] = useState({
   }, []);
 
   // --- Fetch departments when school selected
-useEffect(() => {
-  // Don't run if no school is selected yet
-  if (!selectedSchool) {
-    setDepartments([]);
-    setSelectedDepartment('');
-    return;
-  }
-
-  const fetchDepartments = async () => {
-    try {
-      setPageError('');
-      setDepartments([]); // clear old ones
+  useEffect(() => {
+    // Don't run if no school is selected yet
+    if (!selectedSchool) {
+      setDepartments([]);
       setSelectedDepartment('');
-      const { data } = await apiClient.get(`/public/departments/${selectedSchool}`);
-      setDepartments(data);
-    } catch (err) {
-      console.error('Error fetching departments:', err);
-      setPageError('Could not load department data from the server.');
+      return;
     }
-  };
 
-  fetchDepartments();
-}, [selectedSchool]);
+    const fetchDepartments = async () => {
+      try {
+        setPageError('');
+        setDepartments([]); // clear old ones
+        setSelectedDepartment('');
+        const { data } = await apiClient.get(`/public/departments/${selectedSchool}`);
+        setDepartments(data);
+      } catch (err) {
+        console.error('Error fetching departments:', err);
+        setPageError('Could not load department data from the server.');
+      }
+    };
+
+    fetchDepartments();
+  }, [selectedSchool]);
 
   // --- Fetch users
   const fetchUsers = async () => {
@@ -104,17 +112,19 @@ useEffect(() => {
     setIsProcessing(true);
 
     if (!selectedSchool || !selectedDepartment) {
-   setModalError('Please select both School and Department for this user.');
-   setIsProcessing(false);
-   return;
- }
-    const userData: any = { name, email, password, role,   school: selectedSchool,
-    department: selectedDepartment, };
+      setModalError('Please select both School and Department for this user.');
+      setIsProcessing(false);
+      return;
+    }
+    const userData: any = {
+      name, email, password, role, school: selectedSchool,
+      department: selectedDepartment,
+    };
 
     try {
       await registerUser(userData);
       setSuccess(`Successfully created user: ${name} (${role}).`);
-        setTimeout(() => setSuccess(''), 1500);
+      setTimeout(() => setSuccess(''), 1500);
       resetForm();
       fetchUsers(); // refresh list
     } catch (err: any) {
@@ -128,7 +138,7 @@ useEffect(() => {
   const handleRoleChange = async (id: string, newRole: string) => {
     try {
       await apiClient.put(`/users/update-role/${id}`, { role: newRole });
-         toast.success('User Role Changed Successfully!');
+      toast.success('User Role Changed Successfully!');
       fetchUsers();
     } catch {
       setPageError('Failed to update user role.');
@@ -153,6 +163,25 @@ useEffect(() => {
       setPageError('Failed to delete user.');
       toast.error('Failed to delete user.');
     }
+  };
+
+
+    // ---------------- Update Password ----------------
+  const handlePasswordUpdate = async (masterKey: string, newPassword: string) => {
+    const toastId = toast.loading('Updating password...');
+
+try {
+      await apiClient.post(
+        `/users/update-password/${passwordDialog.userId}`,
+        { masterKey, password: newPassword }
+      );
+  
+      toast.success('Password updated successfully!', { id: toastId });
+} catch (error) {
+
+  toast.error("Password Change Failed");
+  
+}
   };
 
 
@@ -222,28 +251,28 @@ useEffect(() => {
                   <option value="qaa">QAA Reviewer</option>
                   <option value="superuser">Superuser</option>
                   <option value="admin">Admin</option>
-                    <option value="developer">Developer</option>
+                  <option value="developer">Developer</option>
                 </select>
               </div>
 
-           
-              
-                  <div className="md:col-span-2"></div>
-                  <div>
-                    <label htmlFor="school" className="block text-sm font-medium text-muted-foreground mb-1">School</label>
-                    <select id="school" value={selectedSchool} onChange={(e) => setSelectedSchool(e.target.value)} required className="w-full px-3 py-2 border border-input bg-card rounded-md focus:ring-ring focus:border-ring">
-                      <option value="" disabled>Select a school...</option>
-                      {schools.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="department" className="block text-sm font-medium text-muted-foreground mb-1">Department</label>
-                    <select id="department" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} required disabled={!selectedSchool || departments.length === 0} className="w-full px-3 py-2 border border-input bg-card rounded-md disabled:opacity-50 disabled:cursor-not-allowed focus:ring-ring focus:border-ring">
-                      <option value="" disabled>Select a department...</option>
-                      {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
-                    </select>
-                  </div>
-              
+
+
+              <div className="md:col-span-2"></div>
+              <div>
+                <label htmlFor="school" className="block text-sm font-medium text-muted-foreground mb-1">School</label>
+                <select id="school" value={selectedSchool} onChange={(e) => setSelectedSchool(e.target.value)} required className="w-full px-3 py-2 border border-input bg-card rounded-md focus:ring-ring focus:border-ring">
+                  <option value="" disabled>Select a school...</option>
+                  {schools.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="department" className="block text-sm font-medium text-muted-foreground mb-1">Department</label>
+                <select id="department" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} required disabled={!selectedSchool || departments.length === 0} className="w-full px-3 py-2 border border-input bg-card rounded-md disabled:opacity-50 disabled:cursor-not-allowed focus:ring-ring focus:border-ring">
+                  <option value="" disabled>Select a department...</option>
+                  {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
+                </select>
+              </div>
+
               <div className="md:col-span-2 text-right">
                 <Button type="submit" isLoading={isProcessing}>Create User</Button>
               </div>
@@ -283,7 +312,7 @@ useEffect(() => {
                       <select
                         value={u.role}
                         onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                      
+
                         className="border border-input rounded-md px-2 py-1"
                       >
                         <option value="department">department</option>
@@ -294,29 +323,58 @@ useEffect(() => {
                       </select>
                     </td>
 
-                    <td className="px-4 py-2 border text-center">
+                    {/* <td className="px-4 py-2 border text-center">
                       <button
                         onClick={() => handleDelete(u._id)}
                         className="text-red-500 hover:text-red-700 transition"
                       >
                         <Trash2 size={18} />
                       </button>
+                    </td> */}
+
+                    <td className="px-4 py-2 border text-center">
+                      <div className="flex items-center justify-evenly gap-3">
+                        {/* 🔑 Change Password */}
+                        <button
+                          onClick={() =>
+                            setPasswordDialog({
+                              isOpen: true,
+                              userId: u._id,
+                              userName: u.name,
+                            })
+                          }
+                          className="text-blue-600 hover:text-blue-800 transition"
+                          title="Change Password"
+                        >
+                          <KeyRound size={18} />
+                        </button>
+
+                        {/* 🗑 Delete User */}
+                        <button
+                          onClick={() => handleDelete(u._id)}
+                          className="text-red-500 hover:text-red-700 transition"
+                          title="Delete User"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </td>
+
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </Card>
-         <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        title="Delete User"
-        message="Are you sure you want to delete this user? This action cannot be undone."
-        confirmLabel="Yes, Delete"
-        cancelLabel="Cancel"
-        onConfirm={confirmDelete}
-        onCancel={() => setConfirmDialog({ isOpen: false, targetId: '' })}
-      />
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          title="Delete User"
+          message="Are you sure you want to delete this user? This action cannot be undone."
+          confirmLabel="Yes, Delete"
+          cancelLabel="Cancel"
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmDialog({ isOpen: false, targetId: '' })}
+        />
       </div>
 
       {/* --- Error Modal --- */}
@@ -326,8 +384,19 @@ useEffect(() => {
           <Button onClick={() => setModalError('')}>Close</Button>
         </div>
       </Modal>
+
+      <UpdatePasswordDialog
+  isOpen={passwordDialog.isOpen}
+  userName={passwordDialog.userName}
+  onClose={() =>
+    setPasswordDialog({ isOpen: false, userId: '', userName: '' })
+  }
+  onSubmit={handlePasswordUpdate}
+/>
+
     </>
   );
 };
 
 export default UserManagementPage;
+
