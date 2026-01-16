@@ -168,7 +168,8 @@ import {
   AlertCircle,
   Archive,
   Megaphone,
-  Trash2
+  Trash2,
+  Replace
 } from 'lucide-react';
 
 type NavItemProps = {
@@ -309,6 +310,12 @@ const Sidebar = ({
               <NavItem to="/app/admin/content" icon={<Megaphone size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 Manage Content
               </NavItem>
+
+              <NavItem to="/app/admin/sub-status" icon={<Replace size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Submission Override
+              </NavItem>
+
+
               <NavItem to="/app/admin/deletion" icon={<Trash2 size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 Deletion
               </NavItem>

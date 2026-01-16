@@ -22,7 +22,9 @@ const {
   getSubmissionsForSuperuser,
   submitAppeal,
   deleteSubmission, 
-  getSubmissionStatus
+  getSubmissionStatus,
+  updateSubmissionStatusByAdmin,
+   getSubmissionsByAcademicYear
 } = require('../controllers/submissionController');
 
 // Import middleware for authentication (protect) and role-based authorization (authorize).
@@ -112,6 +114,21 @@ router.route('/:id')
 
 router.delete('/:id', protect, authorize('admin', 'superuser'), deleteSubmission);
 
+
+
+router.get(
+  '/by-academic-year/:academicYear',
+  protect,
+  authorize('admin'),
+  getSubmissionsByAcademicYear
+);
+
+
+
+
+router.put( '/admin/update-status/:id', protect, authorize('admin'),
+  updateSubmissionStatusByAdmin
+);
 
 
 // Export the configured router to be mounted in the main server file.

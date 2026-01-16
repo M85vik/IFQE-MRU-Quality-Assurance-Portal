@@ -45,6 +45,7 @@ import PublishResultsPage from './pages/admin/PublishResultsPage';
 import ResultsPage from "./pages/results/ResultsPage";
 import SubmissionViewPage from './pages/department/SubmissionViewPage';
 import { Toaster } from 'react-hot-toast'
+import AdminSubmissionOverridePage from './pages/admin/AdminSubmissionOverridePage';
 const AppRootRedirector = () => {
   const { userInfo } = useAuthStore();
   if (!userInfo) return <Navigate to="/login" replace />;
@@ -99,9 +100,7 @@ function App() {
             <Route path="department/appeals" element={<AppealDashboard />} />
             <Route path="department/results" element={<ResultsPage />} />
             <Route path="department/archives" element={<ArchivesPage />} />
-            <Route
-  path="department/submission-reviews"
-  element={<SubmissionViewDashboard />}
+            <Route path="department/submission-reviews" element={<SubmissionViewDashboard />}
 />
 
 <Route
@@ -130,6 +129,7 @@ function App() {
             <Route path="admin/publish-results" element={<PublishResultsPage />} />
             <Route path="admin/results" element={<ResultsPage />} />
             <Route path="admin/archives" element={<ArchivingPanel />} />
+             <Route path="admin/sub-status" element={<AdminSubmissionOverridePage/>} />
 
             <Route path="developer/dashboard" element={<DeveloperDashboard />} />
 
