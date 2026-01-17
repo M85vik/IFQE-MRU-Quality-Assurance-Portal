@@ -77,7 +77,7 @@
 //               Archives
 //             </NavItem>
 
-            
+
 //           </>
 //         )}
 
@@ -311,6 +311,10 @@ const Sidebar = ({
                 Manage Content
               </NavItem>
 
+              <NavItem to="/app/admin/results" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed}>
+                Results
+              </NavItem>
+
               <NavItem to="/app/admin/sub-status" icon={<Replace size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 Submission Override
               </NavItem>
@@ -321,6 +325,10 @@ const Sidebar = ({
               </NavItem>
               <NavItem to="/app/admin/archives" icon={<Archive size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 Archive Files
+              </NavItem>
+
+              <NavItem to="/app/admin/publish-results" icon={<FileCheck2 size={20} />} isCollapsed={isCollapsed}>
+                Publish Results
               </NavItem>
             </>
           )}
