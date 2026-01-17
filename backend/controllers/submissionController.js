@@ -981,6 +981,66 @@ const getSubmissionStatus = async (req, res) => {
 
 
 
+const updateSubmissionStatusByAdmin = async (req, res) => {
+  const { id } = req.params;
+  const { status, reason } = req.body;
+
+  if (!status) {
+    return res.status(400).json({ message: 'Status is required.' });
+  }
+
+  const submission = await Submission.findById(id);
+  if (!submission) {
+    return res.status(404).json({ message: 'Submission not found.' });
+  }
+
+  submission.status = status;
+
+  submission.adminOverride = {
+    by: req.user._id,
+    reason: reason || 'Manual override',
+    at: new Date(),
+  };
+
+  await submission.save();
+
+  res.status(200).json({
+    message: 'Submission status updated by admin.',
+  });
+};
+
+
+
+const getSubmissionsByAcademicYear = async (req, res) => {
+  const { academicYear } = req.params;
+
+  if (!academicYear) {
+    return res.status(400).json({
+      message: 'Academic year is required.',
+    });
+  }
+
+  try {
+    const submissions = await Submission.find({
+      academicYear,
+    })
+      .select('title status department createdAt academicYear')
+      .populate('department', 'name')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(submissions);
+  } catch (error) {
+    console.error('Error fetching submissions by academic year:', error);
+    res.status(500).json({
+      message: 'Failed to fetch submissions.',
+    });
+  }
+};
+
+
+
+
+
 // Export all controller functions for use in the routes file.
 module.exports = {
     createSubmission,
@@ -992,5 +1052,7 @@ module.exports = {
     getSubmissionsForSuperuser,
     submitAppeal,
     deleteSubmission,
-    getSubmissionStatus
+    getSubmissionStatus,
+    updateSubmissionStatusByAdmin,
+    getSubmissionsByAcademicYear
 };
