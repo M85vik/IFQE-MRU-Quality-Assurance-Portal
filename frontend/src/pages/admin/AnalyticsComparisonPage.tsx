@@ -135,7 +135,7 @@ const AnalyticsComparisonPage: React.FC = () => {
                             id="year-select"
                             value={selectedYear}
                             onChange={(e) => setSelectedYear(e.target.value)}
-                            className="w-full p-2 border border-border/70 bg-black rounded-md focus:ring-2 focus:ring-foreground/40 focus:border-foreground/50 text-white bg-[#222222] "
+                            className="w-full p-2 border border-border/70  rounded-md focus:ring-2 focus:ring-foreground/40 focus:border-foreground/50 text-white bg-[#222222] "
                         >
                             {availableYears.map(year => <option key={year} value={year}>{year}</option>)}
                         </select>
