@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyDepartmentSubmissions } from '../../services/submissionService';
 
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import { FileText, Inbox } from 'lucide-react';
@@ -47,7 +47,7 @@ const SubmissionViewDashboard: React.FC = () => {
         Submission Reviews
       </h1>
 
-      <Card className="p-0">
+      <CardWhite className="p-0">
         <div className="px-6 py-4 border-b border-border flex items-center gap-3">
           <FileText className="text-blue-600" />
           <h2 className="text-xl font-semibold">
@@ -106,7 +106,7 @@ const SubmissionViewDashboard: React.FC = () => {
             </p>
           </div>
         )}
-      </Card>
+      </CardWhite>
     </div>
   );
 };

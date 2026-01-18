@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSuperuserQueue } from '../../services/superuserService';
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
@@ -109,13 +109,13 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
   {currentConfig.title}
 </h1>
 
-      <Card className="p-0">
+      <CardWhite className="p-0">
         <div className="px-6 py-4 border-b border-border flex items-center gap-3">
           {currentConfig.icon}
           <h2 className="text-xl font-semibold text-card-foreground">Queue ({filteredItems.length})</h2>
         </div>
         {renderTable()}
-      </Card>
+      </CardWhite>
     </div>
   );
 };

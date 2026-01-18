@@ -91,12 +91,13 @@ const MainLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#FAF8F1] text-[#2b3636]">
+    <div className="flex h-screen bg-[#FAF8F1] text-[#2b3636]">
       {/* ✅ SINGLE Sidebar (desktop + mobile) */}
       <Sidebar
         isCollapsed={isSidebarCollapsed}
         isMobileOpen={isMobileMenuOpen}
         onCloseMobile={() => setMobileMenuOpen(false)}
+      
       />
 
       {/* Main content */}

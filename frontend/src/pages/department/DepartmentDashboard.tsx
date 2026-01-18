@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyDepartmentSubmissions, createNewSubmission } from '../../services/submissionService';
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
@@ -76,21 +76,21 @@ const DepartmentDashboard: React.FC = () => {
           <Button onClick={() => setIsCreateModalOpen(true)}><PlusCircle size={20} className="mr-2" /> New Submission</Button>
         </div>
 
-        <Card className="p-0">
+        <CardWhite className="p-0">
           <div className="px-6 py-4 border-b border-border flex items-center gap-3"><Edit className="text-yellow-500" /> <h2 className="text-xl font-semibold">Drafts & Revisions ({drafts.length})</h2></div>
           {drafts.length > 0 ? (
             <table className="min-w-full"><thead className="bg-secondary/50"><tr><th className="px-6 py-3 text-left text-xs uppercase">Title</th><th className="px-6 py-3 text-left text-xs uppercase">Status</th><th className="relative px-6 py-3"></th></tr></thead>
               <tbody className="divide-y divide-border">{drafts.map(sub => (<tr key={sub._id} className="hover:bg-accent"><td className="px-6 py-4 font-medium">{sub.title}</td><td className="px-6 py-4 text-sm">{sub.status}</td><td className="px-6 py-4 text-right"><Button onClick={() => navigate(`/app/department/submission/${sub._id}`)} variant="outline"><Edit size={16} className="mr-2" /> Edit</Button></td></tr>))}</tbody></table>
           ) : <p className="text-center text-muted-foreground py-8">No drafts or revisions pending.</p>}
-        </Card>
+        </CardWhite>
 
-        <Card className="p-0">
+        <CardWhite className="p-0">
           <div className="px-6 py-4 border-b border-border flex items-center gap-3"><Clock className="text-blue-500" /> <h2 className="text-xl font-semibold">In Progress ({inProgress.length})</h2></div>
           {inProgress.length > 0 ? (
             <table className="min-w-full"><thead className="bg-secondary/50"><tr><th className="px-6 py-3 text-left text-xs uppercase">Title</th><th className="px-6 py-3 text-left text-xs uppercase">Status</th></tr></thead>
               <tbody className="divide-y divide-border">{inProgress.map(sub => (<tr key={sub._id} className="hover:bg-accent"><td className="px-6 py-4 font-medium">{sub.title}</td><td className="px-6 py-4 text-sm">{sub.status}</td></tr>))}</tbody></table>
           ) : <p className="text-center text-muted-foreground py-8">No submissions are currently under review.</p>}
-        </Card>
+        </CardWhite>
       </div>
 
       <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Create New Submission">

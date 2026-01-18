@@ -76,7 +76,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { getMyDepartmentSubmissions } from '../../services/submissionService';
 import useSecureDownloader from '../../hooks/useSecureDownloader';
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import { Archive, Download, Inbox } from 'lucide-react';
@@ -144,7 +144,7 @@ const ArchivesPage: React.FC = () => {
         Archived Submissions
       </h1>
 
-      <Card className="p-0">
+      <CardWhite className="p-0">
         <div className="px-6 py-4 border-b border-border flex items-center gap-3">
           <Archive className="text-green-500" />
           <h2 className="text-xl font-semibold">
@@ -200,7 +200,7 @@ const ArchivesPage: React.FC = () => {
             </p>
           </div>
         )}
-      </Card>
+      </CardWhite>
     </div>
   );
 };

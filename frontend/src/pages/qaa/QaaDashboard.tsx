@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getReviewQueue } from '../../services/qaaService';
 
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
@@ -178,7 +178,7 @@ const QaaDashboard: React.FC = () => {
                 Submissions for Review
             </h1>
 
-            <Card>
+            <CardWhite>
                 <div className="p-6">
                     <div className="flex items-center mb-4">
                         <SlidersHorizontal
@@ -225,11 +225,11 @@ const QaaDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </Card>
+            </CardWhite>
 
-            <Card title={`Pending Reviews (${queue.length})`}>
+            <CardWhite title={`Pending Reviews (${queue.length})`}>
                 {renderContent()}
-            </Card>
+            </CardWhite>
         </div>
     );
 };

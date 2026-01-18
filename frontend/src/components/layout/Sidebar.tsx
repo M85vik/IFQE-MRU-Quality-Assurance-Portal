@@ -252,7 +252,7 @@ const Sidebar = ({
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1   p-4 space-y-2 overflow-y-auto">
           {userInfo?.role === 'department' && (
             <>
               <NavItem to="/app/department/dashboard" icon={<LayoutDashboard size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>

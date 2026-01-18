@@ -6,7 +6,7 @@ import useSecureDownloader from '../../hooks/useSecureDownloader';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 
 import { Download, MessageSquare, ArrowLeft } from 'lucide-react';
 
@@ -135,7 +135,7 @@ const SubmissionViewPage: React.FC = () => {
 
       {/* CRITERIA */}
       {submission.partB.criteria.map(criterion => (
-        <Card key={criterion._id} className="p-4">
+        <CardWhite key={criterion._id} className="p-4">
           {criterion.subCriteria.map(sub => (
             <div key={sub._id} className="space-y-4">
               {sub.indicators.map(ind => (
@@ -225,7 +225,7 @@ const SubmissionViewPage: React.FC = () => {
               ))}
             </div>
           ))}
-        </Card>
+        </CardWhite>
       ))}
     </div>
   );
