@@ -13,7 +13,7 @@ const Scorecard: React.FC<ScorecardProps> = ({ title, score, maxScore = 500, col
     const percentage = maxScore > 0 ? (numericScore / maxScore) * 100 : 0;
 
     return (
-        <div className="bg-card p-4 rounded-lg shadow-sm border border-border text-center">
+        <div className="bg-card p-2  rounded-lg shadow-sm border border-border text-center ">
             <h3 className="text-sm font-medium text-muted-foreground mb-2">{title}</h3>
             <div className="flex items-baseline justify-center">
                 <p className="text-4xl font-bold text-card-foreground">{score}</p>

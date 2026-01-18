@@ -160,7 +160,7 @@ const ArchivingPanel: React.FC = () => {
 
     if (submissions.length === 0) {
       return (
-        <p className="p-6 text-muted-foreground">
+        <p className="p-6 text-white">
           No submissions for {selectedYear}.
         </p>
       );
@@ -169,7 +169,7 @@ const ArchivingPanel: React.FC = () => {
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-border">
-          <thead className="bg-secondary/50">
+          <thead className="bg-[#FA8112]">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">Title</th>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">School</th>
@@ -218,7 +218,7 @@ const ArchivingPanel: React.FC = () => {
   // ------------------------------------------------------------------
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <AlertTriangle className="text-yellow-600" />
@@ -238,8 +238,8 @@ const ArchivingPanel: React.FC = () => {
         </select>
       </div>
 
-      <Card className="p-0">
-        <div className="px-6 py-4 border-b bg-muted/70 rounded-t-lg">
+      <Card className="p-0 bg-[#37353E]">
+        <div className="px-6 py-4 border-b bg-white rounded-t-lg">
           <h2 className="text-xl font-semibold">
             Submissions ({selectedYear})
           </h2>

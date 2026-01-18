@@ -150,7 +150,7 @@ const AppealDashboard: React.FC = () => {
                     <td className="px-6 py-4 font-medium">{sub.title}</td>
                     <td className="px-6 py-4 text-sm">{sub.academicYear}</td>
                     <td className="px-6 py-4 text-right">
-                      <Button onClick={() => navigate(`/app/department/appeal/${sub._id}`)}>
+                      <Button onClick={() => navigate(`/app/department/appeal/${sub._id}`)}   className='border border-white'>
                         <AlertCircle size={16} className="mr-2" /> Start Appeal
                       </Button>
                     </td>

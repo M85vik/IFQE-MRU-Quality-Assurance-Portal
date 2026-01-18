@@ -40,9 +40,9 @@ const LoginPage: React.FC = () => {
     return (
         <>
             <div
-                className="min-h-screen w-full flex justify-center items-center p-4 bg-cover bg-center bg-no-repeat"
+                className="min-h-screen w-full flex justify-center items-center p-4 bg-cover bg-center bg-no-repeat bg-[#37353E]"
                 // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg')" }}
-                style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg?w=1920&h=1080')" }}
+                // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg?w=1920&h=1080')" }}
             >
                 <motion.div
                     initial={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
                     <div className="bg-white bg-opacity-90 border border-border rounded-2xl shadow-2xl p-8 space-y-6 backdrop-blur-md">
                         <div className="text-center">
                             <h1 className="text-3xl font-bold text-gray-900">IFQE Portal</h1>
-                            <p className="mt-2 text-gray-600">Sign in to your account</p>
+                            <p className="mt-2 text-gray-800">Sign in to your account</p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-9">
@@ -81,7 +81,7 @@ const LoginPage: React.FC = () => {
                                 </Button>
                             </div>
                         </form>
-                          <div className='text-center  rounded-xl text-slate-500 '>
+                          <div className='text-center  rounded-xl text-slate-900 '>
                         <button onClick={()=>  navigate('/')}>Back to Homepage</button>
                     </div>
                     </div>

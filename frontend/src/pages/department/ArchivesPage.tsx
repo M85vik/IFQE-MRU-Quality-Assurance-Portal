@@ -180,8 +180,9 @@ const ArchivesPage: React.FC = () => {
                       onClick={() =>
                      downloadArchive(sub._id)
                       }
-                      variant="secondary"
+                      variant="primary"
                       isLoading={isDownloading}
+                        className='border border-white'
                     >
                       <Download size={16} className="mr-2" />
                       Download ZIP

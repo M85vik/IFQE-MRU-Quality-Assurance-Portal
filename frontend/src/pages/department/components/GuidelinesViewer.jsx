@@ -4,7 +4,7 @@ const GuidelinesViewer = ({ guidelines }) => {
   if (!guidelines) {
     return (
       <div className="p-4 bg-gray-50 rounded-lg">
-        <p className="text-sm text-gray-500">No guideline information available.</p>
+        <p className="text-sm text-white">No guideline information available.</p>
       </div>
     );
   }
@@ -17,15 +17,15 @@ const GuidelinesViewer = ({ guidelines }) => {
     return (
       <div className="space-y-4">
         <div>
-          <h4 className="font-semibold text-gray-900 mb-2">Guidelines:</h4>
+          <h4 className="font-semibold  text-white mb-2">Guidelines:</h4>
           {Array.isArray(guidelines) && guidelines.length > 0 ? (
-            <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+            <ul className="list-disc list-inside space-y-1 text-sm text-white">
               {guidelines.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-500">No specific instructions provided.</p>
+            <p className="text-sm text-white">No specific instructions provided.</p>
           )}
         </div>
       </div>
@@ -37,9 +37,9 @@ const GuidelinesViewer = ({ guidelines }) => {
     <div className="space-y-4">
       {/* Guidelines Text */}
       <div>
-        <h4 className="font-semibold text-gray-900 mb-2">Guidelines:</h4>
+        <h4 className="font-semibold text-white mb-2">Guidelines:</h4>
         {guidelines.text && guidelines.text.length > 0 ? (
-          <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+          <ul className="list-disc list-inside space-y-1 text-sm text-white">
             {guidelines.text.map((item, index) => (
               <li key={index}>{item}</li>
             ))}

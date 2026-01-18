@@ -85,7 +85,7 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{sub.school?.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{sub.department?.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Button onClick={() => navigate(`/app/superuser/review/${sub._id}`)}>
+                  <Button onClick={() => navigate(`/app/superuser/review/${sub._id}`)}   className='border border-white'>
                     {currentConfig.buttonText}
                   </Button>
                 </td>

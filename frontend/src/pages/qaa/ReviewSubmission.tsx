@@ -62,11 +62,7 @@ const SaveStatusIndicator = ({ status }: { status: 'idle' | 'saving' | 'saved' |
 
 // Indicators that are NOT out of 4
 const INDICATOR_MAX_SCORES: Record<string, number> = {
-    "2.3.1": 12,
-   "2.3.2":12,
-   "2.3.3":12,
-   "2.3.4":12,
-   "4.2.1":16
+  
 };
 
 
@@ -210,7 +206,7 @@ const ReviewSubmission: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-4">
                         <SaveStatusIndicator status={saveStatus} />
-                        <Button onClick={handleSendForApproval} isLoading={isSubmitting}>Send for Final Approval</Button>
+                        <Button onClick={handleSendForApproval} isLoading={isSubmitting}   className='border border-white'>Send for Final Approval</Button>
                     </div>
                 </div>
 

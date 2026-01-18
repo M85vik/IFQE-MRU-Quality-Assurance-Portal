@@ -196,8 +196,8 @@ const NavItem = ({
       flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all group
       ${isCollapsed ? 'justify-center' : ''}
       ${isActive
-        ? 'bg-[#083D77] text-[#FAF8F1]'
-        : 'text-[#083D77] hover:bg-[#083D77]/10'
+        ? 'bg-[#FA8112] text-[#ffffff]'
+        : 'text-[#ffffff] hover:bg-[#FAF3E1]  hover:text-[#000000]'
       }
     `
     }
@@ -236,7 +236,7 @@ const Sidebar = ({
         className={`
           fixed md:static inset-y-0 left-0 z-40
           flex flex-col flex-shrink-0
-          bg-[white] text-[#083D77]
+          bg-[#0c0c0c] text-[#ffffff]
           border-r border-[#083D77]/30
           transition-all duration-300 ease-in-out
           w-64
@@ -245,7 +245,7 @@ const Sidebar = ({
         `}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-center border-b border-[#083D77]/30">
+        <div className="h-16 flex items-center justify-center ">
           <Link to="/app" className="text-xl font-bold">
             {isCollapsed ? 'IFQE' : 'IFQE Portal'}
           </Link>
@@ -295,13 +295,13 @@ const Sidebar = ({
 
           {userInfo?.role === 'admin' && (
             <>
-              <NavItem to="/app/admin/dashboard" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+              <NavItem to="/app/admin/dashboard" icon={<BarChart2 size={20}  />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 Analytics Overview
               </NavItem>
-              <NavItem to="/app/admin/comparison" icon={<BarChartHorizontal size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+              <NavItem to="/app/admin/comparison" icon={<BarChartHorizontal size={20}  />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 Indicator Comparison
               </NavItem>
-              <NavItem to="/app/admin/users" icon={<UserPlus size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+              <NavItem to="/app/admin/users" icon={<UserPlus size={20}  />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 User Management
               </NavItem>
               <NavItem to="/app/admin/windows" icon={<Calendar size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
@@ -329,6 +329,10 @@ const Sidebar = ({
 
               <NavItem to="/app/admin/publish-results" icon={<FileCheck2 size={20} />} isCollapsed={isCollapsed}>
                 Publish Results
+              </NavItem>
+
+              <NavItem to="/app/admin/activity-logs" icon={<FileText size={20} />} isCollapsed={isCollapsed}>
+                Activity Logs
               </NavItem>
             </>
           )}

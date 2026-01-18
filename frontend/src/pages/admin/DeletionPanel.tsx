@@ -75,12 +75,12 @@ const DeletionPanel: React.FC = () => {
   const renderTable = () => {
     if (isLoading) return <div className="p-6"><Spinner /></div>;
     if (error) return <Alert message={error} type="error" />;
-    if (submissions.length === 0) return <p className="p-6 text-muted-foreground">No submissions for {selectedYear}.</p>;
+    if (submissions.length === 0) return <p className="p-6 text-white">No submissions for {selectedYear}.</p>;
 
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-border">
-          <thead className="bg-secondary/50">
+          <thead className="bg-[#FA8112]">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">Title</th>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">School</th>
@@ -117,7 +117,7 @@ const DeletionPanel: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-foreground/90 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-w flex items-center gap-2">
           <AlertTriangle className="text-red-500" /> Deletion Panel
         </h1>
 
@@ -130,8 +130,8 @@ const DeletionPanel: React.FC = () => {
         </select>
       </div>
 
-      <Card className="p-0">
-        <div className="px-6 py-4 border-b border-border bg-muted/70 rounded-t-lg">
+      <Card className="p-0 bg-[#37353E]">
+        <div className="px-6 py-4 border-b border-border bg-white rounded-t-lg">
           <h2 className="text-xl font-semibold">Submissions ({selectedYear})</h2>
           <p className="text-base text-muted-foreground">Permanently delete submissions and all S3 files.</p>
         </div>

@@ -19,12 +19,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     >
       
       <div
-        className="relative bg-card rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-border"
+        className="relative bg-[#37353E] rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col "
         onClick={(e) => e.stopPropagation()} 
       >
         
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h3 className="text-xl font-semibold text-card-foreground">{title}</h3>
+        <div className="flex items-center justify-between p-4 ">
+          <h3 className="text-xl font-semibold text-white">{title}</h3>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg text-sm p-1.5"
@@ -35,7 +35,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
         </div>
 
         
-        <div className="p-6 overflow-y-auto">
+        <div className="p-6 overflow-y-auto ">
           {children}
         </div>
       </div>

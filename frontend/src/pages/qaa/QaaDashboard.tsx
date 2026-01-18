@@ -150,6 +150,9 @@ const QaaDashboard: React.FC = () => {
                                         onClick={() =>
                                             navigate(`/app/qaa/review/${sub._id}`)
                                         }
+
+
+                                        className='border border-white'
                                     >
                                         <FileSearch
                                             size={16}
@@ -170,7 +173,7 @@ const QaaDashboard: React.FC = () => {
         <div className="space-y-6">
             <h1
                 className="text-3xl font-bold"
-                style={{ color: '#083D77' }}
+                style={{ color: '#222222' }}
             >
                 Submissions for Review
             </h1>

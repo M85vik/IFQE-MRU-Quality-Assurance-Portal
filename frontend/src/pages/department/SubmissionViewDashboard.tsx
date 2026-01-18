@@ -86,7 +86,8 @@ const SubmissionViewDashboard: React.FC = () => {
                             `/app/department/submission-view/${sub._id}`
                           )
                         }
-                        variant="outline"
+                        variant="primary"
+                          className='border border-white'
                       >
                         <FileText size={16} className="mr-2" />
                         View Remarks

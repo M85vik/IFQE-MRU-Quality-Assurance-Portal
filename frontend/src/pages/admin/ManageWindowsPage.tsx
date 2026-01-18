@@ -116,25 +116,25 @@ const ManageWindowsPage: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 ">
             <h1 className="text-3xl font-bold text-primary-DEFAULT">Manage Submission & Appeal Windows</h1>
 
-            <Card>
-              <div className="p-6">
+            <Card className='bg-[#37353E]'>
+              <div className="p-6 text-white">
                 <h2 className="text-xl font-semibold mb-4">{editingId ? 'Edit' : 'Create'} Window</h2>
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                    <Input id="academicYear" name="academicYear" label="Academic Year (YYYY-YYYY)" value={formData.academicYear} onChange={handleFormChange} required />
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end text-black">
+                    <Input id="academicYear" name="academicYear" label="Academic Year (YYYY-YYYY)"  value={formData.academicYear} onChange={handleFormChange} required />
                     <Input id="startDate" name="startDate" label="Start Date" type="date" value={formData.startDate} onChange={handleFormChange} required />
                     <Input id="endDate" name="endDate" label="End Date" type="date" value={formData.endDate} onChange={handleFormChange} required />
                     <div>
-                        <label htmlFor="windowType" className="block text-sm font-medium text-muted-foreground mb-1">Window Type</label>
+                        <label htmlFor="windowType" className="block text-sm font-medium text-white mb-1">Window Type</label>
                         <select id="windowType" name="windowType" value={formData.windowType} onChange={handleFormChange} className="w-full p-2 border border-input bg-background rounded-md">
                             <option value="Submission">Submission</option>
                             <option value="Appeal">Appeal</option>
                         </select>
                     </div>
                     <div className="flex space-x-2">
-                        <Button type="submit" isLoading={isSubmitting}>{editingId ? 'Update' : 'Create'}</Button>
+                        <Button type="submit" className='hover:bg-[#FAF3E1] hover:text-[#222222]  border-[#37353E] border-2 hover:border-[#FA8112] ' isLoading={isSubmitting}>{editingId ? 'Update' : 'Create'}</Button>
                         {editingId && <Button type="button" variant="secondary" onClick={resetForm}>Cancel</Button>}
                     </div>
                 </form>
@@ -142,14 +142,14 @@ const ManageWindowsPage: React.FC = () => {
               </div>
             </Card>
 
-            <Card>
+            <Card className='bg-[#37353E]' >
               <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Existing Windows</h2>
+                <h2 className="text-xl font-semibold mb-4 text-white ">Existing Windows</h2>
                 {isLoading ? <Spinner /> : (
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-border">
-                            <thead className="bg-secondary/50">
-                                <tr>
+                            <thead className="bg-[#FA8112] text-black font-bold">
+                                <tr >
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase">Academic Year</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase">Window Type</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase">Start Date</th>

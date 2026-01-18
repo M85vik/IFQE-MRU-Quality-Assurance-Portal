@@ -225,14 +225,14 @@ try {
   return (
     <>
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold" style={{ color: '#083D77' }}>
+        <h1 className="text-3xl font-bold" style={{ color: '#222222' }}>
           User Management
         </h1>
 
         {/* ---------------- Create User Section ---------------- */}
-        <Card className="p-0">
+        <Card className="p-0  bg-[#37353E]">
           <div className="px-6 py-4 border-b border-border">
-            <h2 className="text-xl font-semibold text-card-foreground flex items-center gap-3">
+            <h2 className="text-xl font-semibold  flex items-center gap-3 text-white">
               <UserPlus size={22} /> Create New Portal User
             </h2>
           </div>
@@ -240,13 +240,13 @@ try {
             {pageError && <Alert message={pageError} type="error" />}
             {success && <Alert message={success} type="success" />}
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-              <Input id="name" label="Full Name" type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 text-white">
+              <Input id="name" label="Full Name" type="text" value={name}  onChange={(e) => setName(e.target.value)} required />
               <Input id="email" label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
               <Input id="password" label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               <div>
-                <label htmlFor="role" className="block text-sm font-medium text-muted-foreground mb-1">Role</label>
-                <select id="role" value={role} onChange={(e) => setRole(e.target.value)} className="w-full px-3 py-2 border border-input bg-card rounded-md focus:ring-ring focus:border-ring">
+                <label htmlFor="role" className="block text-sm font-medium text-white mb-1">Role</label>
+                <select id="role" value={role} onChange={(e) => setRole(e.target.value)} className="w-full px-3 py-2 text-black border border-input bg-card rounded-md focus:ring-ring focus:border-ring">
                   <option value="department">Department User</option>
                   <option value="qaa">QAA Reviewer</option>
                   <option value="superuser">Superuser</option>
@@ -259,41 +259,41 @@ try {
 
               <div className="md:col-span-2"></div>
               <div>
-                <label htmlFor="school" className="block text-sm font-medium text-muted-foreground mb-1">School</label>
+                <label htmlFor="school" className="block text-sm font-medium  mb-1 text-white">School</label>
                 <select id="school" value={selectedSchool} onChange={(e) => setSelectedSchool(e.target.value)} required className="w-full px-3 py-2 border border-input bg-card rounded-md focus:ring-ring focus:border-ring">
-                  <option value="" disabled>Select a school...</option>
-                  {schools.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                  <option value=""  className='text-black'  disabled>Select a school...</option>
+                  {schools.map(s => <option className='text-black' key={s._id} value={s._id}>{s.name}</option>)}
                 </select>
               </div>
               <div>
-                <label htmlFor="department" className="block text-sm font-medium text-muted-foreground mb-1">Department</label>
-                <select id="department" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} required disabled={!selectedSchool || departments.length === 0} className="w-full px-3 py-2 border border-input bg-card rounded-md disabled:opacity-50 disabled:cursor-not-allowed focus:ring-ring focus:border-ring">
-                  <option value="" disabled>Select a department...</option>
-                  {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
+                <label htmlFor="department" className="block text-sm font-medium  mb-1">Department</label>
+                <select id="department" value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} required disabled={!selectedSchool || departments.length === 0} className=" text-black w-full px-3 py-2 border border-input bg-card rounded-md disabled:opacity-50 disabled:cursor-not-allowed focus:ring-ring focus:border-ring">
+                  <option value="" className='text-black' disabled>Select a department...</option>
+                  {departments.map(d => <option  className='text-black' key={d._id} value={d._id}>{d.name}</option>)}
                 </select>
               </div>
 
               <div className="md:col-span-2 text-right">
-                <Button type="submit" isLoading={isProcessing}>Create User</Button>
+                <Button  className='hover:bg-[#FAF3E1] hover:text-[#222222]  border-[#37353E] border-2 hover:border-[#FA8112] ' type="submit" isLoading={isProcessing}>Create User</Button>
               </div>
             </form>
           </div>
         </Card>
 
         {/* ---------------- All Users Section ---------------- */}
-        <Card className="p-0">
+        <Card className="p-0 bg-[#37353E]">
           {CopySuccess && <Alert message={CopySuccess} type="success" />}
           {CopyError && <Alert message={CopyError} type="error" />}
           <div className="px-6 py-4 border-b border-border flex items-center gap-3">
-            <Users size={22} />
-            <h2 className="text-xl font-semibold text-card-foreground flex-1">All Users</h2>
-            <Button onClick={handleCopyAll} className="flex items-center gap-2">
+            <Users size={22} color='white' />
+            <h2 className="text-xl font-semibold text-white flex-1">All Users</h2>
+            <Button onClick={handleCopyAll} className="flex items-center gap-2 hover:bg-[#FAF3E1] hover:text-[#222222]  border-[#37353E] border-2 hover:border-[#FA8112] ">
               <Copy size={16} /> Copy All
             </Button>
           </div>
-          <div className="p-6 overflow-x-auto">
-            <table className="min-w-full border border-gray-200 text-sm">
-              <thead className="bg-gray-100 text-left">
+          <div className="p-6 overflow-x-auto text-white">
+            <table className="min-w-full border border-gray-200 text-sm ">
+              <thead className=" text-left bg-[#FA8112] text-black">
                 <tr>
                   <th className="px-4 py-2 border">Name</th>
                   <th className="px-4 py-2 border">Email</th>
@@ -301,9 +301,9 @@ try {
                   <th className="px-4 py-2 border text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className='bg-white'>
                 {users.map((u) => (
-                  <tr key={u._id}>
+                  <tr key={u._id} className='text-black '>
                     <td className="px-4 py-2 border">{u.name}</td>
                     <td className="px-4 py-2 border">{u.email}</td>
 

@@ -31,7 +31,7 @@ const ConfirmDialog = ({
     <Modal isOpen={isOpen} onClose={onCancel} title={title}>
       <div className="flex items-start space-x-3">
         <AlertTriangle className="text-yellow-500 flex-shrink-0 mt-1" size={22} />
-        <div className="text-foreground/80 leading-relaxed">
+        <div className="text-white leading-relaxed">
           {message}
         </div>
       </div>
@@ -40,9 +40,10 @@ const ConfirmDialog = ({
         <Button variant="secondary" onClick={onCancel}>
           {cancelLabel}
         </Button>
-        <Button
+        <Button 
+
           onClick={onConfirm}
-          className="bg-red-600 hover:bg-red-700 text-white"
+          className="bg-red-600 hover:border-red-700 text-white"
         >
           {confirmLabel}
         </Button>

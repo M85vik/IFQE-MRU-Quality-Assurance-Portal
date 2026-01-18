@@ -60,11 +60,7 @@ interface Submission {
 
 // Indicators that are NOT out of 4
 const INDICATOR_MAX_SCORES: Record<string, number> = {
-    "2.3.1": 12,
-    "2.3.2": 12,
-    "2.3.3": 12,
-    "2.3.4": 12,
-    "4.2.1": 16
+   
 
 };
 
@@ -231,7 +227,7 @@ const FinalReviewPage: React.FC = () => {
                     </h1>
                     <p className="text-muted-foreground">{submission.school.name} - {submission.academicYear}</p>
                 </div>
-                <Button onClick={handleFinalize} isLoading={isSubmitting}>
+                <Button onClick={handleFinalize} isLoading={isSubmitting}   className='border border-white'>
                     <Check className="mr-2" size={18} />
                     Finalize Score
                 </Button>
