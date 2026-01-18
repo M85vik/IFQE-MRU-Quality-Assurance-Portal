@@ -32,8 +32,8 @@ const registerUser = async (req, res) => {
     // 2. Create a new user in the database with the provided details.
     // The password will be automatically hashed by the Mongoose pre-save hook in the User model.
     const user = await User.create({ name, email, password, role, department, school });
-  
-   
+
+
     const now = new Date();
     const year = now.getFullYear(); // e.g., 2025
     const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
@@ -42,7 +42,7 @@ const registerUser = async (req, res) => {
 
     try {
       await logActivity(
-       req.user,
+        req.user,
         'Create User',
         `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
         `created ${academicYear}`,
@@ -96,23 +96,23 @@ const loginUser = async (req, res) => {
       // 3. If credentials are valid, send back user data and a new JWT.
 
       const now = new Date();
-    const year = now.getFullYear(); // e.g., 2025
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
+      const year = now.getFullYear(); // e.g., 2025
+      const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
 
-const sanitizedUser = user.toObject();
-delete sanitizedUser.password;
+      const sanitizedUser = user.toObject();
+      delete sanitizedUser.password;
 
-    try {
-      await logActivity(
-       sanitizedUser,
-        'User LoggedIn',
-        `User ID: ${user._id}, Department: ${user?.department || 'NA'}`,
-        `created ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
-    }
+      try {
+        await logActivity(
+          sanitizedUser,
+          'User LoggedIn',
+          `User ID: ${user._id}, Department: ${user?.department || 'NA'}`,
+          `created ${academicYear}`,
+          req.ip
+        );
+      } catch (logError) {
+        console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
+      }
 
       res.json({
         _id: user._id,
@@ -222,15 +222,20 @@ const updateUserPassword = async (req, res) => {
   }
 
   const MASTER_KEY = process.env.MASTER_KEY;
+  if (!masterKey) {
+    return res.status(403).json({ message: 'Invalid master key.' });
+  }
+
+  const inputKeyBuffer = Buffer.from(masterKey);
+  const storedKeyBuffer = Buffer.from(MASTER_KEY);
+
   if (
-    !masterKey ||
-    !crypto.timingSafeEqual(
-      Buffer.from(masterKey),
-      Buffer.from(MASTER_KEY)
-    )
+    inputKeyBuffer.length !== storedKeyBuffer.length ||
+    !crypto.timingSafeEqual(inputKeyBuffer, storedKeyBuffer)
   ) {
     return res.status(403).json({ message: 'Invalid master key.' });
   }
+
 
   try {
     const user = await User.findById(id);
@@ -300,4 +305,4 @@ const deleteUser = async (req, res) => {
 
 
 // Export the controller functions to be used in the user routes file.
-module.exports = { registerUser, loginUser, getUserProfile, getAllUsers, updateUserRole, updateUserPassword,deleteUser };
+module.exports = { registerUser, loginUser, getUserProfile, getAllUsers, updateUserRole, updateUserPassword, deleteUser };
