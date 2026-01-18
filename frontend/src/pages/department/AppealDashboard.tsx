@@ -69,7 +69,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyDepartmentSubmissions } from '../../services/submissionService';
 import { getCurrentWindow } from "../../services/submissionWindowService"
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import { AlertCircle, Inbox } from 'lucide-react';
@@ -126,7 +126,7 @@ const AppealDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-primary-DEFAULT">Appealable Submissions</h1>
-      <Card className="p-0">
+      <CardWhite className="p-0">
         <div className="px-6 py-4 border-b border-border flex items-center gap-3">
           <AlertCircle className="text-orange-500" />
           <h2 className="text-xl font-semibold">
@@ -150,7 +150,7 @@ const AppealDashboard: React.FC = () => {
                     <td className="px-6 py-4 font-medium">{sub.title}</td>
                     <td className="px-6 py-4 text-sm">{sub.academicYear}</td>
                     <td className="px-6 py-4 text-right">
-                      <Button onClick={() => navigate(`/app/department/appeal/${sub._id}`)}>
+                      <Button onClick={() => navigate(`/app/department/appeal/${sub._id}`)}   className='border border-white'>
                         <AlertCircle size={16} className="mr-2" /> Start Appeal
                       </Button>
                     </td>
@@ -167,7 +167,7 @@ const AppealDashboard: React.FC = () => {
             </p>
           </div>
         )}
-      </Card>
+      </CardWhite>
     </div>
   );
 };

@@ -91,12 +91,13 @@ const MainLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-[#FAF8F1] text-[#334443]">
+    <div className="flex h-screen bg-[#FAF8F1] text-[#2b3636]">
       {/* ✅ SINGLE Sidebar (desktop + mobile) */}
       <Sidebar
         isCollapsed={isSidebarCollapsed}
         isMobileOpen={isMobileMenuOpen}
         onCloseMobile={() => setMobileMenuOpen(false)}
+      
       />
 
       {/* Main content */}
@@ -108,7 +109,7 @@ const MainLayout: React.FC = () => {
         />
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-[#FAF8F1] p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto bg-[#F5E7C6] p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

@@ -12,11 +12,13 @@ const Button: React.FC<ButtonProps> = ({ children, onClick, type = 'button', var
   const baseClasses = "font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring focus:ring-opacity-75 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center";
 
   const variantClasses = {
-    primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    primary: 'bg-[#FA8112] text-primary-foreground hover:bg-[#FAF3E1] hover:text-black border-2 hover:border-[#FF885B]',
     secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
     outline: 'bg-transparent text-foreground border border-border hover:bg-accent hover:text-accent-foreground',
     glow: 'bg-rose-600 text-white hover:bg-rose-700 shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50',
     ghost: 'hover:bg-accent hover:text-accent-foreground',
+    oraka:' bg-[#FA8112] '
+    
   };
 
   const sizeClasses = {

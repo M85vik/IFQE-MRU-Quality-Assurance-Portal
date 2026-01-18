@@ -85,11 +85,11 @@ const AdminSubmissionOverridePage = () => {
   };
 
   return (
-    <Card className="space-y-4  ">
+    <Card className="space-y-4 bg-[#37353E] ">
       {/* HEADER */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-red-700 mb-5">
-          ⚠ Admin Submission Status Override
+        <h2 className="text-xl font-semibold text-white mb-5">
+        Admin Submission Status Override
         </h2>
 
         {/* 🎓 Academic Year Selector */}
@@ -108,9 +108,9 @@ const AdminSubmissionOverridePage = () => {
 
       {/* WARNING */}
       <Alert
-    
+        
         type="error"
-        message="⚠ This is a dangerous operation. Manually changing submission status can corrupt workflow history, approval integrity, and reporting data. Proceed only if you fully understand the impact."
+        message="This is a dangerous operation. Manually changing submission status can corrupt workflow history, approval integrity, and reporting data. Proceed only if you fully understand the impact."
       />
 
       {/* ERROR */}
@@ -125,7 +125,7 @@ const AdminSubmissionOverridePage = () => {
         </div>
       ) : (
         <table className="w-full border text-sm mt-5">
-          <thead className="bg-gray-100">
+          <thead className="  bg-[#FA8112]">
             <tr>
               <th className="px-4 py-2 border">Title</th>
               <th className="px-4 py-2 border">Department</th>
@@ -134,7 +134,7 @@ const AdminSubmissionOverridePage = () => {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className='text-white '>
             {submissions.length === 0 ? (
               <tr>
                 <td colSpan={4} className="text-center py-6 text-gray-500">
@@ -157,10 +157,10 @@ const AdminSubmissionOverridePage = () => {
                       onChange={(e) =>
                         requestStatusChange(s, e.target.value)
                       }
-                      className="border rounded-md px-2 py-1 bg-white"
+                      className="border rounded-md px-2 py-1 bg-white text-black"
                     >
                       {STATUSES.map((status) => (
-                        <option key={status} value={status}>
+                        <option  key={status} value={status}>
                           {status}
                         </option>
                       ))}

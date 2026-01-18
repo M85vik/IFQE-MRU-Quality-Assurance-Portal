@@ -139,7 +139,7 @@ const AppealPage: React.FC = () => {
                         <h1 className="text-2xl font-bold">Appeal Submission: {submission.title}</h1>
                         <p className="text-muted-foreground">Select indicators you wish to appeal and provide a clear justification.</p>
                     </div>
-                    <Button onClick={handleOpenConfirmDialog} isLoading={isSubmitting} disabled={appealedCount === 0}>
+                    <Button onClick={handleOpenConfirmDialog} isLoading={isSubmitting} disabled={appealedCount === 0}   className='border border-white'>
                         <Send className="mr-2" size={18} />
                         Submit Appeal ({appealedCount})
                     </Button>

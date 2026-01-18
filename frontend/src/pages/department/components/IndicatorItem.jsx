@@ -194,7 +194,7 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
       {/* Template Modal */}
       <Modal isOpen={isTemplateModalOpen} onClose={() => setIsTemplateModalOpen(false)} title={`Template for ${indicator.indicatorCode}`}>
         <div className="space-y-4 text-center">
-          <p className="text-gray-700">
+          <p className="text-white">
             This indicator has a template file to help you format your evidence correctly.
           </p>
           <Button

@@ -21,13 +21,15 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, toggleMobileMenu }) => {
   return (
     <header
       className="p-4 h-16 flex justify-between items-center sticky top-0 z-20 shadow-md"
-      style={{ backgroundColor: '#083D77', color: '#FAF8F1' }}
+      style={{ backgroundColor: 'white', color: '#FAF8F1' }}
     >
       {/* Left Menu Buttons */}
       <div className="flex items-center">
         <Button
+
+
           onClick={toggleMobileMenu}
-       
+          variant="primary"
           size="sm"
           className="md:hidden  transition "
           aria-label="Toggle Menu"
@@ -37,33 +39,33 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, toggleMobileMenu }) => {
 
         <Button
           onClick={toggleSidebar}
-          
+             variant="primary"
           size="sm"
-          className="hidden md:inline-flex  transition"
+          className="hidden md:inline-flex  transition  hover:bg-[#FAF3E1]  "
           aria-label="Toggle Sidebar"
         >
-          <Menu size={20} color="#FAF8F1" />
+          <Menu size={20} color="#222222" className='hover:text-[#FAF3E1]' />
         </Button>
       </div>
 
       {/* User Info & Logout */}
       <div className="flex items-center space-x-3 sm:space-x-4">
-        <div className="flex items-center space-x-2 text-right">
+        <div className="flex items-center space-x-2 text-right text-[#222222]">
           <div>
             <p className="text-sm font-semibold">{userInfo?.name}</p>
             <p className="text-xs opacity-80 capitalize">{userInfo?.role}</p>
           </div>
-          <UserCircle size={32} color="#FAF8F1" />
+          <UserCircle size={32} color="#222222" />
         </div>
 
         <Button
           onClick={handleLogout}
          
           size="sm"
-          className="hover:bg-[#FAF8F1]/10 transition"
+          className="hover:bg-[#FAF3E1] transition"
           aria-label="Logout"
         >
-          <LogOut size={18} color="#FAF8F1" />
+          <LogOut size={18} color="#222222" />
         </Button>
       </div>
     </header>

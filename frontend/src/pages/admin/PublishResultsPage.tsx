@@ -54,25 +54,25 @@ export default function PublishResultsPage() {
     <div className="p-6 space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-bold text-[#083D77]">
+        <h2 className="text-3xl font-bold text-[#222222]">
           Result Publication Control
         </h2>
-        <p className="text-gray-500 mt-1 text-sm">
+        <p className="text-slate-800 mt-1 text-sm">
           Manage visibility of performance results for each academic year.
         </p>
       </div>
 
       {/* Main Card */}
-      <div className="bg-white shadow-lg border border-gray-200 rounded-xl p-6 space-y-6">
+      <div className="bg-[#37353E] shadow-lg border border-gray-200 rounded-xl p-6 space-y-6">
 
         {/* Dropdown */}
         <div className="flex flex-wrap gap-4 items-center">
-          <label className="text-[#083D77] font-semibold flex items-center gap-2">
+          <label className="text-white font-semibold flex items-center gap-2">
             <CalendarDays size={20} /> Academic Year:
           </label>
 
           <select
-            className="border border-gray-300 rounded-lg p-2 text-[#083D77] shadow-sm focus:ring-2 focus:ring-[#083D77]"
+            className="border border-gray-300 rounded-lg p-2 text-black shadow-sm focus:ring-2 focus:ring-[#FA8112]"
             onChange={(e) => setSelectedYear(e.target.value)}
             value={selectedYear}
           >

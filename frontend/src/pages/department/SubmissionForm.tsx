@@ -173,10 +173,10 @@ const SubmissionForm: React.FC = () => {
                 <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div>
                         <h1 className="text-3xl font-bold text-foreground">{submission.title || `IFQE Submission: ${submission.academicYear}`}</h1>
-                        <p className="text-muted-foreground">Status: <span className="font-semibold">{submission.status}</span></p>
+                        <p className="text-slate-900">Status: <span className="font-semibold">{submission.status}</span></p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="w-48">
+                        <div className="w-5xl">
                             <Scorecard
                                 title="Total Self-Assessed Score"
                                 score={totalSelfAssessedScore}
@@ -222,9 +222,9 @@ const SubmissionForm: React.FC = () => {
                                     <Button
                                         variant="secondary"
                                         onClick={() => setIsTemplateModalOpen(true)}
-                                        className="bg-primary/90 text-white font-semibold hover:scale-105 transition-transform"
+                                        className="bg-green-800 text-white font-semibold hover:scale-105 hover:bg-green-600 transition-transform"
                                     >
-                                        <Download size={16} className="mr-2" />  View Template
+                                        <Download size={16} className="mr-2" />  View Template 
                                     </Button>
                                 </div>
 

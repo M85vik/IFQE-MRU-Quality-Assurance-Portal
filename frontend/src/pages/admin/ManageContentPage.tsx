@@ -148,19 +148,19 @@ const ManageContentPage: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6   ">
             <h1 className="text-3xl font-bold text-primary-DEFAULT">Homepage Content</h1>
 
-            <Card>
+            <Card className='bg-[#37353E] '>
                 <div className="p-6">
-                    <h2 className="text-xl font-semibold mb-4 text-card-foreground">{editingId ? 'Edit' : 'Create'} Announcement</h2>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h2 className="text-xl font-semibold mb-4  text-white ">{editingId ? 'Edit' : 'Create'} Announcement</h2>
+                    <form onSubmit={handleSubmit} className="space-y-4 ">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white">
                             <Input id="title" name="title" label="Title" value={formData.title} onChange={handleFormChange} required />
                             <Input id="date" name="date" label="Date (e.g., November 10, 2025)" value={formData.date} onChange={handleFormChange} required />
                             <div>
-                                <label htmlFor="category" className="block text-sm font-medium text-muted-foreground mb-1">Category</label>
-                                <select id="category" name="category" value={formData.category} onChange={handleFormChange} className="w-full p-2 border border-input bg-background rounded-md">
+                                <label htmlFor="category" className="block text-sm font-medium text-white mb-1">Category</label>
+                                <select id="category" name="category" value={formData.category} onChange={handleFormChange} className=" text-black w-full p-2 border border-input bg-background rounded-md">
                                     <option value="Announcement">Announcement</option>
                                     <option value="Deadline">Deadline</option>
                                     <option value="System Update">System Update</option>
@@ -168,29 +168,29 @@ const ManageContentPage: React.FC = () => {
                                 </select>
                             </div>
                             <div>
-                                <label htmlFor="color" className="block text-sm font-medium text-muted-foreground mb-1">Color Theme</label>
-                                <select id="color" name="color" value={formData.color} onChange={handleFormChange} className="w-full p-2 border border-input bg-background rounded-md">
+                                <label htmlFor="color" className="block text-sm font-medium text-white mb-1">Color Theme</label>
+                                <select id="color" name="color" value={formData.color} onChange={handleFormChange} className=" text-black w-full p-2 border border-input bg-background rounded-md">
                                     <option value="blue">Blue</option>
                                     <option value="red">Red</option>
                                     <option value="gray">Gray</option>
                                 </select>
                             </div>
                             <div className="md:col-span-2">
-                                <label htmlFor="summary" className="block text-sm font-medium text-muted-foreground mb-1">Summary</label>
-                                <textarea id="summary" name="summary" value={formData.summary} onChange={handleFormChange} required rows={2} className="w-full p-2 border border-input bg-background rounded-md" />
+                                <label htmlFor="summary" className="block text-sm font-medium text-white mb-1">Summary</label>
+                                <textarea id="summary" name="summary" value={formData.summary} onChange={handleFormChange} required rows={2} className="text-black w-full p-2 border border-input bg-background rounded-md" />
                             </div>
                             <div className="md:col-span-2">
-                                <label htmlFor="details" className="block text-sm font-medium text-muted-foreground mb-1">Details (for hover effect)</label>
-                                <textarea id="details" name="details" value={formData.details} onChange={handleFormChange} rows={3} className="w-full p-2 border border-input bg-background rounded-md" />
+                                <label htmlFor="details" className="block text-sm font-medium text-white mb-1">Details (for hover effect)</label>
+                                <textarea id="details" name="details" value={formData.details} onChange={handleFormChange} rows={3} className="text-black w-full p-2 border border-input bg-background rounded-md" />
                             </div>
                         </div>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <input type="checkbox" id="isActive" name="isActive" checked={formData.isActive} onChange={handleFormChange} className="h-4 w-4 rounded" />
-                                <label htmlFor="isActive" className="ml-2 block text-sm text-foreground">Active on Homepage</label>
+                                <label htmlFor="isActive" className="ml-2 block text-sm text-white">Active on Homepage</label>
                             </div>
                             <div className="flex space-x-2">
-                                <Button type="submit" isLoading={isSubmitting}>{editingId ? 'Update' : 'Create'}</Button>
+                                <Button className='hover:bg-[#FAF3E1] hover:text-[#222222]  border-[#37353E] border-2 hover:border-[#FA8112] ' type="submit" isLoading={isSubmitting}>{editingId ? 'Update' : 'Create'}</Button>
                                 {editingId && <Button type="button" variant="secondary" onClick={resetForm}>Cancel</Button>}
 
 
@@ -202,13 +202,13 @@ const ManageContentPage: React.FC = () => {
                 </div>
             </Card>
 
-            <Card>
+            <Card className='bg-[#37353E]'>
                 <div className="p-6">
-                    <h2 className="text-xl font-semibold mb-4 text-card-foreground">Existing Announcements</h2>
+                    <h2 className="text-xl font-semibold mb-4 text-white">Existing Announcements</h2>
                     {isLoading ? <Spinner /> : (
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-border">
-                                <thead className="bg-secondary/50">
+                                <thead className="bg-[#FA8112]">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium uppercase">Title</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium uppercase">Category</th>

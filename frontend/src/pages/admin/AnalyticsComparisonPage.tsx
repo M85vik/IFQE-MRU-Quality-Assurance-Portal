@@ -135,7 +135,7 @@ const AnalyticsComparisonPage: React.FC = () => {
                             id="year-select"
                             value={selectedYear}
                             onChange={(e) => setSelectedYear(e.target.value)}
-                            className="w-full p-2 border border-border/70 bg-muted/40 rounded-md focus:ring-2 focus:ring-foreground/40 focus:border-foreground/50 text-foreground/90"
+                            className="w-full p-2 border border-border/70  rounded-md focus:ring-2 focus:ring-foreground/40 focus:border-foreground/50 text-white bg-[#222222] "
                         >
                             {availableYears.map(year => <option key={year} value={year}>{year}</option>)}
                         </select>
@@ -143,7 +143,7 @@ const AnalyticsComparisonPage: React.FC = () => {
                 </div>
 
                 <Card>
-                    <div className="p-6">
+                    <div className="p-6 bg-white rounded-lg">
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                             <h2 className="text-xl font-semibold text-foreground/90">School Performance by Indicator</h2>
                             <div className="relative w-full sm:w-auto">

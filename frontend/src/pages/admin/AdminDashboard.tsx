@@ -259,12 +259,12 @@ const ScoreboardChart: React.FC<{ data: ChartData[] }> = ({ data }) => {
             strokeDasharray="3 3"
             stroke="rgba(15, 14, 14, 0.1)"
           />
-          <XAxis type="number" domain={[0, 500]} stroke="#2222aeff" />
+          <XAxis type="number" domain={[0, 500]} stroke="#FA8112" />
           <YAxis
             type="category"
             dataKey="schoolName"
             width={120}
-            stroke="#2222aeff"
+            stroke="#FA8112"
             tick={{ fontSize: 12 }}
           />
           <Tooltip
@@ -276,7 +276,7 @@ const ScoreboardChart: React.FC<{ data: ChartData[] }> = ({ data }) => {
           />
           <Bar
             dataKey="finalScore"
-            fill="#181662ff"
+            fill="white"
             name="Final Score"
             barSize={20}
           />
@@ -339,7 +339,7 @@ const AdminDashboard: React.FC = () => {
     if (error) return <div className="p-6"><Alert message={error} type="error" /></div>;
     if (performanceData.length === 0) {
       return (
-        <p className="text-center text-muted-foreground py-8">
+        <p className="text-center text-white py-8">
           No approved submissions with scores found for {selectedYear}.
         </p>
       );
@@ -351,7 +351,7 @@ const AdminDashboard: React.FC = () => {
     if (isLoading) return <div className="p-6"><Spinner /></div>;
     if (approvedSubmissions.length === 0) {
       return (
-        <p className="text-center text-muted-foreground py-8">
+        <p className="text-center text-black py-8">
           There are no approved submissions yet.
         </p>
       );
@@ -359,9 +359,9 @@ const AdminDashboard: React.FC = () => {
 
     return (
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-border">
-          <thead className="bg-secondary/50">
-            <tr className="bg-muted/70 text-foreground/90">
+        <table className="min-w-full divide-y  divide-border">
+          <thead className="bg-[#fdfdfd]">
+            <tr className="bg-muted/70 text-black">
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">
                 Title
               </th>
@@ -423,14 +423,14 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-3xl font-bold" style={{ color: '#083D77' }}>
+        <h1 className="text-3xl font-bold" style={{ color: '#222222' }}>
           University Analytics
         </h1>
 
         <select
           value={selectedYear}
           onChange={e => setSelectedYear(e.target.value)}
-          className="p-2 border border-input bg-background rounded-md"
+          className="p-2 border border-input bg-background rounded-md text-black "
         >
           {availableYears.map(year => (
             <option key={year} value={year}>
@@ -440,24 +440,24 @@ const AdminDashboard: React.FC = () => {
         </select>
       </div>
 
-      <Card className="p-0">
-        <div className="px-6 py-4 border-b border-border bg-muted/70 rounded-t-lg">
+      <Card className="p-0 ">
+        <div className="px-6 py-4 border-b border-border bg-white rounded-t-lg">
           <h2 className="text-xl font-semibold flex items-center gap-3">
             <BarChart3 size={22} /> Total Score by School
           </h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-black mt-1">
             Total review scores for approved submissions.
           </p>
         </div>
         <div className="p-6">{renderAnalyticsContent()}</div>
       </Card>
 
-      <Card className="p-0">
-        <div className="px-6 py-4 border-b border-border bg-muted/70 rounded-t-lg">
+      <Card className="p-0  ">
+        <div className="px-6 py-4 border-b border-border bg-white rounded-t-lg">
           <h2 className="text-xl font-semibold flex items-center gap-3">
             <Archive size={22} /> Approved & Archived Submissions
           </h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-black mt-1">
             Download the final ZIP archive.
           </p>
         </div>

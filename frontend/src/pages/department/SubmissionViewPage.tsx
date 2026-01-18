@@ -6,7 +6,7 @@ import useSecureDownloader from '../../hooks/useSecureDownloader';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 
 import { Download, MessageSquare, ArrowLeft } from 'lucide-react';
 
@@ -96,26 +96,31 @@ const SubmissionViewPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* HEADER */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-center px-2 justify-between gap-4">
         <div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="mb-2"
-          >
-            <ArrowLeft size={16} className="mr-2" />
-            Back
-          </Button>
+        
 
           <h1 className="text-2xl font-bold">
             Submission Review: {submission.title}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-slate-900">
             Academic Year: {submission.academicYear} • Status:{' '}
             <span className="font-semibold">{submission.status}</span>
           </p>
+
+
+           
         </div>
+
+         <Button
+            variant="primary"
+            size="sm"
+            onClick={() => navigate(-1)}
+             className='border border-white mb2'
+          >
+            <ArrowLeft size={16} className="mr-2" />
+            Back
+          </Button>
       </div>
 
       {/* INFO BANNER */}
@@ -130,7 +135,7 @@ const SubmissionViewPage: React.FC = () => {
 
       {/* CRITERIA */}
       {submission.partB.criteria.map(criterion => (
-        <Card key={criterion._id} className="p-4">
+        <CardWhite key={criterion._id} className="p-4">
           {criterion.subCriteria.map(sub => (
             <div key={sub._id} className="space-y-4">
               {sub.indicators.map(ind => (
@@ -220,7 +225,7 @@ const SubmissionViewPage: React.FC = () => {
               ))}
             </div>
           ))}
-        </Card>
+        </CardWhite>
       ))}
     </div>
   );

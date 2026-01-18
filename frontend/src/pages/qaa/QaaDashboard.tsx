@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getReviewQueue } from '../../services/qaaService';
 
-import Card from '../../components/shared/Card';
+import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
@@ -150,6 +150,9 @@ const QaaDashboard: React.FC = () => {
                                         onClick={() =>
                                             navigate(`/app/qaa/review/${sub._id}`)
                                         }
+
+
+                                        className='border border-white'
                                     >
                                         <FileSearch
                                             size={16}
@@ -170,12 +173,12 @@ const QaaDashboard: React.FC = () => {
         <div className="space-y-6">
             <h1
                 className="text-3xl font-bold"
-                style={{ color: '#083D77' }}
+                style={{ color: '#222222' }}
             >
                 Submissions for Review
             </h1>
 
-            <Card>
+            <CardWhite>
                 <div className="p-6">
                     <div className="flex items-center mb-4">
                         <SlidersHorizontal
@@ -222,11 +225,11 @@ const QaaDashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </Card>
+            </CardWhite>
 
-            <Card title={`Pending Reviews (${queue.length})`}>
+            <CardWhite title={`Pending Reviews (${queue.length})`}>
                 {renderContent()}
-            </Card>
+            </CardWhite>
         </div>
     );
 };

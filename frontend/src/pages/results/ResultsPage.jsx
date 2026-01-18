@@ -44,13 +44,13 @@ export default function InternalResultsPage() {
 
     return (
         <div className="p-6 space-y-6">
-            <h2 className="text-2xl font-bold text-[#083D77]">Results</h2>
+            <h2 className="text-2xl font-bold text-[#222222]">Results</h2>
 
             {/* Year Dropdown */}
             <div className="flex items-center gap-4">
-                <label className="font-medium">Academic Year:</label>
+                <label className="font-medium text-[#222222]">Academic Year:</label>
                 <select
-                    className="border p-2 rounded-md"
+                    className="border p-2 rounded-md bg-slate-900 text-white"
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
                 >
@@ -61,7 +61,7 @@ export default function InternalResultsPage() {
                 </select>
             </div>
 
-            {loading && <p className="text-blue-700">Loading…</p>}
+            {loading && <p className="text-slate-800">Loading…</p>}
             {error && <p className="text-red-600">{error}</p>}
 
             {schools.length === 0 && !loading && !error && (
@@ -128,7 +128,7 @@ function ResultTable({ school }) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
-        <thead className="bg-[#0077C8] text-white text-sm">
+        <thead className="bg-[#222222] text-white text-sm">
           <tr>
             <th className="p-3">S. No.</th>
             <th className="p-3 text-left">Criteria</th>
@@ -142,29 +142,29 @@ function ResultTable({ school }) {
 
         <tbody>
           {school.criteria.map((row) => (
-            <tr key={row.code} className="even:bg-gray-50 hover:bg-blue-50 transition">
+            <tr key={row.code} className="even:bg-gray-50 hover:bg-[#FAF3E1] transition">
               <td className="p-3 text-center">{row.sNo}</td>
               <td className="p-3">{row.name}</td>
               <td className="p-3 text-center">{row.weightage}%</td>
               <td className="p-3 text-center">{row.maxMarks}</td>
               <td className="p-3 text-center">{row.marksAwarded}</td>
               <td className="p-3 text-center">
-                <span className="px-3 py-1 rounded-md bg-[#D0E9FF] text-[#0B2A52] font-semibold">
+                <span className="px-3 py-1 rounded-md bg-[#FFA240] text-[#000000] font-semibold">
                   {row.percentage}%
                 </span>
               </td>
-              <td className="p-3 text-center font-bold text-[#0B2A52]">
+              <td className="p-3 text-center font-bold text-[#000000]">
                 {row.weightedScore}
               </td>
             </tr>
           ))}
 
           {/* Final Score Row */}
-          <tr className="bg-[#E0F3FF] font-bold border-t">
-            <td colSpan={6} className="p-3 text-right text-[#0B2A52]">
+          <tr className="bg-[#FFA240] font-bold border-t">
+            <td colSpan={6} className="p-3 text-right text-[#000000]">
               FINAL SCORE
             </td>
-            <td className="p-3 text-center text-[#0077C8] text-lg">
+            <td className="p-3 text-center text-[#000000] text-lg">
               {school.finalScore.totalWeightedScore} / {school.finalScore.outOf}
             </td>
           </tr>
