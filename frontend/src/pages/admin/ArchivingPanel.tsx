@@ -169,7 +169,7 @@ const ArchivingPanel: React.FC = () => {
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-border">
-          <thead className="bg-[#FA8112]">
+          <thead className="bg-[#FA8112] text-black font-bold">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">Title</th>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">School</th>
@@ -197,7 +197,8 @@ const ArchivingPanel: React.FC = () => {
                 <td className="px-6 py-4">
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="primary"
+                      className='border border-white'
                     disabled={sub.archive?.status === 'In Progress'}
                     onClick={() => handleRequestArchive(sub)}
                   >
@@ -243,7 +244,7 @@ const ArchivingPanel: React.FC = () => {
           <h2 className="text-xl font-semibold">
             Submissions ({selectedYear})
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-slate-900">
             Generate and manage submission archives.
           </p>
         </div>

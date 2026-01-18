@@ -10,7 +10,7 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ children, title, actionButton, className = '' }) => {
   return (
     
-    <div className={`bg-card rounded-lg border border-border shadow-sm overflow-hidden ${className}`}>
+    <div className={`bg-[#37353E] rounded-lg border border-border shadow-sm overflow-hidden ${className}`}>
       {title && (
         <div className="p-4 border-b border-border flex justify-between items-center">
           <h2 className="text-xl font-semibold text-card-foreground">{title}</h2>

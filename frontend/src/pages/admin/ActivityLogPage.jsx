@@ -103,7 +103,7 @@ const roleColors = {
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide">User</th>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide">Role</th>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide">Action</th>
-              <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide">Details</th>
+              {/* <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide">Details</th> */}
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide">Academic Year</th>
            
               <th></th>
@@ -139,12 +139,12 @@ const roleColors = {
                   <td className="px-6 py-3 text-sm text-foreground">{log.action}</td>
 
                   {/* Truncate text with tooltip */}
-                  <td
+                  {/* <td
                     className="px-6 py-3 text-sm text-muted-foreground max-w-sm truncate"
                     title={log.details}
                   >
                     {log.details}
-                  </td>
+                  </td> */}
 
                   <td className="px-6 py-3 text-sm text-muted-foreground">{log.academicYear}</td>
 

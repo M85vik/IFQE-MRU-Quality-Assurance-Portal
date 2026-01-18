@@ -80,7 +80,7 @@ const DeletionPanel: React.FC = () => {
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-border">
-          <thead className="bg-[#FA8112]">
+          <thead className="bg-[#FA8112]  text-black font-bold">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">Title</th>
               <th className="px-6 py-3 text-left text-xs font-semibold uppercase">School</th>
@@ -133,7 +133,7 @@ const DeletionPanel: React.FC = () => {
       <Card className="p-0 bg-[#37353E]">
         <div className="px-6 py-4 border-b border-border bg-white rounded-t-lg">
           <h2 className="text-xl font-semibold">Submissions ({selectedYear})</h2>
-          <p className="text-base text-muted-foreground">Permanently delete submissions and all S3 files.</p>
+          <p className="text-base text-slate-900">Permanently delete submissions and all S3 files.</p>
         </div>
         {renderTable()}
       </Card>

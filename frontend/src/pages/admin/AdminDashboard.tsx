@@ -339,7 +339,7 @@ const AdminDashboard: React.FC = () => {
     if (error) return <div className="p-6"><Alert message={error} type="error" /></div>;
     if (performanceData.length === 0) {
       return (
-        <p className="text-center text-black py-8">
+        <p className="text-center text-white py-8">
           No approved submissions with scores found for {selectedYear}.
         </p>
       );
@@ -440,7 +440,7 @@ const AdminDashboard: React.FC = () => {
         </select>
       </div>
 
-      <Card className="p-0 bg-[#37353E]">
+      <Card className="p-0 ">
         <div className="px-6 py-4 border-b border-border bg-white rounded-t-lg">
           <h2 className="text-xl font-semibold flex items-center gap-3">
             <BarChart3 size={22} /> Total Score by School
@@ -452,7 +452,7 @@ const AdminDashboard: React.FC = () => {
         <div className="p-6">{renderAnalyticsContent()}</div>
       </Card>
 
-      <Card className="p-0 bg-[#37353E] ">
+      <Card className="p-0  ">
         <div className="px-6 py-4 border-b border-border bg-white rounded-t-lg">
           <h2 className="text-xl font-semibold flex items-center gap-3">
             <Archive size={22} /> Approved & Archived Submissions

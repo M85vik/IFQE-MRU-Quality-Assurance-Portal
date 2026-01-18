@@ -177,11 +177,11 @@ const ManageContentPage: React.FC = () => {
                             </div>
                             <div className="md:col-span-2">
                                 <label htmlFor="summary" className="block text-sm font-medium text-white mb-1">Summary</label>
-                                <textarea id="summary" name="summary" value={formData.summary} onChange={handleFormChange} required rows={2} className="w-full p-2 border border-input bg-background rounded-md" />
+                                <textarea id="summary" name="summary" value={formData.summary} onChange={handleFormChange} required rows={2} className="text-black w-full p-2 border border-input bg-background rounded-md" />
                             </div>
                             <div className="md:col-span-2">
                                 <label htmlFor="details" className="block text-sm font-medium text-white mb-1">Details (for hover effect)</label>
-                                <textarea id="details" name="details" value={formData.details} onChange={handleFormChange} rows={3} className="w-full p-2 border border-input bg-background rounded-md" />
+                                <textarea id="details" name="details" value={formData.details} onChange={handleFormChange} rows={3} className="text-black w-full p-2 border border-input bg-background rounded-md" />
                             </div>
                         </div>
                         <div className="flex items-center justify-between">

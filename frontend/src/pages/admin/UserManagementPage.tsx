@@ -230,7 +230,7 @@ try {
         </h1>
 
         {/* ---------------- Create User Section ---------------- */}
-        <Card className="p-0  bg-[#37353E]">
+        <Card className="p-0 ">
           <div className="px-6 py-4 border-b border-border">
             <h2 className="text-xl font-semibold  flex items-center gap-3 text-white">
               <UserPlus size={22} /> Create New Portal User
@@ -260,7 +260,7 @@ try {
               <div className="md:col-span-2"></div>
               <div>
                 <label htmlFor="school" className="block text-sm font-medium  mb-1 text-white">School</label>
-                <select id="school" value={selectedSchool} onChange={(e) => setSelectedSchool(e.target.value)} required className="w-full px-3 py-2 border border-input bg-card rounded-md focus:ring-ring focus:border-ring">
+                <select id="school" value={selectedSchool} onChange={(e) => setSelectedSchool(e.target.value)} required className=" text-black w-full px-3 py-2 border border-input bg-card rounded-md focus:ring-ring focus:border-ring">
                   <option value=""  className='text-black'  disabled>Select a school...</option>
                   {schools.map(s => <option className='text-black' key={s._id} value={s._id}>{s.name}</option>)}
                 </select>
@@ -281,7 +281,7 @@ try {
         </Card>
 
         {/* ---------------- All Users Section ---------------- */}
-        <Card className="p-0 bg-[#37353E]">
+        <Card className="p-0 ">
           {CopySuccess && <Alert message={CopySuccess} type="success" />}
           {CopyError && <Alert message={CopyError} type="error" />}
           <div className="px-6 py-4 border-b border-border flex items-center gap-3">
@@ -291,7 +291,7 @@ try {
               <Copy size={16} /> Copy All
             </Button>
           </div>
-          <div className="p-6 overflow-x-auto text-white">
+          <div className="p-6 overflow-x-auto text-white rounded-lg  ">
             <table className="min-w-full border border-gray-200 text-sm ">
               <thead className=" text-left bg-[#FA8112] text-black">
                 <tr>
