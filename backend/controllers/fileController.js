@@ -205,7 +205,7 @@ const getDownloadUrl = async (req, res) => {
   const command = new GetObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileKey,
-     ResponseContentDisposition: 'attachment', // forces download
+    //  ResponseContentDisposition: 'attachment',  // forces download
   });
 
   try {

@@ -83,12 +83,24 @@ const MainLayout: React.FC = () => {
   const toggleSidebar = () => setIsSidebarCollapsed(prev => !prev);
   const toggleMobileMenu = () => setMobileMenuOpen(prev => !prev);
 
+  // useEffect(() => {
+  //   document.body.classList.add('portal-theme');
+  //   return () => {
+  //     document.body.classList.remove('portal-theme');
+  //   };
+  // }, []);
+
+
   useEffect(() => {
-    document.body.classList.add('portal-theme');
-    return () => {
-      document.body.classList.remove('portal-theme');
-    };
-  }, []);
+  document.body.classList.add('portal-theme');
+  document.body.style.overflow = 'hidden'; // 🔒 lock body scroll
+
+  return () => {
+    document.body.classList.remove('portal-theme');
+    document.body.style.overflow = 'auto'; // 🔓 restore body scroll
+  };
+}, []);
+
 
   return (
     <div className="flex h-screen bg-[#FAF8F1] text-[#2b3636]">

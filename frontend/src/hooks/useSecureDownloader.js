@@ -17,15 +17,25 @@ const useSecureDownloader = () => {
 
         try {
 
-            //archive download fix 
+            // download fix 
             // const { data } = await apiClient.get(`/files/download-url?fileKey=${fileKey}`);
             const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}`);
             if (data && data.downloadUrl) {
+
+
 
                 const link = document.createElement('a');
                 link.href = data.downloadUrl;
 
                 const name = fileKey.split('/').pop() || fileName;
+
+                const isPreviewable = /\.(pdf|png|jpe?g|webp|gif|svg)$/i.test(name);
+              
+                if(isPreviewable) {
+                    link.target = '_blank';
+
+                }
+              
                 link.setAttribute('download', name);
               
                 document.body.appendChild(link);

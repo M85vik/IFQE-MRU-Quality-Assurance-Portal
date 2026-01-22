@@ -54,8 +54,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
     const onDrop = (acceptedFiles: File[]) => {
         if (isDisabled || acceptedFiles.length === 0) return;
         const selectedFile = acceptedFiles[0];
-        if (selectedFile.size > 10 * 1024 * 1024) { // 10MB limit
-            setError('File is too large. Maximum size is 10MB.');
+        if (selectedFile.size > 50 * 1024 * 1024) { // 50MB limit
+            setError('File is too large. Maximum size is 50MB.');
             return;
         }
         setError('');

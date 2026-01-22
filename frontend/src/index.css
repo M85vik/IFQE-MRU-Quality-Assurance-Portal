@@ -39,6 +39,11 @@ html,
 body,
 #root {
   height: 100%;
+
+}
+
+
+.portal-scroll-lock {
   overflow: hidden;
 }
 

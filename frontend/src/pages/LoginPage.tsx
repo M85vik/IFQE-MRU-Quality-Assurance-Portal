@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
     return (
         <>
             <div
-                className="min-h-screen w-full flex justify-center items-center p-4 bg-cover bg-center bg-no-repeat bg-[#37353E]"
+                className="min-h-screen w-full flex justify-center items-center p-4 bg-cover bg-center bg-no-repeat bg-slate-900"
                 // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg')" }}
                 // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg?w=1920&h=1080')" }}
             >
