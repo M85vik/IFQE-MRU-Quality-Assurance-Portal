@@ -2,11 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  LineChart, Line, CartesianGrid
+  LineChart, Line, CartesianGrid, PieChart, Pie, Cell
 } from 'recharts';
-import { Cpu, Database, Server, Cloud, Activity, Trash2 } from 'lucide-react';
+import { Cpu, Database, Server, Cloud, Activity, Trash2, MessageSquare } from 'lucide-react';
 import CountUp from 'react-countup';
 import apiClient from '../../api/axiosConfig';
+import { getAllFeedback, getFeedbackStats } from '../../services/feedbackService';
 import { P } from 'framer-motion/dist/types.d-Cjd591yU';
 
 /* ---------------------- Small Stat Card ---------------------- */
@@ -52,6 +53,8 @@ const DeveloperDashboard: React.FC = () => {
   const [submissionStatus, setSubmissionStatus] = useState<any[]>([]);
   const [academicYear, setAcademicYear] = useState("2024-2025");
   const [archiveLogs, setArchiveLogs] = useState<any[]>([]);
+  const [feedbackList, setFeedbackList] = useState<any[]>([]);
+  const [feedbackStats, setFeedbackStats] = useState<any>({ total: 0, byRole: [], byCategory: [] });
 
 
   const fetchSubmissionStatus = useCallback(async () => {
@@ -104,14 +107,28 @@ const DeveloperDashboard: React.FC = () => {
   }
 }, []);
 
+  const fetchFeedback = useCallback(async () => {
+    try {
+      const [feedbackData, statsData] = await Promise.all([
+        getAllFeedback(),
+        getFeedbackStats()
+      ]);
+      setFeedbackList(feedbackData);
+      setFeedbackStats(statsData);
+    } catch (err) {
+      console.error("Feedback Fetch Failed:", err);
+    }
+  }, []);
+
 
   useEffect(() => {
     fetchMetrics();
     fetchSubmissionStatus();
-      fetchArchiveLogs();
+    fetchArchiveLogs();
+    fetchFeedback();
     const interval = setInterval(fetchMetrics, 70000);
     return () => clearInterval(interval);
-  }, [fetchMetrics, fetchSubmissionStatus,academicYear,   fetchArchiveLogs]);
+  }, [fetchMetrics, fetchSubmissionStatus, academicYear, fetchArchiveLogs, fetchFeedback]);
 
   return (
     <div className="p-8 space-y-10 bg-gray-50 min-h-screen">
@@ -404,6 +421,108 @@ const DeveloperDashboard: React.FC = () => {
       </tbody>
     </table>
   </div>
+</motion.div>
+
+
+{/* Anonymous Feedback Section */}
+<motion.div className="bg-white rounded-xl shadow p-6"
+  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+  <h2 className="text-lg font-semibold mb-4 text-gray-800 flex items-center">
+    <MessageSquare className="mr-2 text-purple-500" /> Anonymous User Feedback
+  </h2>
+
+  {/* Feedback Stats */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    {/* Total Feedback */}
+    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+      <p className="text-gray-600 text-sm">Total Feedback</p>
+      <h3 className="text-3xl font-bold text-purple-700">
+        <CountUp end={feedbackStats.total || 0} duration={1.2} />
+      </h3>
+    </div>
+
+    {/* By Role Chart */}
+    <div className="bg-gray-50 rounded-xl p-4">
+      <p className="text-gray-600 text-sm mb-2">By Role</p>
+      <div className="flex flex-wrap gap-2">
+        {feedbackStats.byRole?.map((item: any, idx: number) => (
+          <span key={idx} className="px-3 py-1 bg-white rounded-full text-sm border shadow-sm">
+            <span className="capitalize font-medium">{item._id}</span>
+            <span className="ml-2 text-gray-500">({item.count})</span>
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* By Category */}
+    <div className="bg-gray-50 rounded-xl p-4">
+      <p className="text-gray-600 text-sm mb-2">By Category</p>
+      <div className="flex flex-wrap gap-2">
+        {feedbackStats.byCategory?.map((item: any, idx: number) => {
+          const categoryEmoji = {
+            bug: '🐛',
+            feature: '✨',
+            improvement: '💡',
+            other: '💬'
+          }[item._id] || '💬';
+          return (
+            <span key={idx} className="px-3 py-1 bg-white rounded-full text-sm border shadow-sm">
+              {categoryEmoji} <span className="capitalize">{item._id}</span>
+              <span className="ml-2 text-gray-500">({item.count})</span>
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+
+  {/* Feedback List */}
+  {feedbackList.length === 0 ? (
+    <p className="text-gray-500 text-center py-8">No feedback received yet.</p>
+  ) : (
+    <div className="overflow-y-auto max-h-[500px] space-y-4">
+      {feedbackList.map((fb, idx) => {
+        const categoryColors = {
+          bug: 'bg-red-100 text-red-700',
+          feature: 'bg-green-100 text-green-700',
+          improvement: 'bg-blue-100 text-blue-700',
+          other: 'bg-gray-100 text-gray-700'
+        };
+        const roleColors = {
+          department: 'bg-indigo-500',
+          qaa: 'bg-emerald-500',
+          admin: 'bg-orange-500',
+          superuser: 'bg-purple-500'
+        };
+        return (
+          <motion.div
+            key={fb._id || idx}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: idx * 0.05 }}
+            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-1 text-xs rounded-full text-white capitalize ${roleColors[fb.role as keyof typeof roleColors] || 'bg-gray-500'}`}>
+                  {fb.role}
+                </span>
+                <span className={`px-2 py-1 text-xs rounded-full capitalize ${categoryColors[fb.category as keyof typeof categoryColors] || categoryColors.other}`}>
+                  {fb.category}
+                </span>
+              </div>
+              <span className="text-xs text-gray-400">
+                {new Date(fb.createdAt).toLocaleString()}
+              </span>
+            </div>
+            <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+              {fb.message}
+            </p>
+          </motion.div>
+        );
+      })}
+    </div>
+  )}
 </motion.div>
 
 
