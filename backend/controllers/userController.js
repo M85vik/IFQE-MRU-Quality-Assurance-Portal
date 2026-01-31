@@ -111,10 +111,11 @@ const loginUser = async (req, res) => {
           req.ip
         );
       } catch (logError) {
-        console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
+        console.warn(`⚠️ Activity log failed for User ${user._id}:`, logError.message);
       }
       // Cookie Authorization Starts Here
-      const token = generateToken(user_id);
+      const token = generateToken(user._id);
+
 
       // Setting The HTTP Only Cookie
 
@@ -122,7 +123,7 @@ const loginUser = async (req, res) => {
         httpOnly : true,  // Prevents Javascript access (XSS Protection)
         secure : process.env.NODE_ENV === 'production',  // Ensures Cookie only travels over HTTP in production
         sameSite : 'strict',  // CSRF Protection
-        maxAge : 24 * 60 * 60 * 1000  // 24-Hour Expiry
+        maxAge : 24 * 60 * 60 * 1000 // 24-Hour Expiry
       });
 
       // Sending User Data Without The Token

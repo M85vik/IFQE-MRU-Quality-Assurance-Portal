@@ -1,8 +1,9 @@
 // ifqe-portal-frontend5/src/App.tsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import useAuthStore from './store/authStore';
+import api from './api/axiosConfig';
 
 // --- Portal Page Imports ---
 import LoginPage from './pages/LoginPage';
@@ -68,6 +69,28 @@ const PerformanceMonitor = () => {
 
 
 function App() {
+
+  // 2. ADD THIS USE EFFECT
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        // Request to backend to check if cookie is valid
+        // Adjust the URL if your backend route is different
+        const response = await api.get('/users/profile'); 
+        
+        if (response.data) {
+          // SUCCESS: Cookie is valid. Update Store with user info.
+          useAuthStore.getState().login(response.data);
+        }
+      } catch (error) {
+        // FAIL: Cookie is invalid/expired. Ensure store is empty.
+        console.log("User not logged in or session expired");
+        useAuthStore.getState().logout();
+      }
+    };
+
+    checkSession();
+  }, []); // Empty array [] means run only ONCE on page load
 
   return (
     <Router>

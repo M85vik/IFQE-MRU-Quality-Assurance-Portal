@@ -6,7 +6,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const apiMetricsMiddleware = require('./middleware/apiMetrics');
 const reportRoutes = require("./routes/reportRoutes");
-const archiveRoutes= require('./routes/archiveSubmissionRoutes')
+const archiveRoutes= require('./routes/archiveSubmissionRoutes');
 const cookieParser = require('cookie-parser');
 
 dotenv.config();

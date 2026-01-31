@@ -62,6 +62,18 @@ router.delete("/:id", protect, deleteUser);
 
 router.post("/update-password/:id", protect, authorize('admin'), updateUserPassword);
 
+// Logout User Route
+router.post('/logout', protect, (req, res) => {
+  // 1. Clear the cookie on the server side
+  res.clearCookie('jwt', { 
+    path: '/', 
+    httpOnly: true,
+    sameSite: 'lax', 
+    secure: process.env.NODE_ENV === 'production'
+  });
 
+  // 2. Send success response
+  res.json({ message: 'User logged out successfully' });
+});
 // Export the configured router to be mounted in the main server file.
 module.exports = router;
