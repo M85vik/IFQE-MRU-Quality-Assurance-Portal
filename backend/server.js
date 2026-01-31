@@ -7,6 +7,8 @@ const connectDB = require('./config/db');
 const apiMetricsMiddleware = require('./middleware/apiMetrics');
 const reportRoutes = require("./routes/reportRoutes");
 const archiveRoutes= require('./routes/archiveSubmissionRoutes')
+const cookieParser = require('cookie-parser');
+
 dotenv.config();
 connectDB();
 
@@ -34,10 +36,11 @@ app.use(cors({
       callback(new Error("Not allowed by CORS: " + origin));
     }
   },
-  credentials: true // if sending cookies or auth headers
+  credentials: true // Required for Cookies
 }));
 
-app.use(express.json());
+app.use(cookieParser());  // Parse Cookies (Must Be Before Routes)
+app.use(express.json());  // Parse JSON Body
 
 app.use(apiMetricsMiddleware); // 👈 Add here before routes
 app.get('/', (req, res) => {
