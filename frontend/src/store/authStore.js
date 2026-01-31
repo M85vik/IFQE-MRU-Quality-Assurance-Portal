@@ -1,17 +1,14 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
+// import { persist } from 'zustand/middleware';
+// We need to remove 'persist' middleware since we are now no longer using localStorage.
 const useAuthStore = create(
-  persist(
     (set) => ({
       userInfo: null,
+      // Updated Login : Accepts User Data (No Token Needed)
       login: (userData) => set({ userInfo: userData }),
+
       logout: () => set({ userInfo: null }),
-    }),
-    {
-      name: 'user-auth-storage', 
-    }
-  )
+    })
 );
 
 export default useAuthStore;
