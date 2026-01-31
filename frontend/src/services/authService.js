@@ -17,3 +17,14 @@ export const registerUser = async (userData) => {
     throw new Error(error.response?.data?.message || 'An error occurred during registration.');
   }
 };
+
+export const logoutUser = async () => {
+  try {
+    // We need to hit the endpoint. The browser will be handling the cookie cleaning automatically.
+    await apiClient.post('/users/logout');
+    return { success : true };
+    }
+    catch (error) {
+      throw new Error('Failed To Logout User.');
+    }
+  };
