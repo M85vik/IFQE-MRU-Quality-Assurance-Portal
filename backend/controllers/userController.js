@@ -120,10 +120,10 @@ const loginUser = async (req, res) => {
       // Setting The HTTP Only Cookie
 
       res.cookie('jwt', token, {
-        httpOnly : true,  // Prevents Javascript access (XSS Protection)
-        secure : process.env.NODE_ENV === 'production',  // Ensures Cookie only travels over HTTP in production
-        sameSite : 'strict',  // CSRF Protection
-        maxAge : 24 * 60 * 60 * 1000 // 24-Hour Expiry
+        httpOnly: true,  // Prevents Javascript access (XSS Protection)
+        secure: process.env.NODE_ENV === 'production',  // Ensures Cookie only travels over HTTP in production
+        sameSite: 'strict',  // CSRF Protection
+        maxAge: 24 * 60 * 60 * 1000 // 24-Hour Expiry
       });
 
       // Sending User Data Without The Token
@@ -157,15 +157,19 @@ const loginUser = async (req, res) => {
  * @returns {json} 200 - A JSON object containing the user's profile information.
  */
 const getUserProfile = async (req, res) => {
-  // The user object is attached to the request (`req.user`) by the authentication middleware
-  // after it successfully verifies the JWT from the request headers.
-  // We can safely assume `req.user` exists in this protected route.
-  res.json({
-    _id: req.user._id,
-    name: req.user.name,
-    email: req.user.email,
-    role: req.user.role,
-  });
+  console.log("DEBUG: getUserProfile controller reached. req.user:", req.user?._id);
+  if (req.user) {
+    res.json({
+      _id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+    });
+  } else {
+    // Return 200 with null. This tells the frontend "No one is logged in" 
+    // without triggering a red 401 error in the browser console.
+    res.status(200).json(null);
+  }
 };
 
 
@@ -320,12 +324,12 @@ const deleteUser = async (req, res) => {
 const logoutUser = (req, res) => {
   // Clearing The Cookie
   res.cookie('jwt', '', {
-    httpOnly : true,
-    expires : new Date(0),  // Expire Immediately
-    secure : process.env.NODE_ENV === 'production',
-    sameSite : 'strict'
+    httpOnly: true,
+    expires: new Date(0),  // Expire Immediately
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
   });
-  res.json({ message : 'Logged Out Successfully'});
+  res.json({ message: 'Logged Out Successfully' });
 };
 
 // Export the controller functions to be used in the user routes file.

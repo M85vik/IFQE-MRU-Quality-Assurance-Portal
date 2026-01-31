@@ -13,10 +13,10 @@ const router = express.Router();
 // Import controller functions that handle the logic for user actions.
 // Note: The logic for these functions was previously in a file named 'authController.js'.
 // Please ensure the path and filename are correct for your project structure.
-const { registerUser, loginUser, getUserProfile,getAllUsers, updateUserRole,deleteUser, updateUserPassword} = require('../controllers/userController');
+const { registerUser, loginUser, getUserProfile, getAllUsers, updateUserRole, deleteUser, updateUserPassword } = require('../controllers/userController');
 
 // Import middleware for authentication (protect) and role-based authorization (authorize).
-const { protect, authorize } = require('../middleware/authMiddleware');
+const { protect, optionalProtect, authorize } = require('../middleware/authMiddleware');
 
 
 // --- Route Definitions ---
@@ -52,10 +52,12 @@ router.post('/login', loginUser);
  *          The `getUserProfile` controller then uses `req.user` to send back the profile.
  *          No `authorize` middleware is needed because any logged-in user can view their own profile.
  */
-router.get('/profile', protect, getUserProfile);
+// Use optionalProtect so guests don't trigger a 401 error in the console.
+// Use optionalProtect so guests don't trigger a 401 error in the console.
+router.get('/profile', optionalProtect, getUserProfile);
 
 // TODAY 
-router.get("/all-users", protect,getAllUsers)
+router.get("/all-users", protect, getAllUsers)
 
 router.put("/update-role/:id", protect, updateUserRole);
 router.delete("/:id", protect, deleteUser);
@@ -65,10 +67,10 @@ router.post("/update-password/:id", protect, authorize('admin'), updateUserPassw
 // Logout User Route
 router.post('/logout', protect, (req, res) => {
   // 1. Clear the cookie on the server side
-  res.clearCookie('jwt', { 
-    path: '/', 
+  res.clearCookie('jwt', {
+    path: '/',
     httpOnly: true,
-    sameSite: 'lax', 
+    sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production'
   });
 

@@ -6,7 +6,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const apiMetricsMiddleware = require('./middleware/apiMetrics');
 const reportRoutes = require("./routes/reportRoutes");
-const archiveRoutes= require('./routes/archiveSubmissionRoutes');
+const archiveRoutes = require('./routes/archiveSubmissionRoutes');
 const cookieParser = require('cookie-parser');
 
 dotenv.config();
@@ -16,8 +16,8 @@ connectDB();
 const app = express();
 
 
-const FRONTEND_URL= process.env.FRONTEND_URL
-if(!FRONTEND_URL) throw new Error("Front URL Environment Varibale Not loaded.");
+const FRONTEND_URL = process.env.FRONTEND_URL
+if (!FRONTEND_URL) throw new Error("Front URL Environment Varibale Not loaded.");
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -64,7 +64,7 @@ app.use('/api/dev', require('./routes/devRoutes'));
 app.use('/api/metrics', require('./routes/metricsRoutes'));
 app.use('/api/system', require('./routes/systemRoutes'));
 
-app.use("/api/announcement-email",require("./routes/announcementEmailRoutes"));
+app.use("/api/announcement-email", require("./routes/announcementEmailRoutes"));
 app.use("/api/reports", reportRoutes);
 app.use("/api/result-publication", require("./routes/resultPublicationRoutes"));
 app.use('/api/archives', archiveRoutes);
