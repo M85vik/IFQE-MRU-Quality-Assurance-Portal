@@ -3,6 +3,7 @@ import useAuthStore from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, UserCircle, Menu } from 'lucide-react';
 import Button from '../shared/Button';
+import { logoutUser } from '../../services/authService';
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -13,9 +14,15 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, toggleMobileMenu }) => {
   const { userInfo, logout } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logoutUser(); // Calls API to clear the cookie
+    } catch (error) {
+      console.error("Logout API failed", error);
+    } finally {
+      logout(); // Clear store regardless of API Success
+      navigate('/login');
+    }
   };
 
   return (
