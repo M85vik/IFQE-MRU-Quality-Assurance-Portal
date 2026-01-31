@@ -70,31 +70,30 @@ const PerformanceMonitor = () => {
 
 function App() {
 
-  // 2. ADD THIS USE EFFECT
+  const [isInitializing, setIsInitializing] = React.useState(true);
+
   useEffect(() => {
     const checkSession = async () => {
       try {
-        // Request to backend to check if cookie is valid
         const response = await api.get('/users/profile');
-
         if (response.data) {
-          // SUCCESS: Cookie is valid. Update Store with user info.
           useAuthStore.getState().login(response.data);
         }
-      } catch (error) {  // <--- FIXED: Correct indentation here
-        console.log("User not logged in or session expired");
-
-        // ONLY redirect if we are NOT already on the login page
-        // This stops the infinite refresh loop
-        if (window.location.pathname !== '/login') {
-          useAuthStore.getState().logout();
-          window.location.href = '/login';
-        }
+      } catch (error) {
+        // Silently fail session check - if the user is on a protected
+        // route, PrivateRoute will catch it and redirect normally.
+        useAuthStore.getState().logout();
+      } finally {
+        setIsInitializing(false);
       }
     };
 
     checkSession();
-  }, []); // Empty array [] means run only ONCE on page load
+  }, []);
+
+  if (isInitializing && window.location.pathname.startsWith('/app')) {
+    return null; // Don't render until we know session status if accessing app
+  }
 
   return (
     <Router>

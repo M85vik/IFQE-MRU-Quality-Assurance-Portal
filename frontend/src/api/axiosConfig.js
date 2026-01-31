@@ -6,11 +6,11 @@ import useAuthStore from '../store/authStore';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-if(!apiUrl) throw new Error("Base Url environment variable not loaded.")
+if (!apiUrl) throw new Error("Base Url environment variable not loaded.")
 const apiClient = axios.create({
-  
-  baseURL:`${apiUrl}/api`,
-  withCredentials : true,  // Enables Cookies To Be Sent/Recieved
+
+  baseURL: `${apiUrl}/api`,
+  withCredentials: true,  // Enables Cookies To Be Sent/Recieved
 });
 
 
@@ -38,10 +38,9 @@ apiClient.interceptors.response.use(
   (error) => {
     // If the backend returns 401 (Unauthorized), Log The User Out
     if (error.response && error.response.status === 401) {
-      console.log("Session expired or invalid. Logging out.");
-      const { logout } = useAuthStore.getState();
-      logout();
-      window.location.href = '/login';
+      // Just clear the state. Protected routes (PrivateRoute) will handle 
+      // the redirect internally without refreshing the browser.
+      useAuthStore.getState().logout();
     }
     return Promise.reject(error);
   }
