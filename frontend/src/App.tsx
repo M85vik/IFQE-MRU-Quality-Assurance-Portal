@@ -75,17 +75,21 @@ function App() {
     const checkSession = async () => {
       try {
         // Request to backend to check if cookie is valid
-        // Adjust the URL if your backend route is different
-        const response = await api.get('/users/profile'); 
-        
+        const response = await api.get('/users/profile');
+
         if (response.data) {
           // SUCCESS: Cookie is valid. Update Store with user info.
           useAuthStore.getState().login(response.data);
         }
-      } catch (error) {
-        // FAIL: Cookie is invalid/expired. Ensure store is empty.
+      } catch (error) {  // <--- FIXED: Correct indentation here
         console.log("User not logged in or session expired");
-        useAuthStore.getState().logout();
+
+        // ONLY redirect if we are NOT already on the login page
+        // This stops the infinite refresh loop
+        if (window.location.pathname !== '/login') {
+          useAuthStore.getState().logout();
+          window.location.href = '/login';
+        }
       }
     };
 
@@ -124,14 +128,14 @@ function App() {
             <Route path="department/results" element={<ResultsPage />} />
             <Route path="department/archives" element={<ArchivesPage />} />
             <Route path="department/submission-reviews" element={<SubmissionViewDashboard />}
-/>
+            />
 
-<Route
-  path="department/submission-view/:id"
-  element={<SubmissionViewPage />}
-/>
+            <Route
+              path="department/submission-view/:id"
+              element={<SubmissionViewPage />}
+            />
 
-            
+
 
             <Route path="qaa/dashboard" element={<QaaDashboard />} />
             <Route path="qaa/review/:id" element={<ReviewSubmission />} />
@@ -152,7 +156,7 @@ function App() {
             <Route path="admin/publish-results" element={<PublishResultsPage />} />
             <Route path="admin/results" element={<ResultsPage />} />
             <Route path="admin/archives" element={<ArchivingPanel />} />
-             <Route path="admin/sub-status" element={<AdminSubmissionOverridePage/>} />
+            <Route path="admin/sub-status" element={<AdminSubmissionOverridePage />} />
 
             <Route path="developer/dashboard" element={<DeveloperDashboard />} />
 
