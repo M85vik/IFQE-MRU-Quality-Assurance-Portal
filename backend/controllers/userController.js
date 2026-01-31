@@ -113,7 +113,19 @@ const loginUser = async (req, res) => {
       } catch (logError) {
         console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
       }
+      // Cookie Authorization Starts Here
+      const token = generateToken(user_id);
 
+      // Setting The HTTP Only Cookie
+
+      res.cookie('jwt', token, {
+        httpOnly : true,  // Prevents Javascript access (XSS Protection)
+        secure : process.env.NODE_ENV === 'production',  // Ensures Cookie only travels over HTTP in production
+        sameSite : 'strict',  // CSRF Protection
+        maxAge : 24 * 60 * 60 * 1000  // 24-Hour Expiry
+      });
+
+      // Sending User Data Without The Token
       res.json({
         _id: user._id,
         name: user.name,
@@ -121,8 +133,9 @@ const loginUser = async (req, res) => {
         role: user.role,
         department: user.department,
         school: user.school,
-        token: generateToken(user._id),
+        // NOTE : 'token' is removed from here.
       });
+
     } else {
       // Security Best Practice: Use a generic error message to prevent attackers
       // from knowing whether an email address is registered in the system.
@@ -302,7 +315,17 @@ const deleteUser = async (req, res) => {
 
   }
 };
-
+// Logging Out User
+const logoutUser = (req, res) => {
+  // Clearing The Cookie
+  res.cookie('jwt', '', {
+    httpOnly : true,
+    expires : new Date(0),  // Expire Immediately
+    secure : process.env.NODE_ENV === 'production',
+    sameSite : 'strict'
+  });
+  res.json({ message : 'Logged Out Successfully'});
+};
 
 // Export the controller functions to be used in the user routes file.
-module.exports = { registerUser, loginUser, getUserProfile, getAllUsers, updateUserRole, updateUserPassword, deleteUser };
+module.exports = { registerUser, loginUser, getUserProfile, getAllUsers, updateUserRole, updateUserPassword, deleteUser, logoutUser };
