@@ -77,12 +77,23 @@ function App() {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        // 1. Check if the specific TAB key exists - this ensures Tab Close = Logout
+        // 1. Check if the specific TAB key exists
         const isTabActive = sessionStorage.getItem('isActiveSession');
 
+        // STRICT CHECK: Distinguish between "Refresh" (Allowed) and "Restore" (Forbidden)
+        // This allows Hard Reloads to work, but acts as a logout for "Undo Close Tab".
+        const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+        if (isTabActive && navEntry && navEntry.type !== 'reload') {
+          // If we have a session, but this was NOT a user-triggered refresh...
+          // It means it's likely a "Restore Tab" or "New Navigation" event.
+          // We invalidate this to prevent the "Undo Close Tab" loophole.
+          sessionStorage.removeItem('isActiveSession');
+          window.location.reload(); // Reload to trigger the "Missing Key" logout logic below
+          return;
+        }
+
         if (!isTabActive) {
-          // SECURITY FIX: If key is missing, explicitly kill the cookie on the server.
-          // This prevents "Smart Intruders" from manually adding the key back.
+          // SECURITY FIX: If key is missing (or we just deleted it), explicitly kill the server cookie.
           try { await logoutUser(); } catch (e) { /* Ignore logout errors */ }
           useAuthStore.getState().logout();
           return;
