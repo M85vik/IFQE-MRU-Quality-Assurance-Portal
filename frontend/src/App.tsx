@@ -47,6 +47,8 @@ import ResultsPage from "./pages/results/ResultsPage";
 import SubmissionViewPage from './pages/department/SubmissionViewPage';
 import { Toaster } from 'react-hot-toast'
 import AdminSubmissionOverridePage from './pages/admin/AdminSubmissionOverridePage';
+import { logoutUser } from './services/authService'; // Import API Logout
+
 const AppRootRedirector = () => {
   const { userInfo } = useAuthStore();
   if (!userInfo) return <Navigate to="/login" replace />;
@@ -75,6 +77,17 @@ function App() {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        // 1. Check if the specific TAB key exists - this ensures Tab Close = Logout
+        const isTabActive = sessionStorage.getItem('isActiveSession');
+
+        if (!isTabActive) {
+          // SECURITY FIX: If key is missing, explicitly kill the cookie on the server.
+          // This prevents "Smart Intruders" from manually adding the key back.
+          try { await logoutUser(); } catch (e) { /* Ignore logout errors */ }
+          useAuthStore.getState().logout();
+          return;
+        }
+
         const response = await api.get('/users/profile');
         if (response.data) {
           useAuthStore.getState().login(response.data);

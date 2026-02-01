@@ -29,6 +29,7 @@ const LoginPage: React.FC = () => {
         try {
             const userData = await loginUser(email, password);
             login(userData);
+            sessionStorage.setItem('isActiveSession', 'true'); // Set Tab Session Key
             navigate('/app', { replace: true });
         } catch (err: any) {
             setModalError(err.message || 'Login failed.');
@@ -41,8 +42,8 @@ const LoginPage: React.FC = () => {
         <>
             <div
                 className="min-h-screen w-full flex justify-center items-center p-4 bg-cover bg-center bg-no-repeat bg-slate-900"
-                // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg')" }}
-                // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg?w=1920&h=1080')" }}
+            // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg')" }}
+            // style={{ backgroundImage: "url('https://images.pexels.com/photos/7233131/pexels-photo-7233131.jpeg?w=1920&h=1080')" }}
             >
                 <motion.div
                     initial={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -81,11 +82,11 @@ const LoginPage: React.FC = () => {
                                 </Button>
                             </div>
                         </form>
-                          <div className='text-center  rounded-xl text-slate-900 '>
-                        <button onClick={()=>  navigate('/')}>Back to Homepage</button>
+                        <div className='text-center  rounded-xl text-slate-900 '>
+                            <button onClick={() => navigate('/')}>Back to Homepage</button>
+                        </div>
                     </div>
-                    </div>
-                  
+
                 </motion.div>
             </div>
 
