@@ -76,22 +76,53 @@ function App() {
 
   useEffect(() => {
     const checkSession = async () => {
-      try {
-        // 1. Check if the specific TAB key exists
-        const isTabActive = sessionStorage.getItem('isActiveSession');
+      // 1. Setup Session Broadcasting (For Multi-Tab Support)
+      const channel = new BroadcastChannel('auth_channel');
 
-        // STRICT CHECK: Distinguish between "Refresh" (Allowed) and "Restore" (Forbidden)
-        // This allows Hard Reloads to work, but acts as a logout for "Undo Close Tab".
+      // LISTEN: Always listen for other tabs asking for the session
+      const messageHandler = (event: MessageEvent) => {
+        if (event.data.type === 'REQUEST_SESSION' && sessionStorage.getItem('isActiveSession')) {
+          channel.postMessage({ type: 'SHARE_SESSION', value: 'true' });
+        }
+      };
+      channel.addEventListener('message', messageHandler);
+
+      try {
+        let isTabActive = sessionStorage.getItem('isActiveSession');
+
+        // STRICT CHECK: Verify Navigation Type (Block Undo Close Tab)
         const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-        if (isTabActive && navEntry && navEntry.type !== 'reload') {
-          // If we have a session, but this was NOT a user-triggered refresh...
-          // It means it's likely a "Restore Tab" or "New Navigation" event.
-          // We invalidate this to prevent the "Undo Close Tab" loophole.
+        // NOTE: We relaxed the check slightly. If isTabActive is present, we trust it UNLESS it's a suspicious restore.
+        // But if it's missing, we try to fetch it from neighbors.
+        const isRestore = isTabActive && navEntry && navEntry.type !== 'reload' && navEntry.type !== 'navigate';
+
+        if (isRestore) {
+          isTabActive = null; // Invalidate invalid restore attempts immediately
           sessionStorage.removeItem('isActiveSession');
-          window.location.reload(); // Reload to trigger the "Missing Key" logout logic below
+          window.location.reload();
           return;
         }
 
+        // HANDSHAKE: If no local key, ask other tabs before giving up
+        if (!isTabActive) {
+          await new Promise<void>((resolve) => {
+            const timeout = setTimeout(() => resolve(), 300); // Wait 300ms for a friend
+
+            const tempListener = (event: MessageEvent) => {
+              if (event.data.type === 'SHARE_SESSION') {
+                sessionStorage.setItem('isActiveSession', event.data.value);
+                isTabActive = event.data.value; // Recovered!
+                clearTimeout(timeout);
+                resolve();
+              }
+            };
+
+            channel.addEventListener('message', tempListener);
+            channel.postMessage({ type: 'REQUEST_SESSION' });
+          });
+        }
+
+        // FINAL VERDICT: If still no key after handshake, KILL IT.
         if (!isTabActive) {
           // SECURITY FIX: If key is missing (or we just deleted it), explicitly kill the server cookie.
           try { await logoutUser(); } catch (e) { /* Ignore logout errors */ }
