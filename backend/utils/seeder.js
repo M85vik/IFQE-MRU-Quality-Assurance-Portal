@@ -80,6 +80,13 @@ const importData = async () => {
         password: '123456',
         role: 'superuser',
     });
+
+    await User.create({
+        name: 'Test Developer',
+        email: 'developer@test.com',
+        password: '123456',
+        role: 'developer',
+    });
     
     console.log('Default Users Created...');
 

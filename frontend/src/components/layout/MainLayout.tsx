@@ -75,6 +75,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import FeedbackButton from '../shared/FeedbackButton';
 
 const MainLayout: React.FC = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -125,6 +126,9 @@ const MainLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Floating Feedback Button (hidden for developers) */}
+      <FeedbackButton />
     </div>
   );
 };
