@@ -23,7 +23,8 @@ const IndicatorSubmissionSchema = new mongoose.Schema({
   indicatorCode: { type: String, required: true },
   title: { type: String, required: true },
   fileKey: { type: String },             // S3 key for the main evidence file
-  evidenceLinkFileKey: { type: String }, // S3 key for an additional evidence link file
+  evidenceLinkFileKey: { type: String }, // S3 key for an additional evidence link file (legacy, single file)
+  evidenceFileKeys: [{ type: String }],  // Array of S3 keys for multiple evidence documents
   selfAssessedScore: { type: Number },   // Score given by the department
   reviewScore: { type: Number },         // Score given by the QAA reviewer
   reviewRemark: { type: String },        // Comment from the QAA reviewer

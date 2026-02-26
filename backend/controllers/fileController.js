@@ -184,7 +184,8 @@ const getDownloadUrl = async (req, res) => {
       { 'archiveFileKey': fileKey },
       { 'partA.summaryFileKey': fileKey },
       { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
-      { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey }
+      { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
+      { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
     ]
   });
 
@@ -238,7 +239,8 @@ const deleteFile = async (req, res) => {
       $or: [
         { 'partA.summaryFileKey': fileKey },
         { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
-        { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey }
+        { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
       ],
       department: user.department,
       status: 'Draft'

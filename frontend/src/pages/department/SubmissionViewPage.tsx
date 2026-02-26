@@ -20,6 +20,7 @@ interface Indicator {
   title: string;
   fileKey?: string;
   evidenceLinkFileKey?: string;
+  evidenceFileKeys?: string[];
   finalScore?: number;
   reviewScore?: number;
   reviewRemark?: string;
@@ -128,8 +129,8 @@ const SubmissionViewPage: React.FC = () => {
         type="error"
         message={
           submission.status === 'Appeal Closed'
-            ? 'Appeal process is closed. These are the final remarks and scores.'
-            : 'These are the evaluated scores and remarks for your submission.'
+            ? 'Appeal process is closed. These are the final remarks.'
+            : 'These are the evaluated remarks for your submission.'
         }
       />
 
@@ -149,12 +150,8 @@ const SubmissionViewPage: React.FC = () => {
                       <p className="font-semibold">
                         {ind.indicatorCode}: {ind.title}
                       </p>
-                      <p className="mt-1 text-sm">
-                        Final Score:{' '}
-                        <span className="font-bold text-lg text-primary-DEFAULT">
-                          {ind.finalScore ?? ind.reviewScore} / 4
-                        </span>
-                      </p>
+                      {/* Score display hidden as per request */}
+
                     </div>
                   </div>
 
@@ -220,6 +217,19 @@ const SubmissionViewPage: React.FC = () => {
                         View Evidence
                       </Button>
                     )}
+
+                    {ind.evidenceFileKeys && ind.evidenceFileKeys.length > 0 && ind.evidenceFileKeys.map((key, idx) => (
+                      <Button
+                        key={key}
+                        size="sm"
+                        variant="outline"
+                        onClick={() => downloadFile(key)}
+                        isLoading={isDownloading}
+                      >
+                        <Download size={14} className="mr-2" />
+                        Evidence {idx + 1}
+                      </Button>
+                    ))}
                   </div>
                 </div>
               ))}

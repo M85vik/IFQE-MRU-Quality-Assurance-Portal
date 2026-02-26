@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { fetchAllIndicators } from '../services/indicatorService';
 import apiClient from '../api/axiosConfig';
+import toast from 'react-hot-toast';
 
 const calculateScores = (submission) => {
     let selfAssessedScore = 0;
@@ -77,6 +78,91 @@ const useSubmissionStore = create((set, get) => ({
           .find(i => i.indicatorCode === indicatorCode);
       if (indicator) {
         indicator.evidenceLinkFileKey = fileKey;
+      }
+      return { submission: newSubmission };
+    });
+  },
+
+  // Add a new evidence file key to the array
+  addEvidenceFileKey: (criterionCode, subCriteriaCode, indicatorCode, fileKey) => {
+    set((state) => {
+      if (!state.submission) return {};
+      // Deep clone the submission state
+      const newSubmission = JSON.parse(JSON.stringify(state.submission));
+      
+      let indicator = null;
+
+      // 1. Try direct path lookup
+      const criterion = newSubmission.partB.criteria.find(c => c.criteriaCode == criterionCode);
+      const subCriterion = criterion?.subCriteria.find(sc => sc.subCriteriaCode == subCriteriaCode);
+      indicator = subCriterion?.indicators.find(i => i.indicatorCode == indicatorCode);
+
+      // 2. Fallback: Scan entire structure if direct path fails
+      if (!indicator && newSubmission.partB && newSubmission.partB.criteria) {
+        console.warn(`[Store] Direct lookup failed for ${indicatorCode}. Scanning all criteria...`);
+        for (const c of newSubmission.partB.criteria) {
+            for (const sc of c.subCriteria) {
+                const found = sc.indicators.find(i => i.indicatorCode == indicatorCode);
+                if (found) {
+                    indicator = found;
+                    break;
+                }
+            }
+            if (indicator) break;
+        }
+      }
+
+      if (indicator) {
+        if (!Array.isArray(indicator.evidenceFileKeys)) {
+          indicator.evidenceFileKeys = [];
+        }
+        // Prevent duplicates
+        if (!indicator.evidenceFileKeys.includes(fileKey)) {
+             indicator.evidenceFileKeys.push(fileKey);
+             console.log(`[Store] Added fileKey ${fileKey} to indicator ${indicatorCode}`);
+        } else {
+             console.log(`[Store] FileKey ${fileKey} already exists in indicator ${indicatorCode}`);
+        }
+      } else {
+        const msg = `Could not find indicator ${indicatorCode} to add file. Please refresh the page.`;
+        console.error(`[Store] ${msg}`);
+        toast.error(msg);
+      }
+      
+      return { submission: newSubmission };
+    });
+  },
+
+  // Remove a specific evidence file key from the array
+  removeEvidenceFileKey: (criterionCode, subCriteriaCode, indicatorCode, fileKey) => {
+    set((state) => {
+      if (!state.submission) return {};
+      const newSubmission = JSON.parse(JSON.stringify(state.submission));
+      
+      let indicator = null;
+      
+      // Try direct path lookup with loose equality
+      const criterion = newSubmission.partB.criteria.find(c => c.criteriaCode == criterionCode);
+      const subCriterion = criterion?.subCriteria.find(sc => sc.subCriteriaCode == subCriteriaCode);
+      indicator = subCriterion?.indicators.find(i => i.indicatorCode == indicatorCode);
+      
+      // Fallback: Scan entire structure if direct path fails
+      if (!indicator && newSubmission.partB && newSubmission.partB.criteria) {
+        for (const c of newSubmission.partB.criteria) {
+          for (const sc of c.subCriteria) {
+            const found = sc.indicators.find(i => i.indicatorCode == indicatorCode);
+            if (found) {
+              indicator = found;
+              break;
+            }
+          }
+          if (indicator) break;
+        }
+      }
+      
+      if (indicator && indicator.evidenceFileKeys) {
+        indicator.evidenceFileKeys = indicator.evidenceFileKeys.filter(key => key !== fileKey);
+        console.log(`[Store] Removed fileKey ${fileKey} from indicator ${indicatorCode}`);
       }
       return { submission: newSubmission };
     });

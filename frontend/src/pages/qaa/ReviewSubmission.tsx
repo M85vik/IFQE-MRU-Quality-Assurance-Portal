@@ -14,6 +14,7 @@ interface Indicator {
     title: string;
     fileKey?: string;
     evidenceLinkFileKey?: string;
+    evidenceFileKeys?: string[];
     selfAssessedScore?: number;
     reviewScore?: number;
     reviewRemark?: string;
@@ -239,10 +240,13 @@ const ReviewSubmission: React.FC = () => {
                                         {sc.indicators.map((ind, indIndex) => (
                                             <div key={ind.indicatorCode} className="py-4">
                                                 <p className="text-sm font-semibold text-foreground mb-2">{ind.indicatorCode}: {ind.title}</p>
-                                                <div className="flex items-center space-x-2 mb-3">
+                                                <div className="flex flex-wrap items-center gap-2 mb-3">
                                                     {ind.fileKey && <Button onClick={() => downloadFile(ind.fileKey)} size="sm" variant="outline" isLoading={isDownloading}>View Main Doc</Button>}
                                                     {ind.evidenceLinkFileKey && <Button onClick={() => downloadFile(ind.evidenceLinkFileKey)} size="sm" variant="outline" isLoading={isDownloading}>View Evidence Doc</Button>}
-                                                    {!ind.fileKey && !ind.evidenceLinkFileKey && <span className="text-xs text-muted-foreground italic">No documents submitted</span>}
+                                                    {ind.evidenceFileKeys && ind.evidenceFileKeys.length > 0 && ind.evidenceFileKeys.map((key, idx) => (
+                                                        <Button key={key} onClick={() => downloadFile(key)} size="sm" variant="outline" isLoading={isDownloading}>Evidence {idx + 1}</Button>
+                                                    ))}
+                                                    {!ind.fileKey && !ind.evidenceLinkFileKey && (!ind.evidenceFileKeys || ind.evidenceFileKeys.length === 0) && <span className="text-xs text-muted-foreground italic">No documents submitted</span>}
                                                 </div>
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
