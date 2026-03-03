@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import apiClient from '../../api/axiosConfig';
-import { UploadCloud, File as FileIcon, X, AlertTriangle, Lock } from 'lucide-react';
+import { UploadCloud, File as FileIcon, X, AlertTriangle, Lock, Eye, Loader2 } from 'lucide-react';
 import Spinner from './Spinner';
 
 
@@ -21,6 +21,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
     const [error, setError] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [currentFileKey, setCurrentFileKey] = useState(initialFileKey);
+    const [isPreviewing, setIsPreviewing] = useState(false);
 
     useEffect(() => {
         setCurrentFileKey(initialFileKey);
@@ -76,6 +77,24 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
         }
     };
 
+    const handlePreview = async () => {
+        if (!currentFileKey) return;
+        setIsPreviewing(true);
+        setError('');
+        try {
+            const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(currentFileKey)}`);
+            if (data?.downloadUrl) {
+                window.open(data.downloadUrl, '_blank');
+            } else {
+                setError('Could not generate preview link.');
+            }
+        } catch (err) {
+            setError('Failed to preview file. Please try again.');
+        } finally {
+            setIsPreviewing(false);
+        }
+    };
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, disabled: isProcessing || isDisabled, multiple: false });
     
     if (isProcessing) {
@@ -99,11 +118,25 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
                     <FileIcon className={`h-5 w-5 flex-shrink-0 ${isDisabled ? 'text-muted-foreground' : 'text-green-600'}`} />
                     <span className={`text-sm font-medium truncate ${isDisabled ? 'text-muted-foreground' : 'text-green-800'}`}>File uploaded.</span>
                 </div>
-                {!isDisabled && (
-                    <button onClick={handleRemoveClick} className="text-destructive opacity-70 hover:opacity-100 p-1 rounded-full hover:bg-destructive/10 flex-shrink-0">
-                        <X size={18} />
+                <div className="flex items-center space-x-1 flex-shrink-0">
+                    <button
+                        onClick={handlePreview}
+                        disabled={isPreviewing}
+                        className="text-blue-600 opacity-70 hover:opacity-100 p-1 rounded-full hover:bg-blue-100 disabled:opacity-30"
+                        title="Preview file"
+                    >
+                        {isPreviewing ? (
+                            <Loader2 size={18} className="animate-spin" />
+                        ) : (
+                            <Eye size={18} />
+                        )}
                     </button>
-                )}
+                    {!isDisabled && (
+                        <button onClick={handleRemoveClick} className="text-destructive opacity-70 hover:opacity-100 p-1 rounded-full hover:bg-destructive/10">
+                            <X size={18} />
+                        </button>
+                    )}
+                </div>
             </div>
         );
     }

@@ -14,6 +14,7 @@ interface Indicator {
     title: string;
     fileKey?: string;
     evidenceLinkFileKey?: string;
+    evidenceFileKeys?: string[];
     selfAssessedScore?: number;
     reviewScore?: number;
     reviewRemark?: string;
@@ -257,9 +258,12 @@ const FinalReviewPage: React.FC = () => {
                                             )}
                                             <div className="flex justify-between items-start mb-4">
                                                 <p className="font-semibold text-foreground flex-1 pr-4">{ind.indicatorCode}: {ind.title}</p>
-                                                <div className="flex-shrink-0 flex items-center space-x-2">
+                                                <div className="flex-shrink-0 flex flex-wrap items-center gap-2">
                                                     {ind.fileKey && <Button onClick={() => downloadFile(ind.fileKey)} size="sm" variant="outline" isLoading={isDownloading}>View Main Doc</Button>}
                                                     {ind.evidenceLinkFileKey && <Button onClick={() => downloadFile(ind.evidenceLinkFileKey)} size="sm" variant="outline" isLoading={isDownloading}>View Evidence Doc</Button>}
+                                                    {ind.evidenceFileKeys && ind.evidenceFileKeys.length > 0 && ind.evidenceFileKeys.map((key, idx) => (
+                                                        <Button key={key} onClick={() => downloadFile(key)} size="sm" variant="outline" isLoading={isDownloading}>Evidence {idx + 1}</Button>
+                                                    ))}
                                                 </div>
                                             </div>
 

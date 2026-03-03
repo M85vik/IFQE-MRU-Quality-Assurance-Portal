@@ -481,10 +481,22 @@ const updateSubmission = async (req, res) => {
                                 dbInd.fileKey = reqInd.fileKey;
                             }
 
-                            // EVIDENCE LINK update
+                            // EVIDENCE LINK update (single file - legacy)
                             if (reqInd.evidenceLinkFileKey && reqInd.evidenceLinkFileKey !== dbInd.evidenceLinkFileKey) {
                                 if (dbInd.evidenceLinkFileKey) oldFileKeys.push(dbInd.evidenceLinkFileKey);
                                 dbInd.evidenceLinkFileKey = reqInd.evidenceLinkFileKey;
+                            }
+
+                            // EVIDENCE FILE KEYS update (multi-file)
+                            if (Array.isArray(reqInd.evidenceFileKeys)) {
+                                // Find keys that were removed and queue them for S3 cleanup
+                                const removedKeys = (dbInd.evidenceFileKeys || []).filter(
+                                    key => !reqInd.evidenceFileKeys.includes(key)
+                                );
+                                oldFileKeys.push(...removedKeys);
+                                dbInd.evidenceFileKeys = reqInd.evidenceFileKeys;
+                                // Explicitly mark this specific path as modified to ensure Mongoose saves it
+                                submission.markModified('partB'); 
                             }
 
                             // ⭐ Save self score

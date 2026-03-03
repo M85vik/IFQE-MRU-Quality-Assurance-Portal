@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import FileUploader from '../../../components/shared/FileUploader';
+import MultiFileUploader from '../../../components/shared/MultiFileUploader';
 import { BookOpen, HelpCircle, Download } from 'lucide-react';
 import useSubmissionStore from '../../../store/submissionStore';
 import useSecureDownloader from '../../../hooks/useSecureDownloader';
@@ -7,18 +8,22 @@ import Modal from '../../../components/shared/Modal';
 import RubricViewer from './RubricViewer';
 import GuidelinesViewer from './GuidelinesViewer';
 import Button from '../../../components/shared/Button';
+import toast from 'react-hot-toast';
 
 const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, onFileRemove }) => {
   const [isRubricModalOpen, setIsRubricModalOpen] = useState(false);
   const [isGuidelinesModalOpen, setIsGuidelinesModalOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const { downloadFile, isDownloading } = useSecureDownloader();
+  const autoSaveTimerRef = useRef(null);
 
   const {
     submission,
     updateIndicatorFileKey,
     updateIndicatorSelfScore,
-    updateIndicatorEvidenceLinkFileKey
+    addEvidenceFileKey,
+    removeEvidenceFileKey,
+    saveDraft
   } = useSubmissionStore();
 
   const submissionIndicator = submission?.partB.criteria
@@ -26,34 +31,52 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
     .find(sc => sc.subCriteriaCode === subCriteriaCode)?.indicators
     .find(i => i.indicatorCode === indicator.indicatorCode);
 
+  // Cleanup timer on unmount (must be before any early returns)
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, []);
+
   if (!submissionIndicator) {
     console.warn(`Could not find submission data for indicator ${indicator.indicatorCode}`);
     return null;
   }
 
-  const handleUploadSuccess = (fileKey) => {
+  const handleUploadSuccess = async (fileKey) => {
     updateIndicatorFileKey(criterionCode, subCriteriaCode, indicator.indicatorCode, fileKey);
+    try {
+      await saveDraft();
+    } catch (err) {
+      console.error('Auto-save failed after upload:', err);
+    }
   };
 
-  const handleEvidenceLinkUploadSuccess = (fileKey) => {
-    updateIndicatorEvidenceLinkFileKey(criterionCode, subCriteriaCode, indicator.indicatorCode, fileKey);
-  };
+  // Debounced auto-save after evidence file add/remove to persist to database
+  // Uses debouncing to handle multiple simultaneous uploads correctly
+  const autoSave = useCallback(() => {
+    // Clear any pending save timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    // Set a new timer - waits 500ms after the last file upload completes
+    autoSaveTimerRef.current = setTimeout(async () => {
+      try {
+        console.log('[AutoSave] Saving after debounce...');
+        await saveDraft();
+        console.log('[AutoSave] Save complete.');
+      } catch (err) {
+        console.error('Auto-save failed:', err);
+        toast.error('Failed to save. Please click Save Draft manually.');
+      }
+    }, 500);
+  }, [saveDraft]);
 
   const handleRemove = async (fileKey) => {
     if (onFileRemove) {
       const identifier = { criterionCode, subCriteriaCode, indicatorCode: indicator.indicatorCode };
-      await onFileRemove(identifier, fileKey);
-    }
-  };
-
-  const handleEvidenceLinkRemove = async (fileKey) => {
-    if (onFileRemove) {
-      const identifier = {
-        criterionCode,
-        subCriteriaCode,
-        indicatorCode: indicator.indicatorCode,
-        isEvidenceLink: true
-      };
       await onFileRemove(identifier, fileKey);
     }
   };
@@ -128,13 +151,13 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
               />
             </div>
 
-            {/* Upload Evidence Link */}
+            {/* Upload Evidence Documents (Multiple) */}
             {indicator.requiresEvidenceLink && (
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
-                  Upload Evidence Document
+                  Upload Evidence Documents
                 </label>
-                <FileUploader
+                <MultiFileUploader
                   submissionId={submission._id}
                   identifier={{
                     criterionCode,
@@ -142,10 +165,20 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
                     indicatorCode: indicator.indicatorCode,
                     isEvidenceLink: true
                   }}
-                  onUploadSuccess={handleEvidenceLinkUploadSuccess}
-                  onRemove={handleEvidenceLinkRemove}
-                  initialFileKey={submissionIndicator.evidenceLinkFileKey}
+                  fileKeys={submissionIndicator.evidenceFileKeys || []}
+                  onFileAdded={(fileKey) => {
+                    // Update store first
+                    addEvidenceFileKey(criterionCode, subCriteriaCode, indicator.indicatorCode, fileKey);
+                    // Then trace and save
+                    console.log('File added, triggering auto-save for:', fileKey);
+                    autoSave();
+                  }}
+                  onFileRemoved={(fileKey) => {
+                    removeEvidenceFileKey(criterionCode, subCriteriaCode, indicator.indicatorCode, fileKey);
+                    autoSave();
+                  }}
                   isDisabled={isDisabled}
+                  maxFiles={10}
                 />
               </div>
             )}
