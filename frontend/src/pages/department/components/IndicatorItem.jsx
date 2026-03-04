@@ -40,22 +40,9 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
     };
   }, []);
 
-  if (!submissionIndicator) {
-    console.warn(`Could not find submission data for indicator ${indicator.indicatorCode}`);
-    return null;
-  }
-
-  const handleUploadSuccess = async (fileKey) => {
-    updateIndicatorFileKey(criterionCode, subCriteriaCode, indicator.indicatorCode, fileKey);
-    try {
-      await saveDraft();
-    } catch (err) {
-      console.error('Auto-save failed after upload:', err);
-    }
-  };
-
   // Debounced auto-save after evidence file add/remove to persist to database
   // Uses debouncing to handle multiple simultaneous uploads correctly
+  // Must be before any early returns (React hooks rules)
   const autoSave = useCallback(() => {
     // Clear any pending save timer
     if (autoSaveTimerRef.current) {
@@ -73,6 +60,20 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
       }
     }, 500);
   }, [saveDraft]);
+
+  if (!submissionIndicator) {
+    console.warn(`Could not find submission data for indicator ${indicator.indicatorCode}`);
+    return null;
+  }
+
+  const handleUploadSuccess = async (fileKey) => {
+    updateIndicatorFileKey(criterionCode, subCriteriaCode, indicator.indicatorCode, fileKey);
+    try {
+      await saveDraft();
+    } catch (err) {
+      console.error('Auto-save failed after upload:', err);
+    }
+  };
 
   const handleRemove = async (fileKey) => {
     if (onFileRemove) {
