@@ -281,6 +281,15 @@ const createSubmissionArchive = async (submission) => {
               zipName: `Part B Criterion ${c.criteriaCode} ${sc.subCriteriaCode} ${i.indicatorCode} Evidence - ${i.evidenceLinkFileKey.split('/').pop()}`
             });
           }
+          // Multiple evidence documents
+          if (Array.isArray(i.evidenceFileKeys)) {
+            i.evidenceFileKeys.forEach((efKey, idx) => {
+              files.push({
+                key: efKey,
+                zipName: `Part B Criterion ${c.criteriaCode} ${sc.subCriteriaCode} ${i.indicatorCode} Evidence ${idx + 1} - ${efKey.split('/').pop()}`
+              });
+            });
+          }
         });
       });
     });

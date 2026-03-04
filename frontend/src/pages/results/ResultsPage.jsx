@@ -40,7 +40,7 @@ export default function InternalResultsPage() {
             }
         };
         fetchResults();
-    }, [year, endpoint]);
+    }, [year, endpoint, isDepartment]);
 
     return (
         <div className="p-6 space-y-6">
