@@ -260,8 +260,8 @@ const ArchivingPanel: React.FC = () => {
             <p className="mt-2 font-semibold text-lg">
               {targetSubmission?.title}
             </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              This may take time and will consume server storage.
+            <p className="mt-2 text-sm text-amber-500">
+              This may take some time. Check status letter.
             </p>
           </>
         }

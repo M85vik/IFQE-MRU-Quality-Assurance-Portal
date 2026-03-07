@@ -351,7 +351,7 @@ const AdminDashboard: React.FC = () => {
     if (isLoading) return <div className="p-6"><Spinner /></div>;
     if (approvedSubmissions.length === 0) {
       return (
-        <p className="text-center text-black py-8">
+        <p className="text-center text-white py-8">
           There are no approved submissions yet.
         </p>
       );
