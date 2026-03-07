@@ -71,7 +71,11 @@ const ReviewSubmission: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { downloadFile, isDownloading } = useSecureDownloader();
+    // const { downloadFile, isDownloading } = useSecureDownloader();
+     const { downloadFile} = useSecureDownloader(); //not using global downloading state 
+    
+     const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
+
     const [submission, setSubmission] = useState<Submission | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
@@ -172,6 +176,18 @@ const ReviewSubmission: React.FC = () => {
         setConfirmDialogOpen(true); // open confirmation modal
     };
 
+    const handleDownload = async (key?: string) => {
+    if (!key || downloadingKey) return;
+
+
+    try {
+        setDownloadingKey(key);
+        await downloadFile(key);
+    } finally {
+        setDownloadingKey(null);
+    }
+};
+
     // ✅ runs only after confirm dialog "Yes"
     const confirmSendForApproval = async () => {
         setConfirmDialogOpen(false);
@@ -217,7 +233,9 @@ const ReviewSubmission: React.FC = () => {
                     </div>
                     <div className="p-4">
                         {submission.partA.summaryFileKey ? (
-                            <Button onClick={() => downloadFile(submission.partA.summaryFileKey)} variant="secondary" isLoading={isDownloading}>
+                            <Button onClick={() => handleDownload(submission.partA.summaryFileKey)} variant="secondary" 
+                            
+                            isLoading={downloadingKey===submission.partA.summaryFileKey}>
                                 <Download size={16} className="mr-2" /> View Summary Document
                             </Button>
                         ) : (
@@ -241,10 +259,30 @@ const ReviewSubmission: React.FC = () => {
                                             <div key={ind.indicatorCode} className="py-4">
                                                 <p className="text-sm font-semibold text-foreground mb-2">{ind.indicatorCode}: {ind.title}</p>
                                                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                                                    {ind.fileKey && <Button onClick={() => downloadFile(ind.fileKey)} size="sm" variant="outline" isLoading={isDownloading}>View Main Doc</Button>}
-                                                    {ind.evidenceLinkFileKey && <Button onClick={() => downloadFile(ind.evidenceLinkFileKey)} size="sm" variant="outline" isLoading={isDownloading}>View Evidence Doc</Button>}
+                                                    {ind.fileKey && <Button
+                                                    
+                                                    onClick={() => handleDownload(ind.fileKey)} size="sm" variant="outline" 
+
+                                                    isLoading={downloadingKey===ind.fileKey}
+                                                    
+                                                    >View Main Doc</Button>}
+                                                    {ind.evidenceLinkFileKey && <Button 
+                                                    
+                                                    onClick={() => handleDownload(ind.evidenceLinkFileKey)} 
+                                                    
+                                                    size="sm" variant="outline" 
+                                                    
+                                                    isLoading={downloadingKey===ind.evidenceLinkFileKey}>View Evidence Doc</Button>}
                                                     {ind.evidenceFileKeys && ind.evidenceFileKeys.length > 0 && ind.evidenceFileKeys.map((key, idx) => (
-                                                        <Button key={key} onClick={() => downloadFile(key)} size="sm" variant="outline" isLoading={isDownloading}>Evidence {idx + 1}</Button>
+                                                        <Button key={key} 
+                                                        
+                                                        onClick={() => handleDownload(key)} 
+                                                        
+                                                        size="sm" variant="outline" 
+                                                        
+                                                        isLoading={downloadingKey===key}
+                                                        
+                                                        >Evidence {idx + 1}</Button>
                                                     ))}
                                                     {!ind.fileKey && !ind.evidenceLinkFileKey && (!ind.evidenceFileKeys || ind.evidenceFileKeys.length === 0) && <span className="text-xs text-muted-foreground italic">No documents submitted</span>}
                                                 </div>
