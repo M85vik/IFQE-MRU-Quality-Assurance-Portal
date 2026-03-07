@@ -14,13 +14,12 @@ const SubmissionWindow = require('../models/SubmissionWindow');
 
 
 // --- Service & Utility Imports ---
-const { createSubmissionArchive } = require('../utils/archiveService');
+
 const { DeleteObjectCommand, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 
 const s3Client = require('../config/s3Client');
 
 
-const logActivity = require("../utils/logActivity.js")
 
 require('../models/School');
 require('../models/Department');
@@ -76,7 +75,7 @@ const isSubmissionWindowOpen = async (academicYear) => {
  */
 const createSubmission = async (req, res) => {
     const { academicYear, title, submissionType } = req.body;
-    const user = req.user;
+   
     //Add here logic if submission for that year already exist submission should not be allowed 
 
     // 1. Authorization & Validation
@@ -95,15 +94,7 @@ const createSubmission = async (req, res) => {
         return res.status(400).json({ message: 'User is not correctly associated with a department and school.' });
     }
 
-    // Prevent duplicate submissions with the same title for the same department and year.
-    // const existingSubmission = await Submission.findOne({
-    //     department: fullUser.department._id,
-    //     academicYear,
-    //     title,
-    // });
-    // if (existingSubmission) {
-    //     return res.status(400).json({ message: `A submission with this title for ${academicYear} already exists.` });
-    // }
+
 
     // Prevent duplicate submissions for the same department and academic year
     const existingSubmission = await Submission.findOne({
@@ -208,20 +199,6 @@ const createSubmission = async (req, res) => {
     try {
         const createdSubmission = await submission.save();
 
-        try {
-            await logActivity(
-                user,
-                'Create Submission',
-                `Submission ID: ${user._id}, Department: ${submission.department}`,
-                submission.academicYear,
-                req.ip
-            );
-
-            console.log("LOG REGISTERED");
-
-        } catch (logError) {
-            console.warn(`⚠️ Activity log failed for submission ${req.params.id}:`, logError.message);
-        }
 
         res.status(201).json(createdSubmission);
     } catch (error) {
@@ -234,184 +211,6 @@ const createSubmission = async (req, res) => {
  * @route   PUT /api/submissions/:id
  * @access  Private (Department, QAA, Superuser)
  */
-// const updateSubmission = async (req, res) => {
-//     try {
-//         const submission = await Submission.findById(req.params.id).populate('school department');
-//         if (!submission) {
-//             return res.status(404).json({ message: 'Submission not found' });
-//         }
-
-//         const { role } = req.user;
-//         const { partA, partB, status, appeal } = req.body;
-//         const oldFileKeys = []; // Collect files to delete AFTER successful DB save
-
-//         // ==========================
-//         // 🚀 DEPARTMENT UPDATE LOGIC
-//         // ==========================
-//         if (role === 'department') {
-//             const windowOpen = await isSubmissionWindowOpen(submission.academicYear);
-//             if (!windowOpen) {
-//                 return res.status(403).json({ message: `Submission window for ${submission.academicYear} is closed.` });
-//             }
-//             if (submission.status !== 'Draft') {
-//                 return res.status(403).json({ message: 'Submission is locked for editing.' });
-//             }
-
-//             // ---- PART A ----
-//             if (partA && partA.summaryFileKey !== submission.partA.summaryFileKey) {
-//                 if (submission.partA.summaryFileKey) {
-//                     oldFileKeys.push(submission.partA.summaryFileKey);
-//                 }
-//                 submission.partA.summaryFileKey = partA.summaryFileKey;
-//                 submission.markModified('partA');
-//             }
-
-//             // ---- PART B ----
-//             if (partB?.criteria) {
-//                 for (const reqCrit of partB.criteria) {
-//                     const dbCrit = submission.partB.criteria.find(c => c.criteriaCode === reqCrit.criteriaCode);
-//                     if (!dbCrit) continue;
-
-//                     for (const reqSub of reqCrit.subCriteria) {
-//                         const dbSub = dbCrit.subCriteria.find(sc => sc.subCriteriaCode === reqSub.subCriteriaCode);
-//                         if (!dbSub) continue;
-
-//                         for (const reqInd of reqSub.indicators) {
-//                             const dbInd = dbSub.indicators.find(i => i.indicatorCode === reqInd.indicatorCode);
-//                             if (!dbInd) continue;
-
-//                             // --- MAIN FILE ---
-//                             if (reqInd.fileKey !== dbInd.fileKey) {
-//                                 if (dbInd.fileKey && reqInd.fileKey) {
-//                                     oldFileKeys.push(dbInd.fileKey);
-//                                 }
-//                                 dbInd.fileKey = reqInd.fileKey; // can be null or string
-//                             }
-
-//                             // --- EVIDENCE LINK FILE ---
-//                             if (reqInd.evidenceLinkFileKey !== dbInd.evidenceLinkFileKey) {
-//                                 if (dbInd.evidenceLinkFileKey && reqInd.evidenceLinkFileKey) {
-//                                     oldFileKeys.push(dbInd.evidenceLinkFileKey);
-//                                 }
-//                                 dbInd.evidenceLinkFileKey = reqInd.evidenceLinkFileKey;
-//                             }
-//                         }
-//                     }
-//                 }
-
-//                 submission.markModified('partB');
-//             }
-
-//             if (status === 'Under Review') submission.status = 'Under Review';
-
-//             const updatedSubmission = await submission.save();
-
-//             // Only delete after DB update is successful
-//             for (const key of oldFileKeys) {
-//                 await deleteS3Object(key);
-//             }
-
-//             return res.json(updatedSubmission);
-//         }
-
-//         // ==========================
-//         // 🧐 QAA UPDATE LOGIC
-//         // ==========================
-//         if (role === 'qaa') {
-//             if (submission.status !== 'Under Review') {
-//                 return res.status(403).json({ message: 'Not allowed. Submission not under review.' });
-//             }
-
-//             if (partB?.criteria) {
-//                 submission.partB.criteria.forEach(dbCrit => {
-//                     const reqCrit = partB.criteria.find(c => c.criteriaCode === dbCrit.criteriaCode);
-//                     if (!reqCrit) return;
-//                     dbCrit.reviewScore = reqCrit.reviewScore;
-//                     dbCrit.subCriteria.forEach(dbSub => {
-//                         const reqSub = reqCrit.subCriteria.find(sc => sc.subCriteriaCode === dbSub.subCriteriaCode);
-//                         if (!reqSub) return;
-//                         dbSub.remark = reqSub.remark;
-//                         dbSub.indicators.forEach(dbInd => {
-//                             const reqInd = reqSub.indicators.find(i => i.indicatorCode === dbInd.indicatorCode);
-//                             if (!reqInd) return;
-//                             dbInd.reviewScore = reqInd.reviewScore;
-//                             dbInd.reviewRemark = reqInd.reviewRemark;
-//                         });
-//                     });
-//                 });
-//                 submission.markModified('partB');
-//             }
-
-//             if (status === 'Pending Final Approval') submission.status = status;
-//             const updated = await submission.save();
-//             return res.json(updated);
-//         }
-
-//         // ==========================
-//         // 👑 SUPERUSER UPDATE LOGIC
-//         // ==========================
-//         if (role === 'superuser') {
-//             if (!['Pending Final Approval', 'Appeal Submitted'].includes(submission.status)) {
-//                 return res.status(403).json({ message: 'Submission not ready for final decision.' });
-//             }
-
-//             if (submission.status === 'Appeal Submitted') {
-//                 appeal.indicators.forEach(ai => {
-//                     submission.partB.criteria.forEach(c =>
-//                         c.subCriteria.forEach(sc => {
-//                             const ind = sc.indicators.find(i => i.indicatorCode === ai.indicatorCode);
-//                             if (ind) ind.finalScore = ai.finalScore;
-//                         })
-//                     );
-//                     const dbAI = submission.appeal.indicators.find(i => i.indicatorCode === ai.indicatorCode);
-//                     if (dbAI) dbAI.superuserDecisionComment = ai.superuserDecisionComment;
-//                 });
-
-//                 submission.status = 'Appeal Closed';
-//                 submission.appeal.status = 'Closed';
-//                 submission.appeal.closedOn = new Date();
-
-//                 if (!submission.archiveFileKey) {
-//                     submission.archiveFileKey = await createSubmissionArchive(submission);
-//                 }
-
-//             } else {
-//                 partB.criteria.forEach(reqCrit => {
-//                     const dbCrit = submission.partB.criteria.find(c => c.criteriaCode === reqCrit.criteriaCode);
-//                     if (!dbCrit) return;
-//                     dbCrit.finalScore = reqCrit.finalScore;
-//                     reqCrit.subCriteria.forEach(reqSub => {
-//                         const dbSub = dbCrit.subCriteria.find(sc => sc.subCriteriaCode === reqSub.subCriteriaCode);
-//                         if (!dbSub) return;
-//                         dbSub.superuserRemark = reqSub.superuserRemark;
-//                         reqSub.indicators.forEach(reqInd => {
-//                             const dbInd = dbSub.indicators.find(i => i.indicatorCode === reqInd.indicatorCode);
-//                             if (dbInd) {
-//                                 dbInd.finalScore = reqInd.finalScore;
-//                                 dbInd.superuserRemark = reqInd.superuserRemark;
-//                             }
-//                         });
-//                     });
-//                 });
-
-//                 submission.status = 'Completed';
-//                 submission.archiveFileKey = await createSubmissionArchive(submission);
-//             }
-
-//             submission.markModified('partB');
-//             submission.markModified('appeal');
-
-//             const updated = await submission.save();
-//             return res.json(updated);
-//         }
-
-//         return res.status(403).json({ message: 'Unauthorized action' });
-
-//     } catch (error) {
-//         console.error("❌ Error in updateSubmission:", error);
-//         res.status(500).json({ message: "Server Error", error: error.message });
-//     }
-// };
 
 
 const updateSubmission = async (req, res) => {
@@ -934,18 +733,6 @@ const deleteSubmission = async (req, res) => {
         await Submission.findByIdAndDelete(req.params.id);
         console.log('✅ Submission deleted from MongoDB.');
 
-
-        try {
-            await logActivity(
-                user,
-                'Deleted Submission',
-                `Submission ID: ${req.params.id}, Department: ${submission.department}`,
-                submission.academicYear,
-                req.ip
-            );
-        } catch (logError) {
-            console.warn(`⚠️ Activity log failed for submission ${req.params.id}:`, logError.message);
-        }
 
         res.status(200).json({ message: 'Submission and all related files deleted successfully.' });
     } catch (error) {

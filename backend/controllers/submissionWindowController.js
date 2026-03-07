@@ -7,7 +7,7 @@
 
 
 const SubmissionWindow = require('../models/SubmissionWindow');
-const logActivity = require("../utils/logActivity")
+
 /**
  * A helper function to safely parse a date string in 'YYYY-MM-DD' format into a UTC Date object.
  * This ensures consistent date handling regardless of the server's local timezone.
@@ -74,17 +74,7 @@ const createSubmissionWindow = async (req, res) => {
         end.setUTCHours(23, 59, 59, 999);
 
         const newWindow = await SubmissionWindow.create({ academicYear, startDate: start, endDate: end, windowType });
-        try {
-            await logActivity(
-                user,
-                'Create Submission Window',
-                `Submission Window ID: ${newWindow._id}, Window Type: ${windowType}`,
-                academicYear,
-                req.ip
-            );
-        } catch (logError) {
-            console.warn(`⚠️ Activity log failed for submission window ${newWindow._id}:`, logError.message);
-        }
+      
         res.status(201).json(newWindow);
     } catch (error) {
         // This error is often triggered by the unique compound index on {academicYear, windowType}
@@ -125,17 +115,7 @@ const updateSubmissionWindow = async (req, res) => {
 
             // Save the updated document. This will trigger Mongoose validation.
             const updatedWindow = await window.save();
-            try {
-                await logActivity(
-                    user,
-                    'Update Submission Window',
-                    `Submission Window ID: ${window._id}, Window Type: ${windowType}`,
-                    academicYear,
-                    req.ip
-                );
-            } catch (logError) {
-                console.warn(`⚠️ Activity log failed for submissionWindow ${window._id}:`, logError.message);
-            }
+         
             res.json(updatedWindow);
         } else {
             res.status(404).json({ message: 'Submission window not found' });
@@ -158,21 +138,7 @@ const deleteSubmissionWindow = async (req, res) => {
         const user = req.user
         if (window) {
             await window.deleteOne(); // Use .deleteOne() on the document instance.
-            const now = new Date();
-            const year = now.getFullYear(); // e.g., 2025
-            const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
-
-            try {
-                await logActivity(
-                    user,
-                    'Delete Submission Window',
-                    `Submission Window ID: ${window._id}, Department: NA`,
-                    academicYear,
-                    req.ip
-                );
-            } catch (logError) {
-                console.warn(`⚠️ Activity log failed for submissionWindow ${window._id}:`, logError.message);
-            }
+           
 
             res.json({ message: 'Submission window removed successfully' });
         } else {
