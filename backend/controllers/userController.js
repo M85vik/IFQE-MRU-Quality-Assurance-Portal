@@ -7,7 +7,7 @@
 const crypto = require('crypto');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
-const logActivity = require("../utils/logActivity")
+
 /**
  * @desc    Register a new user.
  * @route   POST /api/users/register
@@ -33,24 +33,6 @@ const registerUser = async (req, res) => {
     // The password will be automatically hashed by the Mongoose pre-save hook in the User model.
     const user = await User.create({ name, email, password, role, department, school });
 
-
-    const now = new Date();
-    const year = now.getFullYear(); // e.g., 2025
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
-
-
-
-    try {
-      await logActivity(
-        req.user,
-        'Create User',
-        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
-        `created ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
-    }
 
     // 3. If user creation is successful, send back the user's details and a JWT.
     if (user) {
@@ -95,24 +77,8 @@ const loginUser = async (req, res) => {
     if (user && (await user.matchPassword(password))) {
       // 3. If credentials are valid, send back user data and a new JWT.
 
-      const now = new Date();
-      const year = now.getFullYear(); // e.g., 2025
-      const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
-
-      const sanitizedUser = user.toObject();
-      delete sanitizedUser.password;
-
-      try {
-        await logActivity(
-          sanitizedUser,
-          'User LoggedIn',
-          `User ID: ${user._id}, Department: ${user?.department || 'NA'}`,
-          `created ${academicYear}`,
-          req.ip
-        );
-      } catch (logError) {
-        console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
-      }
+     
+     
 
       res.json({
         _id: user._id,
@@ -185,22 +151,6 @@ const updateUserRole = async (req, res) => {
     user.role = role;
     await user.save();
 
-
-    const now = new Date();
-    const year = now.getFullYear(); // e.g., 2025
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
-    try {
-      await logActivity(
-        req.user,
-        'Update User',
-        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
-        `updated ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn(`⚠️ Activity log failed for User ${req.params.id}:`, logError.message);
-    }
-
     return res.status(200).json({ message: 'Role updated successfully.', user });
   } catch (error) {
     console.error(`Error Updating User: ${error.message}`);
@@ -246,20 +196,6 @@ const updateUserPassword = async (req, res) => {
     user.password = password;
     await user.save();
 
-    const year = new Date().getFullYear();
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`;
-
-    try {
-      await logActivity(
-        req.user,
-        'Update User Password',
-        `User ID: ${user._id}, Department: ${req.user?.department || 'NA'}`,
-        `updated ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn('⚠️ Activity log failed:', logError.message);
-    }
 
     return res.status(200).json({
       message: 'Password updated successfully.',
@@ -280,20 +216,7 @@ const deleteUser = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
     await user.deleteOne();
-    const now = new Date();
-    const year = now.getFullYear(); // e.g., 2025
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
-    try {
-      await logActivity(
-        req.user,
-        'Deleted User',
-        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
-        `deleted ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn(`⚠️ Activity log failed for User ${req.params.id}:`, logError.message);
-    }
+   
 
     return res.status(200).json({ message: 'User deleted successfully.' });
   } catch (error) {
