@@ -75,7 +75,7 @@ const isSubmissionWindowOpen = async (academicYear) => {
  */
 const createSubmission = async (req, res) => {
     const { academicYear, title, submissionType } = req.body;
-    const user = req.user;
+   
     //Add here logic if submission for that year already exist submission should not be allowed 
 
     // 1. Authorization & Validation

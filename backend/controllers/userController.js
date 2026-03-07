@@ -162,9 +162,10 @@ const updateUserRole = async (req, res) => {
 
 
 const updateUserPassword = async (req, res) => {
+  
   const { id } = req.params;
   const { password, masterKey } = req.body;
-
+  
   if (!password) {
     return res.status(400).json({
       message: 'Password is Required.',
