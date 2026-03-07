@@ -59,12 +59,24 @@ const SubmissionViewPage: React.FC = () => {
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
+  const { downloadFile } = useSecureDownloader();
 
-  const { downloadFile, isDownloading } = useSecureDownloader();
+  const handleDownload = async (key?: string) => {
+    if (!key || downloadingKey) return;
+
+    try {
+        setDownloadingKey(key);
+        await downloadFile(key);
+    } finally {
+        setDownloadingKey(null);
+    }
+};
 
   // ------------------------------------------------------------------
   // FETCH SUBMISSION
   // ------------------------------------------------------------------
+
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -196,8 +208,8 @@ const SubmissionViewPage: React.FC = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => downloadFile(ind.fileKey!)}
-                        isLoading={isDownloading}
+                        onClick={() => handleDownload(ind.fileKey)}
+                        isLoading={downloadingKey===ind.fileKey}
                       >
                         <Download size={14} className="mr-2" />
                         View Main Document
@@ -209,9 +221,9 @@ const SubmissionViewPage: React.FC = () => {
                         size="sm"
                         variant="outline"
                         onClick={() =>
-                          downloadFile(ind.evidenceLinkFileKey!)
+                          handleDownload(ind.evidenceLinkFileKey)
                         }
-                        isLoading={isDownloading}
+                        isLoading={downloadingKey===ind.evidenceLinkFileKey}
                       >
                         <Download size={14} className="mr-2" />
                         View Evidence
@@ -223,8 +235,8 @@ const SubmissionViewPage: React.FC = () => {
                         key={key}
                         size="sm"
                         variant="outline"
-                        onClick={() => downloadFile(key)}
-                        isLoading={isDownloading}
+                        onClick={() => handleDownload(key)}
+                        isLoading={downloadingKey===key}
                       >
                         <Download size={14} className="mr-2" />
                         Evidence {idx + 1}
