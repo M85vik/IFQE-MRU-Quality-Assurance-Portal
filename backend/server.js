@@ -39,7 +39,7 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use(apiMetricsMiddleware); // 👈 Add here before routes
+app.use(apiMetricsMiddleware); 
 app.get('/', (req, res) => {
   res.send('IFQE Portal API is running...');
 });
@@ -57,9 +57,11 @@ app.use('/api/submission-windows', require('./routes/submissionWindowRoutes'));
 app.use('/api/announcements', require('./routes/announcementRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 
+
 app.use('/api/dev', require('./routes/devRoutes'));
 app.use('/api/metrics', require('./routes/metricsRoutes'));
 app.use('/api/system', require('./routes/systemRoutes'));
+
 
 app.use("/api/announcement-email",require("./routes/announcementEmailRoutes"));
 app.use("/api/reports", reportRoutes);
