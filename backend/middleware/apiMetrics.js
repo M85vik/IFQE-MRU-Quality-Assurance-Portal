@@ -6,10 +6,11 @@ const apiMetricsMiddleware = async (req, res, next) => {
   res.on('finish', async () => {
     const duration = Date.now() - start;
     const userId = req.user ? req.user._id : null;
-
+    console.log("req : " , req);
+    
     try {
       await ApiMetric.create({
-        route: req.route?.path || req.originalUrl,
+        route: req.originalUrl || "unknown",
         method: req.method,
         statusCode: res.statusCode,
         userId,
