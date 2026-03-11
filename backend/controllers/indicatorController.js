@@ -5,7 +5,7 @@
  */
 
 const Indicator = require('../models/Indicator');
-
+const logger = require("../utils/logger.js")
 /**
  * @desc    Get all indicators from the database.
  * @route   GET /api/indicators
@@ -24,9 +24,15 @@ const getAllIndicators = async (req, res) => {
     // Send the array of indicators back to the client.
     res.json(indicators);
   } catch (error) {
-    // Log the error on the server for debugging purposes.
-    console.error("Error fetching all indicators:", error);
-    // Send a generic server error message to the client.
+   
+    // console.error("Error fetching all indicators:", error);
+
+     logger.error(`Error fetching all indicators`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "indicatorController/getAllIndicators"
+        }) 
+   
     res.status(500).json({ message: 'Server Error' });
   }
 };

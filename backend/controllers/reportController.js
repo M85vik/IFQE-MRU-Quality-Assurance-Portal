@@ -3,6 +3,8 @@ const Submission = require("../models/Submission");
 const ResultPublication = require("../models/ResultPublication");
 const SchoolResult = require("../models/SchoolResult");
 const CRITERIA_CONFIG = require("../config/criteriaConfig");
+const logger = require("../utils/logger.js");
+
 
 exports.getAllSchoolsCriteriaReport = async (req, res) => {
   try {
@@ -33,7 +35,12 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
       });
     }
 
-    console.log("⚠ No stored snapshot found — regenerating from submissions...");
+    // console.log("⚠ No stored snapshot found — regenerating from submissions...");
+
+    logger.info(`⚠ No stored snapshot found — regenerating from submissions...`, {
+      AcademicYear: academicYear || "",
+      controller: "reportController/getAllSchoolCriteriaReport"
+    })
 
     // Fetch data from submissions only if needed
     const results = await Submission.aggregate([
@@ -53,34 +60,18 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
             criteriaCode: "$partB.criteria.criteriaCode"
           },
           totalScore: {
-            // $sum: {
-            //   $ifNull: [
-            //     "$partB.criteria.subCriteria.indicators.finalScore",
-            //     {
-            //       $ifNull: [
-            //         "$partB.criteria.subCriteria.indicators.reviewScore",
-            //         {
-            //           $ifNull: [
-            //             "$partB.criteria.subCriteria.indicators.selfAssessedScore",
-            //             0
-            //           ]
-            //         }
-            //       ]
-            //     }
-            //   ]
-            // }
 
-           $sum: {
-  $ifNull: [
-    "$partB.criteria.subCriteria.indicators.finalScore",
-    {
-      $ifNull: [
-        "$partB.criteria.subCriteria.indicators.reviewScore",
-        0
-      ]
-    }
-  ]
-}
+            $sum: {
+              $ifNull: [
+                "$partB.criteria.subCriteria.indicators.finalScore",
+                {
+                  $ifNull: [
+                    "$partB.criteria.subCriteria.indicators.reviewScore",
+                    0
+                  ]
+                }
+              ]
+            }
 
           }
         }
@@ -156,7 +147,12 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
     // Save fresh snapshot for future
     if (structuredSchools.length > 0) {
       await SchoolResult.insertMany(structuredSchools);
-      console.log("🔥 Fresh SchoolResult snapshot saved for", academicYear);
+      // console.log("🔥 Fresh SchoolResult snapshot saved for", academicYear);
+
+      logger.info(`🔥 Fresh SchoolResult snapshot saved  for : ${academicYear || " "}`, {
+        AcademicYear: academicYear || "",
+        controller: "reportController/getAllSchoolCriteriaReport"
+      })
     }
 
     return res.status(200).json({
@@ -166,7 +162,12 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Report Error:", error);
+    // console.error("Report Error:", error);
+    logger.error(`Report Error `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "reportController/getAllSchoolCriteriaReport"
+    })
     res.status(500).json({ message: "Failed to generate report" });
   }
 };
@@ -206,7 +207,13 @@ exports.getMySchoolReport = async (req, res) => {
     return res.status(200).json(result);
 
   } catch (error) {
-    console.error("Error fetching my school report:", error);
+    // console.error("Error fetching my school report:", error);
+    logger.error(`Error fetching (department) my school report`, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "reportController/getMySchoolReport"
+    })
+
     res.status(500).json({ message: "Failed to fetch school report" });
   }
 };

@@ -7,6 +7,7 @@
 const crypto = require('crypto');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const logger = require("../utils/logger.js");
 
 /**
  * @desc    Register a new user.
@@ -42,13 +43,29 @@ const registerUser = async (req, res) => {
         email: user.email,
         role: user.role,
         token: generateToken(user._id), // Generate a JWT for the new user.
-      });
+      })
+
+      logger.info(`New User Created, ${user.name || ""}`, {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        controller: "UserController/registerUser"
+      })
+
+        ;
     } else {
       // This case handles potential Mongoose validation errors during creation.
       res.status(400).json({ message: 'Invalid user data provided' });
     }
   } catch (error) {
-    console.error(`Error in registerUser: ${error.message}`);
+    // console.error(`Error in registerUser: ${error.message}`);
+
+    logger.error(`Error Creating New User `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/registerUser"
+    })
     res.status(500).json({ message: 'Server error during registration' });
   }
 };
@@ -65,6 +82,8 @@ const registerUser = async (req, res) => {
  */
 const loginUser = async (req, res) => {
   try {
+
+
     const { email, password } = req.body;
 
     // 1. Find the user by their email.
@@ -77,8 +96,17 @@ const loginUser = async (req, res) => {
     if (user && (await user.matchPassword(password))) {
       // 3. If credentials are valid, send back user data and a new JWT.
 
-     
-     
+
+
+      logger.info(`LOGGED IN ${user.name || ""}`, {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        school: user.school,
+        controller: "UserController/loginUser"
+      })
+
 
       res.json({
         _id: user._id,
@@ -92,10 +120,19 @@ const loginUser = async (req, res) => {
     } else {
       // Security Best Practice: Use a generic error message to prevent attackers
       // from knowing whether an email address is registered in the system.
+
+
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
-    console.error(`Error in loginUser: ${error.message}`);
+
+    // console.error(`Error in loginUser: ${error.message}`);
+
+    logger.error(`Login Error `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/loginUser"
+    })
     res.status(500).json({ message: 'Server error during login' });
   }
 };
@@ -127,7 +164,13 @@ const getAllUsers = async (req, res) => {
     const users = await User.find({}).select('-password -__v');
     return res.status(200).json(users);
   } catch (error) {
-    console.error(`Error in Getting Users: ${error.message}`);
+    // console.error(`Error in Getting Users: ${error.message}`);
+
+    logger.error(`Error Getting All Users `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/getAllUsers"
+    })
     res.status(500).json({ message: 'Error Fetching All Users.' });
   }
 
@@ -135,7 +178,7 @@ const getAllUsers = async (req, res) => {
 
 
 
-
+// To change User's Roles ( admin, qaa, superuser, reviewer)
 const updateUserRole = async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
@@ -146,14 +189,29 @@ const updateUserRole = async (req, res) => {
   try {
 
     const user = await User.findById(id);
+    const copyUser = user
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
     user.role = role;
     await user.save();
 
+    logger.info(`User Role Changed, ${user.name || " "}`, {
+
+      Role: `from ${copyUser.role || " "} to ${role || " "}`,
+      controller: "UserController/updateUserRole"
+
+    })
+
     return res.status(200).json({ message: 'Role updated successfully.', user });
   } catch (error) {
-    console.error(`Error Updating User: ${error.message}`);
+
+    logger.error(`Error Updating User Role`, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/updateUserRole"
+    })
+
+    // console.error(`Error Updating User: ${error.message}`);
     res.status(500).json({ message: 'Error Updating User.' });
   }
 };
@@ -162,10 +220,10 @@ const updateUserRole = async (req, res) => {
 
 
 const updateUserPassword = async (req, res) => {
-  
+
   const { id } = req.params;
   const { password, masterKey } = req.body;
-  
+
   if (!password) {
     return res.status(400).json({
       message: 'Password is Required.',
@@ -197,12 +255,24 @@ const updateUserPassword = async (req, res) => {
     user.password = password;
     await user.save();
 
+    logger.info(`User Password Changed, ${user.name || " "}`, {
+
+      name: user.name || " ",
+      school: user.school || " ",
+      department: user.department || " ",
+      controller: "UserController/updateUserPassword"
+    })
 
     return res.status(200).json({
       message: 'Password updated successfully.',
     });
   } catch (error) {
-    console.error('Error Updating User:', error.message);
+    // console.error('Error Updating User:', error.message);
+    logger.error(`Error Updating User Password`, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/updateUserPassword"
+    })
     return res.status(500).json({
       message: 'Internal server error.',
     });
@@ -216,12 +286,25 @@ const deleteUser = async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
+    const copyUser = user
     await user.deleteOne();
-   
 
+    logger.info(`User Deleted, ${copyUser.name || " "}`, {
+
+      name: copyUser.name || " ",
+      school: copyUser.school || " ",
+      department: copyUser.department || " ",
+      controller: "UserController/deleteUser"
+
+    })
     return res.status(200).json({ message: 'User deleted successfully.' });
   } catch (error) {
-    console.error(`Error Deleting User: ${error.message}`);
+    // console.error(`Error Deleting User: ${error.message}`);
+    logger.error(`Error Deleting User `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/deleteUser"
+    })
     res.status(500).json({ message: 'Error Deleting User.' });
 
   }
