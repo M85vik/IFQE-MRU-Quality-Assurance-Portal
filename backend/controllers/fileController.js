@@ -13,7 +13,7 @@ const crypto = require('crypto'); // Used for generating secure random filenames
 const s3Client = require('../config/s3Client'); // The configured S3 client instance.
 const Submission = require('../models/Submission');
 const SubmissionWindow = require('../models/SubmissionWindow');
-
+const logger = require("../utils/logger.js")
 /**
  * Generates a cryptographically random string to be used as a filename.
  * This prevents filename collisions and avoids security issues with user-provided names.
@@ -108,7 +108,12 @@ const getUploadUrl = async (req, res) => {
     // to another endpoint to be saved in the MongoDB submission document.
     res.json({ uploadUrl, fileKey: key });
   } catch (error) {
-    console.error("Error generating S3 upload URL:", error);
+    // console.error("Error generating S3 upload URL:", error);
+     logger.error(`Error in file uploading `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "fileController/getUploadUrl"
+        }) 
     res.status(500).json({ message: 'Could not generate upload URL' });
   }
 };
@@ -136,7 +141,7 @@ const getDownloadUrl = async (req, res) => {
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,
       Key: fileKey,
-       ResponseContentDisposition: 'attachment', // forces download
+     //  ResponseContentDisposition: 'attachment', // forces download
     });
 
     try {
@@ -144,7 +149,12 @@ const getDownloadUrl = async (req, res) => {
     
       return res.json({ downloadUrl }); // ✅ Return immediately after responding
     } catch (error) {
-      console.error('Could not generate template download URL:', error);
+      // console.error('Could not generate template download URL:', error);
+       logger.error(`Could not generate template download URL`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "fileController/getDownloadUrl"
+        }) 
       return res.status(500).json({ message: 'Could not generate download URL' });
     }
   }
@@ -187,7 +197,12 @@ const getDownloadUrl = async (req, res) => {
     
     res.json({ downloadUrl });
   } catch (error) {
-    console.error("Error generating S3 download URL:", error);
+    // console.error("Error generating S3 download URL:", error);
+      logger.error(`Could not generate S3 download URL`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "fileController/getDownloadUrl"
+        }) 
     res.status(500).json({ message: 'Could not generate download URL' });
   }
 };
@@ -204,38 +219,45 @@ const deleteFile = async (req, res) => {
     const { fileKey } = req.body;
     const user = req.user;
 
-    // --- 1. Security Check: Find the submission to verify ownership and editability ---
-    // This single query is a powerful security check. It ensures the file exists in a submission that:
-    // a) Belongs to the current user's department.
-    // b) Is currently in 'Draft' status and therefore editable.
-    const submission = await Submission.findOne({
-      $or: [
-        { 'partA.summaryFileKey': fileKey },
-        { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
-        { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
-        { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
-      ],
-      department: user.department,
-      status: 'Draft'
-    });
-
-    if (!submission) {
-        // If no submission is found, the user is not authorized or the submission is locked.
-        return res.status(403).json({ message: 'Not authorized to delete this file or submission is not editable.' });
-    }
-
-    // --- 2. Execute the S3 Delete Command ---
-    const command = new DeleteObjectCommand({
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: fileKey,
-    });
-
+    
     try {
+      // --- 1. Security Check: Find the submission to verify ownership and editability ---
+      // This single query is a powerful security check. It ensures the file exists in a submission that:
+      // a) Belongs to the current user's department.
+      // b) Is currently in 'Draft' status and therefore editable.
+      const submission = await Submission.findOne({
+        $or: [
+          { 'partA.summaryFileKey': fileKey },
+          { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
+          { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
+          { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
+        ],
+        department: user.department,
+        status: 'Draft'
+      });
+  
+      if (!submission) {
+          // If no submission is found, the user is not authorized or the submission is locked.
+          return res.status(403).json({ message: 'Not authorized to delete this file or submission is not editable.' });
+      }
+  
+      
+      // --- 2. Execute the S3 Delete Command ---
+      const command = new DeleteObjectCommand({
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: fileKey,
+      });
         await s3Client.send(command);
-          await logS3Metric("DELETE", user, fileKey);
+        
         res.json({ message: 'File deleted successfully.' });
     } catch (error) {
-        console.error("S3 Deletion Error:", error);
+        // console.error("S3 Deletion Error:", error);
+
+          logger.error(`S3 Deletion Error`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "fileController/deleteFile"
+        }) 
         res.status(500).json({ message: 'Could not delete file from storage.' });
     }
 };

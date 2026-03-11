@@ -7,7 +7,7 @@
 
 
 const SubmissionWindow = require('../models/SubmissionWindow');
-
+const logger = require("../utils/logger.js")
 /**
  * A helper function to safely parse a date string in 'YYYY-MM-DD' format into a UTC Date object.
  * This ensures consistent date handling regardless of the server's local timezone.
@@ -48,7 +48,12 @@ const getSubmissionWindows = async (req, res) => {
         const windows = await SubmissionWindow.find({}).sort({ academicYear: -1, windowType: 1 });
         res.json(windows);
     } catch (error) {
-        console.error('Error fetching submission windows:', error);
+        // console.error('Error fetching submission windows:', error);
+        logger.error(`Error Fetching Submission Windows `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submissionWindowController/getSubmissionWindows"
+        })
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -74,12 +79,26 @@ const createSubmissionWindow = async (req, res) => {
         end.setUTCHours(23, 59, 59, 999);
 
         const newWindow = await SubmissionWindow.create({ academicYear, startDate: start, endDate: end, windowType });
-      
+
+        logger.info(`New Submission Created, ${user.name || ""}`, {
+            name: user.name || "",
+            email: user.email || "",
+            role: user.role || "",
+            controller: "submissionWindowController/createSubmissionWindow"
+        })
+
+
         res.status(201).json(newWindow);
+
     } catch (error) {
         // This error is often triggered by the unique compound index on {academicYear, windowType}
         // in the SubmissionWindow model, preventing duplicates.
-        console.error('Error creating submission window:', error);
+        // console.error('Error creating submission window:', error);
+        logger.error(`Error Creating Submission Windows `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submissionWindowController/createSubmissionWindow"
+        })
         res.status(400).json({ message: 'Error creating window. A window of this type for the academic year might already exist.', error: error.message });
     }
 };
@@ -91,7 +110,7 @@ const createSubmissionWindow = async (req, res) => {
  */
 const updateSubmissionWindow = async (req, res) => {
     const { academicYear, startDate, endDate, windowType } = req.body;
-    const user =req.user
+    const user = req.user
     try {
         const window = await SubmissionWindow.findById(req.params.id);
 
@@ -115,14 +134,27 @@ const updateSubmissionWindow = async (req, res) => {
 
             // Save the updated document. This will trigger Mongoose validation.
             const updatedWindow = await window.save();
-         
+
+            logger.info(`Submission Window Updated, ${user.name || ""}`, {
+                name: user.name || "",
+                email: user.email || "",
+                role: user.role || "",
+                controller: "submissionWindowController/updateSubmissionWindow"
+            })
+
             res.json(updatedWindow);
         } else {
             res.status(404).json({ message: 'Submission window not found' });
         }
     } catch (error) {
         // This can also be triggered by the unique index if the update creates a conflict.
-        console.error(`Error updating submissionWindow ${req.params.id}:`, error);
+        // console.error(`Error updating submissionWindow ${req.params.id}:`, error);
+
+        logger.error(`Error Updating Submission Windows `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submissionWindowController/updateSubmissionWindow"
+        })
         res.status(400).json({ message: 'Error updating submission window. The update may have caused a duplicate entry.', error: error.message });
     }
 };
@@ -138,14 +170,28 @@ const deleteSubmissionWindow = async (req, res) => {
         const user = req.user
         if (window) {
             await window.deleteOne(); // Use .deleteOne() on the document instance.
-           
+
+
+            logger.info(`Submission Window deleted, ${user.name || ""}`, {
+                name: user.name || "",
+                email: user.email || "",
+                role: user.role || "",
+                controller: "submissionWindowController/deleteSubmissionWindow"
+            })
 
             res.json({ message: 'Submission window removed successfully' });
         } else {
             res.status(404).json({ message: 'Submission window not found' });
         }
     } catch (error) {
-        console.error(`Error deleting submission window ${req.params.id}:`, error);
+        // console.error(`Error deleting submission window ${req.params.id}:`, error);
+
+
+        logger.error(`Error Deleting Submission Windows `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submissionWindowController/deleteSubmissionWindow"
+        })
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -166,7 +212,13 @@ const getCurrentOpenWindow = async (req, res) => {
 
         res.json(openWindow || null);
     } catch (error) {
-        console.error('Error fetching current appeal window:', error);
+        // console.error('Error fetching current appeal window:', error);
+
+        logger.error(`Error Fetching Current Open Window`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submissionWindowController/getCurrentOpenWindow"
+        })
         res.status(500).json({ message: 'Server Error' });
     }
 };
