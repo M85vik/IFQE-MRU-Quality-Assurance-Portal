@@ -189,13 +189,13 @@ const { Upload } = require('@aws-sdk/lib-storage');
 
 const s3Client = require('../config/s3Client');
 const ArchiveLog = require('../models/ArchiveLog');
+const logger = require('./logger.js');
 
 // ------------------------------------------------------------------
 // CONFIG (SSD-BACKED TEMP STORAGE)
 // ------------------------------------------------------------------
 
-const BASE_TEMP_DIR =
-  process.env.ARCHIVE_TEMP_DIR || '/var/tmp/archives';
+const BASE_TEMP_DIR = process.env.ARCHIVE_TEMP_DIR || '/var/tmp/archives';
 
 // ------------------------------------------------------------------
 // HELPERS
@@ -230,6 +230,7 @@ async function downloadS3ToDisk(bucket, key, destination) {
 // MAIN SERVICE
 // ------------------------------------------------------------------
 
+
 const createSubmissionArchive = async (submission) => {
   const SUB_ID = submission._id.toString();
   const startTime = Date.now();
@@ -243,7 +244,9 @@ const createSubmissionArchive = async (submission) => {
   let archiveKey;
 
   try {
-    console.log(`[Archive | ${SUB_ID}] START`);
+    // console.log(`[Archive | ${SUB_ID}] START`);
+
+    logger.info(`[Archive | ${SUB_ID}] START`, {})
 
     // --------------------------------------------------------------
     // 1. Ensure base + job directories
@@ -295,11 +298,15 @@ const createSubmissionArchive = async (submission) => {
     });
 
     if (!files.length) {
-      console.log(`[Archive | ${SUB_ID}] No files found`);
+      // console.log(`[Archive | ${SUB_ID}] No files found`);
+      logger.info(`[Archive | ${SUB_ID}] No Files Found `, {})
+
       return null;
     }
 
-    console.log(`[Archive | ${SUB_ID}] Downloading ${files.length} files`);
+    // console.log(`[Archive | ${SUB_ID}] Downloading ${files.length} files`);
+    logger.info(`[Archive | ${SUB_ID}] Downloading ${files.length || ""}`, {})
+
 
     // --------------------------------------------------------------
     // 3. Download files to SSD (STREAMED)
@@ -312,9 +319,14 @@ const createSubmissionArchive = async (submission) => {
       try {
         await downloadS3ToDisk(BUCKET, f.key, localPath);
         f.localPath = localPath;
-        console.log(`[Archive | ${SUB_ID}] Downloaded ${i + 1}/${files.length}`);
+        // console.log(`[Archive | ${SUB_ID}] Downloaded ${i + 1}/${files.length}`);
+        logger.info(`[Archive | ${SUB_ID}] Downloaded ${i + 1}/${files.length}`, {})
+
       } catch (err) {
-        console.warn(`[Archive | ${SUB_ID}] Missing file: ${f.key}`);
+        // console.warn(`[Archive | ${SUB_ID}] Missing file: ${f.key}`);
+
+        logger.warn(`[Archive | ${SUB_ID}] Missing file: ${f.key}`, {})
+
         const missingPath = path.join(jobDir, `MISSING_${i}.txt`);
         await fs.promises.writeFile(missingPath, `Missing file: ${f.key}`);
         f.localPath = missingPath;
@@ -355,13 +367,18 @@ const createSubmissionArchive = async (submission) => {
       );
     }
 
-    console.log(`[Archive | ${SUB_ID}] Upload started`);
+    // console.log(`[Archive | ${SUB_ID}] Upload started`);
+
+    logger.info(`[Archive | ${SUB_ID}] Upload started`, {})
 
     const uploadPromise = upload.done();
     await archive.finalize();
     await uploadPromise;
 
-    console.log(`[Archive | ${SUB_ID}] Upload completed`);
+    // console.log(`[Archive | ${SUB_ID}] Upload completed`);
+
+    logger.info(`[Archive | ${SUB_ID}] Upload completed`, {})
+
 
     // --------------------------------------------------------------
     // 5. Save DB
@@ -383,7 +400,7 @@ const createSubmissionArchive = async (submission) => {
         })
       );
       zipSizeMB = Number((head.ContentLength / (1024 * 1024)).toFixed(2));
-    } catch (_) {}
+    } catch (_) { }
 
     // --------------------------------------------------------------
     // 7. Save log (non-blocking)
@@ -402,14 +419,22 @@ const createSubmissionArchive = async (submission) => {
         createdBy: submission.updatedByRole || 'superuser',
       });
     } catch (logErr) {
-      console.warn(`[Archive | ${SUB_ID}] Log save failed`, logErr.message);
+
+      // console.warn(`[Archive | ${SUB_ID}] Log save failed`, logErr.message);
+
+      logger.warn(`[Archive | ${SUB_ID}] Log save failed`, {})
     }
 
-    console.log(`[Archive | ${SUB_ID}] SUCCESS`);
+    // console.log(`[Archive | ${SUB_ID}] SUCCESS`);
+    logger.info(`[Archive | ${SUB_ID}] SUCCESS `, {})
     return archiveKey;
 
   } catch (err) {
-    console.error(`[Archive | ${SUB_ID}] FAILED`, err);
+    // console.error(`[Archive | ${SUB_ID}] FAILED`, err);
+    logger.error(`[Archive | ${SUB_ID}] FAILED`, {
+      message: err.message || "",
+      stack: err.stack || ""
+    })
     upload?.abort();
     throw err;
 
@@ -422,12 +447,19 @@ const createSubmissionArchive = async (submission) => {
         recursive: true,
         force: true,
       });
-      console.log(`[Archive | ${SUB_ID}] Temp cleaned`);
+      // console.log(`[Archive | ${SUB_ID}] Temp cleaned`);
+
+      logger.info(`[Archive | ${SUB_ID}] Temp cleaned`, {})
     } catch (cleanupErr) {
-      console.warn(
-        `[Archive | ${SUB_ID}] Cleanup failed`,
-        cleanupErr.message
-      );
+
+      // console.warn(
+      //   `[Archive | ${SUB_ID}] Cleanup failed`,
+      //   cleanupErr.message
+      // );
+
+      logger.warn(`[Archive | ${SUB_ID}] Cleanup failed`, {
+        message: cleanupErr.message
+      })
     }
   }
 };
