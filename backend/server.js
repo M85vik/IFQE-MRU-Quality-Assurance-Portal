@@ -3,6 +3,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const cookieParser = require('cookie-parser')
 const connectDB = require('./config/db');
 const apiMetricsMiddleware = require('./middleware/apiMetrics');
 const reportRoutes = require("./routes/reportRoutes");
@@ -16,6 +17,8 @@ const app = express();
 
 const FRONTEND_URL= process.env.FRONTEND_URL
 if(!FRONTEND_URL) throw new Error("Front URL Environment Varibale Not loaded.");
+
+
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -38,6 +41,10 @@ app.use(cors({
   },
   credentials: true // if sending cookies or auth headers
 }));
+
+
+
+app.use(cookieParser());
 
 app.use(express.json());
 
