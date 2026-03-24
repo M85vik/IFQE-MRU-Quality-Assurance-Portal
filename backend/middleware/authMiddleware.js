@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const logger = require('../utils/logger');
 
 const protect = async (req, res, next) => {
 
@@ -49,8 +50,34 @@ const protect = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error(error);
-    return res.status(401).json({ message: 'Not authorized, token failed' });
+    // console.error(error);
+
+     if (error.name === "TokenExpiredError") {
+      logger.warn("JWT expired", {
+        expiredAt: error.expiredAt,
+        url: req.originalUrl,
+        method: req.method,
+        ip: req.ip || ""
+      });
+
+      return res.status(401).json({
+        message: "Session expired, please login again"
+      });
+    }
+
+
+    logger.error("JWT verification failed", {
+      error: error.message,
+      stack: error.stack,
+      url: req.originalUrl
+    });
+
+    return res.status(401).json({
+      message: "Not authorized, token failed"
+    });
+
+    
+
   }
 
  
