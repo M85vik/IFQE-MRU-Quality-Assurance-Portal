@@ -9,6 +9,9 @@ const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const logger = require("../utils/logger.js");
 
+
+
+
 /**
  * @desc    Register a new user.
  * @route   POST /api/users/register
@@ -18,33 +21,29 @@ const logger = require("../utils/logger.js");
  * @param   {object} res - The Express response object.
  * @returns {json} 201 - A JSON object with the new user's data and a JWT.
  * @returns {json} 400 - If the email already exists or if user data is invalid.
- */
+*/
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role, department, school } = req.body;
-
     // 1. Check if a user with the given email already exists to prevent duplicates.
     const userExists = await User.findOne({ email });
     if (userExists) {
-      // If the user exists, return a 400 Bad Request status.
+      
       return res.status(400).json({ message: 'User with this email already exists' });
     }
-
-    // 2. Create a new user in the database with the provided details.
-    // The password will be automatically hashed by the Mongoose pre-save hook in the User model.
+    
+    
     const user = await User.create({ name, email, password, role, department, school });
-
-
-    // 3. If user creation is successful, send back the user's details and a JWT.
+    
     if (user) {
       res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id), // Generate a JWT for the new user.
+        // token: generateToken(user._id), // Generate a JWT for the new user.
       })
-
+      
       logger.info(`New User Created, ${user.name || ""}`, {
         _id: user._id,
         name: user.name,
@@ -52,15 +51,15 @@ const registerUser = async (req, res) => {
         role: user.role,
         controller: "UserController/registerUser"
       })
-
-        ;
+      
+      ;
     } else {
       // This case handles potential Mongoose validation errors during creation.
       res.status(400).json({ message: 'Invalid user data provided' });
     }
   } catch (error) {
     // console.error(`Error in registerUser: ${error.message}`);
-
+    
     logger.error(`Error Creating New User `, {
       message: error.message || "",
       stack: error.stack || "",
@@ -79,11 +78,12 @@ const registerUser = async (req, res) => {
  * @param   {object} res - The Express response object.
  * @returns {json} 200 - A JSON object with the logged-in user's data and a JWT.
  * @returns {json} 401 - If credentials (email or password) are invalid.
- */
+*/
 const loginUser = async (req, res) => {
   try {
-
-
+    
+    const isProduction = process.env.NODE_ENV ==="production";
+  
     const { email, password } = req.body;
 
     // 1. Find the user by their email.
@@ -107,6 +107,13 @@ const loginUser = async (req, res) => {
         controller: "UserController/loginUser"
       })
 
+      const token = generateToken(user._id);
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: isProduction,        // true in production
+        sameSite: "Lax"
+      })
 
       res.json({
         _id: user._id,
@@ -115,13 +122,10 @@ const loginUser = async (req, res) => {
         role: user.role,
         department: user.department,
         school: user.school,
-        token: generateToken(user._id),
+        token: token,
       });
     } else {
-      // Security Best Practice: Use a generic error message to prevent attackers
-      // from knowing whether an email address is registered in the system.
-
-
+   
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
