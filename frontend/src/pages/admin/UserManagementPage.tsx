@@ -170,18 +170,16 @@ const UserManagementPage: React.FC = () => {
   const handlePasswordUpdate = async (masterKey: string, newPassword: string) => {
     const toastId = toast.loading('Updating password...');
 
-try {
+    try {
       await apiClient.post(
         `/users/update-password/${passwordDialog.userId}`,
         { masterKey, password: newPassword }
       );
-  
-      toast.success('Password updated successfully!', { id: toastId });
-} catch (error) {
 
-  toast.error("Password Change Failed");
-  
-}
+      toast.success('Password updated successfully!', { id: toastId });
+    } catch (error) {
+      toast.error('Password Change Failed', { id: toastId });
+    }
   };
 
 
