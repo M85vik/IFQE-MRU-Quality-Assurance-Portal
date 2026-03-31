@@ -8,6 +8,7 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const logger = require("../utils/logger.js");
+const { log } = require('console');
 
 
 
@@ -236,7 +237,10 @@ const updateUserPassword = async (req, res) => {
 
   const MASTER_KEY = process.env.MASTER_KEY;
 
-
+  console.log("MASTER KEY FROM SERVER :", MASTER_KEY);
+  
+  console.log("master key from user : ", masterKey);
+  
   if (!MASTER_KEY) {
 
     logger.warn(`User Password Not Changed`, {
