@@ -28,13 +28,13 @@ const registerUser = async (req, res) => {
     // 1. Check if a user with the given email already exists to prevent duplicates.
     const userExists = await User.findOne({ email });
     if (userExists) {
-      
+
       return res.status(400).json({ message: 'User with this email already exists' });
     }
-    
-    
+
+
     const user = await User.create({ name, email, password, role, department, school });
-    
+
     if (user) {
       res.status(201).json({
         _id: user._id,
@@ -43,7 +43,7 @@ const registerUser = async (req, res) => {
         role: user.role,
         // token: generateToken(user._id), // Generate a JWT for the new user.
       })
-      
+
       logger.info(`New User Created, ${user.name || ""}`, {
         _id: user._id,
         name: user.name,
@@ -51,15 +51,15 @@ const registerUser = async (req, res) => {
         role: user.role,
         controller: "UserController/registerUser"
       })
-      
-      ;
+
+        ;
     } else {
       // This case handles potential Mongoose validation errors during creation.
       res.status(400).json({ message: 'Invalid user data provided' });
     }
   } catch (error) {
     // console.error(`Error in registerUser: ${error.message}`);
-    
+
     logger.error(`Error Creating New User `, {
       message: error.message || "",
       stack: error.stack || "",
@@ -81,9 +81,9 @@ const registerUser = async (req, res) => {
 */
 const loginUser = async (req, res) => {
   try {
-    
-    const isProduction = process.env.NODE_ENV ==="production";
-  
+
+    const isProduction = process.env.NODE_ENV === "production";
+
     const { email, password } = req.body;
 
     // 1. Find the user by their email.
@@ -112,7 +112,7 @@ const loginUser = async (req, res) => {
       res.cookie("token", token, {
         httpOnly: true,
         secure: isProduction,        // true in production
-      sameSite: isProduction ? "None" : "Lax"
+        sameSite: isProduction ? "None" : "Lax"
       })
 
       res.json({
@@ -125,7 +125,7 @@ const loginUser = async (req, res) => {
         token: token,
       });
     } else {
-   
+
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
@@ -235,9 +235,31 @@ const updateUserPassword = async (req, res) => {
   }
 
   const MASTER_KEY = process.env.MASTER_KEY;
-  if (!masterKey) {
-    return res.status(403).json({ message: 'Invalid master key.' });
+
+
+  if (!MASTER_KEY) {
+
+    logger.warn(`User Password Not Changed`, {
+      masterKeySys: MASTER_KEY,
+      controller: "UserController/updateUserPassword"
+    })
+    return res.status(500).json({
+      message: 'Server misconfigured: MASTER_KEY missing',
+    });
   }
+
+  if (!masterKey) {
+    logger.warn(`User Password Not Changed`, {
+      masterKeySys: MASTER_KEY,
+      masterKey: masterKey,
+      controller: "UserController/updateUserPassword"
+    })
+    return res.status(400).json({
+      message: 'Master key is required',
+    });
+  }
+
+
 
   const inputKeyBuffer = Buffer.from(masterKey);
   const storedKeyBuffer = Buffer.from(MASTER_KEY);
