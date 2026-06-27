@@ -270,13 +270,14 @@ const updateSubmission = async (req, res) => {
             // PART A update
             if (partA) {
                 if (
-                    submission.partA.summaryFileKey &&
+                    partA.summaryFileKey !== undefined && 
                     submission.partA.summaryFileKey !== partA.summaryFileKey
                 ) {
-                    oldFileKeys.push(submission.partA.summaryFileKey);
+                    if (submission.partA.summaryFileKey) {
+                         oldFileKeys.push(submission.partA.summaryFileKey);
+                    }
+                    submission.partA.summaryFileKey = partA.summaryFileKey;
                 }
-
-                submission.partA.summaryFileKey = partA.summaryFileKey;
                 submission.markModified('partA');
             }
 
@@ -301,13 +302,13 @@ const updateSubmission = async (req, res) => {
                             if (!dbInd) continue;
 
                             // FILE KEY update
-                            if (reqInd.fileKey && reqInd.fileKey !== dbInd.fileKey) {
+                            if (reqInd.fileKey !== undefined && reqInd.fileKey !== dbInd.fileKey) {
                                 if (dbInd.fileKey) oldFileKeys.push(dbInd.fileKey);
                                 dbInd.fileKey = reqInd.fileKey;
                             }
 
                             // EVIDENCE LINK update (single file - legacy)
-                            if (reqInd.evidenceLinkFileKey && reqInd.evidenceLinkFileKey !== dbInd.evidenceLinkFileKey) {
+                            if (reqInd.evidenceLinkFileKey !== undefined && reqInd.evidenceLinkFileKey !== dbInd.evidenceLinkFileKey) {
                                 if (dbInd.evidenceLinkFileKey) oldFileKeys.push(dbInd.evidenceLinkFileKey);
                                 dbInd.evidenceLinkFileKey = reqInd.evidenceLinkFileKey;
                             }

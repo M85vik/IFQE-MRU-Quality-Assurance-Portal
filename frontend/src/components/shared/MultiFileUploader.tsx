@@ -46,17 +46,15 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
     setError('');
 
     try {
-      // Get presigned URL
-      const { data: { uploadUrl, fileKey } } = await apiClient.post('/files/upload-url', {
-        submissionId,
-        fileType: file.type,
-        ...identifier,
-        isMultiEvidence: true,
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('submissionId', submissionId);
+      Object.keys(identifier).forEach(key => {
+        formData.append(key, identifier[key]);
       });
 
-      // Upload to S3
-      await axios.put(uploadUrl, file, {
-        headers: { 'Content-Type': file.type },
+      const { data: { fileKey } } = await apiClient.post('/files/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -70,9 +68,11 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
       // Remove from uploading list and add to files
       setUploadingFiles(prev => prev.filter(f => f.id !== uploadId));
       onFileAdded(fileKey);
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Upload error:', err?.response?.data || err?.message || err);
       setUploadingFiles(prev => prev.filter(f => f.id !== uploadId));
-      setError('Upload failed. Please try again.');
+      const backendMessage = err?.response?.data?.message;
+      setError(backendMessage || 'Upload failed. Please try again.');
     }
   };
 
