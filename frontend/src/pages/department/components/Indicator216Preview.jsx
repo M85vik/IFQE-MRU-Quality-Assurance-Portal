@@ -38,6 +38,7 @@ const Indicator216Preview = ({ fileKey }) => {
         // | Designation and Affiliation | Date | Duration | No. of Participants | Mode (Online/Offline)
         let colTitle = 1;
         let colParticipants = 7;
+        let colMode = 8;
 
         // Dynamically detect header columns
         for (let i = 0; i < Math.min(rows.length, 5); i++) {
@@ -50,6 +51,8 @@ const Indicator216Preview = ({ fileKey }) => {
               colTitle = idx;
             } else if (text.includes('no. of participants') || text.includes('participants') || text.includes('number of participants')) {
               colParticipants = idx;
+            } else if (text.includes('mode') || text.includes('online') || text.includes('offline')) {
+              colMode = idx;
             }
           });
         }

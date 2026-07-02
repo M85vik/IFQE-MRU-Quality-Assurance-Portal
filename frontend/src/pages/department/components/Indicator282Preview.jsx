@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import apiClient from '../../../api/axiosConfig';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -34,7 +34,7 @@ const Indicator282Preview = ({ fileKey }) => {
         // S.No | Name of the scholar | Thesis Title | Name of the supervisor
         // | Name of the co-supervisor | Degree award notification | Ph.D. Certification
         let colScholar = 1;
-
+        let colThesis = 2;
         let colDegreeNotification = 5;
         let colCertification = 6;
 
@@ -46,6 +46,8 @@ const Indicator282Preview = ({ fileKey }) => {
             const text = String(cell).toLowerCase().trim();
             if (text.includes('name of the scholar') || text.includes('scholar')) {
               colScholar = idx;
+            } else if (text.includes('thesis title') || text.includes('thesis')) {
+              colThesis = idx;
             } else if (text.includes('degree award') || text.includes('notification')) {
               colDegreeNotification = idx;
             } else if (text.includes('certification') || text.includes('ph.d. cert') || text.includes('phd cert')) {
