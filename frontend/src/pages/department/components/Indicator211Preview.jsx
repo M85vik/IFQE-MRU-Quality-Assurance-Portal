@@ -208,14 +208,7 @@ const Indicator211Preview = ({ fileKey }) => {
     return 2;
   };
 
-  // Helper: Parse a number
-  const parseNumber = (val) => {
-    if (val === null || val === undefined || val === '') return 0;
-    if (typeof val === 'number') return val;
-    const cleaned = String(val).replace(/[%,]/g, '').trim();
-    const num = parseFloat(cleaned);
-    return isNaN(num) ? 0 : num;
-  };
+
 
   if (loading) {
     return (

@@ -56,7 +56,7 @@ const Indicator117Preview = ({ fileKey }) => {
         let colProgram = 0;
         let colCode = 1;
         let colTitle = 2;
-        let colDuration = 3;
+
         let colRegistered = 4;
         let colCompleted = 5;
 
@@ -73,8 +73,6 @@ const Indicator117Preview = ({ fileKey }) => {
               colCode = idx;
             } else if (text.includes('course title') || text.includes('title')) {
               colTitle = idx;
-            } else if (text.includes('duration')) {
-              colDuration = idx;
             } else if (text.includes('registered') || text.includes('no. of students registered') || text.includes('students registered')) {
               colRegistered = idx;
             } else if (text.includes('completed') || text.includes('completed vac') || text.includes('students completed')) {

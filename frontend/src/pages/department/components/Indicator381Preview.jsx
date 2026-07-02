@@ -55,7 +55,7 @@ const Indicator381Preview = ({ fileKey }) => {
           if (!row || row.length === 0) continue;
 
           // Detect section headers
-          const firstCellStr = String(row[0] || row[1] || '').toLowerCase().trim();
+
           const rowText = row.map(c => String(c || '').toLowerCase()).join(' ');
 
           if (rowText.includes('3.8(a)') || rowText.includes('3.8(a)') || rowText.includes('internship as per scheme') || rowText.includes('students going for internship')) {

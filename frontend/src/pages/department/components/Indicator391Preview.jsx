@@ -90,7 +90,7 @@ const Indicator391Preview = ({ fileKey }) => {
           // Only process section A (publications) for journal/conference summary
           if (currentSection !== 'a') continue;
 
-          const snoCell = String(row[0] || '').trim();
+
           const nameCell = row[colName] && String(row[colName]).trim();
           if (!nameCell) continue;
           if (nameCell.toLowerCase().includes('total') || nameCell.toLowerCase() === 'name of the student') continue;
