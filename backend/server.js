@@ -67,4 +67,4 @@ app.use("/api/result-publication", require("./routes/resultPublicationRoutes"));
 app.use('/api/archives', archiveRoutes);
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 
