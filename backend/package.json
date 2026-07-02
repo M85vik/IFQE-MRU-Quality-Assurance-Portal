@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "mime-types": "^3.0.1",
     "mongoose": "^8.23.0",
+    "multer": "^2.2.0",
     "resend": "^6.5.2"
   },
   "devDependencies": {

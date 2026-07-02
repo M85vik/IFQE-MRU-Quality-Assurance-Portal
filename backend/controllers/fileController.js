@@ -269,5 +269,147 @@ const deleteFile = async (req, res) => {
 
 
 
+/**
+ * @desc    Fetch a file directly through the backend and stream to client to avoid CORS.
+ * @route   GET /api/files/download-proxy
+ * @access  Private (Department owners, QAA, Admin, Superuser)
+ */
+const downloadFileProxy = async (req, res) => {
+  const { fileKey } = req.query;
+  const user = req.user;
+
+  if (!fileKey) return res.status(400).json({ message: 'fileKey is required' });
+
+  // 1. Authorization matching getDownloadUrl
+  let authorized = false;
+  
+  if (fileKey.startsWith('templates/')) {
+    authorized = true;
+  } else {
+    // Check Database (works for already saved files)
+    const submission = await Submission.findOne({
+      $or: [
+        { 'archiveFileKey': fileKey },
+        { 'partA.summaryFileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey },
+        { 'archive.fileKey': fileKey }
+      ]
+    });
+
+    if (submission) {
+        const isOwner = submission.department && submission.department.toString() === user.department?.toString();
+        const isReviewer = ['qaa', 'admin', 'superuser'].includes(user.role);
+        if (isOwner || isReviewer) {
+            authorized = true;
+        }
+    } 
+    
+    // Fallback: If not in DB yet (just uploaded), verify they own the folder path
+    if (!authorized) {
+        const pathParts = fileKey.split('/');
+        // Format: evidence/year/schoolId/departmentId/indicatorCode/...
+        if (pathParts[0] === 'evidence' && pathParts.length > 3) {
+            if (pathParts[3] === user.department?.toString()) {
+                authorized = true;
+            }
+        }
+    }
+  }
+
+  if (!authorized) {
+    return res.status(403).json({ message: 'Not authorized to access this file.' });
+  }
+
+  const command = new GetObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: fileKey,
+  });
+
+  try {
+    const response = await s3Client.send(command);
+    res.setHeader('Content-Type', response.ContentType || 'application/octet-stream');
+    response.Body.pipe(res);
+  } catch (error) {
+    logger.error('S3 Proxy Error', { message: error.message, controller: 'fileController/downloadFileProxy' });
+    res.status(500).json({ message: 'Could not proxy file from S3' });
+  }
+};
+
+/**
+ * @desc    Upload file directly to S3 through backend proxy to avoid client CORS.
+ * @route   POST /api/files/upload
+ * @access  Private (Department users)
+ */
+const uploadFile = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const { submissionId, indicatorCode, partACode, isEvidenceLink } = req.body;
+    const user = req.user;
+
+    // Same validation logic as getUploadUrl
+    const submission = await Submission.findById(submissionId);
+    if (!submission) {
+      return res.status(404).json({ message: 'Submission not found' });
+    }
+
+    const windowOpen = await SubmissionWindow.findOne({ 
+      academicYear: submission.academicYear,
+      windowType: 'Submission' 
+    });
+    const now = new Date();
+    if (!windowOpen || !(now >= windowOpen.startDate && now <= windowOpen.endDate)) {
+        return res.status(403).json({ message: 'Cannot upload files because the submission window is closed.' });
+    }
+
+    if (submission.department.toString() !== user.department.toString()) {
+      return res.status(403).json({ message: 'Not authorized to upload to this submission' });
+    }
+
+    if (submission.status !== 'Draft') {
+      return res.status(403).json({ message: 'Cannot upload files to a submitted or approved report.' });
+    }
+
+    const fileName = generateFileName();
+    const fileExtension = mime.extension(req.file.mimetype) || 'bin';
+    let key;
+    const basePath = `evidence/${submission.academicYear}/${submission.school}/${submission.department}`;
+
+    if (indicatorCode) {
+      if (isEvidenceLink === 'true' || isEvidenceLink === true) {
+        key = `${basePath}/${indicatorCode}/evidence-link/${fileName}.${fileExtension}`;
+      } else {
+        key = `${basePath}/${indicatorCode}/main/${fileName}.${fileExtension}`;
+      }
+    } else if (partACode === 'SUMMARY') {
+      key = `${basePath}/partA-summary/${fileName}.${fileExtension}`;
+    } else {
+      return res.status(400).json({ message: 'A valid indicator or part A code is required.' });
+    }
+
+    const command = new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: key,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+    });
+
+    await s3Client.send(command);
+
+    res.json({ fileKey: key });
+  } catch (error) {
+    logger.error('Error in direct file upload proxy', {
+      message: error.message || '',
+      stack: error.stack || '',
+      controller: 'fileController/uploadFile'
+    });
+    res.status(500).json({ message: 'Could not upload file to storage.' });
+  }
+};
+
 // Export the controller functions.
-module.exports = { getUploadUrl, getDownloadUrl, deleteFile };
+module.exports = { getUploadUrl, getDownloadUrl, deleteFile, downloadFileProxy, uploadFile };

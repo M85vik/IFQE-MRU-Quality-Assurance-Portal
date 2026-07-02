@@ -33,9 +33,15 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
         setProgress(0);
         setError('');
         try {
-            const { data: { uploadUrl, fileKey } } = await apiClient.post('/files/upload-url', { submissionId, fileType: fileToUpload.type, ...identifier });
-            await axios.put(uploadUrl, fileToUpload, {
-                headers: { 'Content-Type': fileToUpload.type },
+            const formData = new FormData();
+            formData.append('file', fileToUpload);
+            formData.append('submissionId', submissionId);
+            Object.keys(identifier).forEach(key => {
+                formData.append(key, identifier[key]);
+            });
+
+            const { data: { fileKey } } = await apiClient.post('/files/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
                 onUploadProgress: (progressEvent) => {
                     if (progressEvent.total) {
                         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -45,8 +51,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
             });
             setCurrentFileKey(fileKey);
             onUploadSuccess(fileKey);
-        } catch (err) {
-            setError('Upload failed. Please try again.');
+        } catch (err: any) {
+            console.error('Upload error:', err?.response?.data || err?.message || err);
+            const backendMessage = err?.response?.data?.message;
+            setError(backendMessage || 'Upload failed. Please try again.');
         } finally {
             setIsProcessing(false);
         }

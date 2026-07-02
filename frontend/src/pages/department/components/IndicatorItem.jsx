@@ -9,6 +9,30 @@ import RubricViewer from './RubricViewer';
 import GuidelinesViewer from './GuidelinesViewer';
 import Button from '../../../components/shared/Button';
 import toast from 'react-hot-toast';
+import Indicator3103Preview from './Indicator3103Preview';
+import Indicator115Preview from './Indicator115Preview';
+import Indicator116Preview from './Indicator116Preview';
+import Indicator117Preview from './Indicator117Preview';
+import Indicator211Preview from './Indicator211Preview';
+import Indicator212Preview from './Indicator212Preview';
+import Indicator213Preview from './Indicator213Preview';
+import Indicator216Preview from './Indicator216Preview';
+import Indicator311Preview from './Indicator311Preview';
+import Indicator341Preview from './Indicator341Preview';
+import Indicator342Preview from './Indicator342Preview';
+import Indicator343Preview from './Indicator343Preview';
+import Indicator344Preview from './Indicator344Preview';
+import Indicator345Preview from './Indicator345Preview';
+import Indicator351Preview from './Indicator351Preview';
+import Indicator353Preview from './Indicator353Preview';
+import Indicator371Preview from './Indicator371Preview';
+import Indicator381Preview from './Indicator381Preview';
+import Indicator391Preview from './Indicator391Preview';
+import Indicator223Preview from './Indicator223Preview';
+import Indicator231Preview from './Indicator231Preview';
+import Indicator251Preview from './Indicator251Preview';
+import Indicator281Preview from './Indicator281Preview';
+import Indicator282Preview from './Indicator282Preview';
 
 const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, onFileRemove }) => {
   const [isRubricModalOpen, setIsRubricModalOpen] = useState(false);
@@ -133,6 +157,81 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
                 </Button>
               )}
             </div>
+            
+            {/* Template Summary Analysis Components */}
+            {indicator.indicatorCode === '3.10.3' && submissionIndicator.fileKey && (
+               <Indicator3103Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '1.1.5' && submissionIndicator.fileKey && (
+               <Indicator115Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '1.1.6' && submissionIndicator.fileKey && (
+               <Indicator116Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '1.1.7' && submissionIndicator.fileKey && (
+               <Indicator117Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.1.1' && submissionIndicator.fileKey && (
+               <Indicator211Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.1.2' && submissionIndicator.fileKey && (
+               <Indicator212Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.1.3' && submissionIndicator.fileKey && (
+               <Indicator213Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.1.6' && submissionIndicator.fileKey && (
+               <Indicator216Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.1.1' && submissionIndicator.fileKey && (
+               <Indicator311Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.4.1' && submissionIndicator.fileKey && (
+               <Indicator341Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.4.2' && submissionIndicator.fileKey && (
+               <Indicator342Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.4.3' && submissionIndicator.fileKey && (
+               <Indicator343Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.4.4' && submissionIndicator.fileKey && (
+               <Indicator344Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.4.5' && submissionIndicator.fileKey && (
+               <Indicator345Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.5.1' && submissionIndicator.fileKey && (
+               <Indicator351Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.5.3' && submissionIndicator.fileKey && (
+               <Indicator353Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.7.1' && submissionIndicator.fileKey && (
+               <Indicator371Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.8.1' && submissionIndicator.fileKey && (
+               <Indicator381Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '3.9.1' && submissionIndicator.fileKey && (
+               <Indicator391Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.2.3' && submissionIndicator.fileKey && (
+               <Indicator223Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.3.1' && submissionIndicator.fileKey && (
+               <Indicator231Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.5.1' && submissionIndicator.fileKey && (
+               <Indicator251Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.8.1' && submissionIndicator.fileKey && (
+               <Indicator281Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            {indicator.indicatorCode === '2.8.2' && submissionIndicator.fileKey && (
+               <Indicator282Preview fileKey={submissionIndicator.fileKey} />
+            )}
+            
           </div>
 
           {/* Right Section */}

@@ -6,12 +6,19 @@
 
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+
+// Configure multer for memory storage and up to 50MB file size limit
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 }
+});
 
 // --- Controller and Middleware Imports ---
 
 // Import controller functions that contain the logic for generating URLs and handling S3 commands.
 
-const { getUploadUrl, getDownloadUrl, deleteFile } = require('../controllers/fileController'); 
+const { getUploadUrl, getDownloadUrl, deleteFile, downloadFileProxy, uploadFile } = require('../controllers/fileController'); 
 // The user provided 'fileController' in the router, but the controller logic was in 's3Controller'. I've used the correct controller path here. If your file is named fileController.js, you can change this path.
 
 // Import the 'protect' middleware to ensure a user is authenticated via JWT.
@@ -20,6 +27,13 @@ const { protect } = require('../middleware/authMiddleware');
 
 // --- Route Definitions ---
 // All routes in this file require the user to be authenticated.
+
+/**
+ * @route   POST /api/files/upload
+ * @desc    Uploads a file directly through the backend server (to S3) to avoid client-side CORS issues.
+ * @access  Private (Authenticated users)
+ */
+router.post('/upload', protect, upload.single('file'), uploadFile);
 
 /**
  * @route   POST /api/files/upload-url
@@ -36,6 +50,13 @@ router.post('/upload-url', protect, getUploadUrl);
  * @access  Private (Authenticated users)
  */
 router.get('/download-url', protect, getDownloadUrl);
+
+/**
+ * @route   GET /api/files/download-proxy
+ * @desc    Fetch a file directly through the backend and stream to client to avoid CORS.
+ * @access  Private (Authenticated users)
+ */
+router.get('/download-proxy', protect, downloadFileProxy);
 
 /**
  * @route   DELETE /api/files/delete-file

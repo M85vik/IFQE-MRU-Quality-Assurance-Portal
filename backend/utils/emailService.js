@@ -1,11 +1,25 @@
 // utils/emailService.js
 const { Resend } = require("resend");
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend;
+function getResendClient() {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("⚠️  RESEND_API_KEY is not set. Email sending will fail.");
+      return null;
+    }
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 async function sendEmail({ to, subject, html }) {
   try {
-    const response = await resend.emails.send({
+    const client = getResendClient();
+    if (!client) {
+      throw new Error("Email service is not configured. Set RESEND_API_KEY in .env");
+    }
+    const response = await client.emails.send({
       from: "IFQE Portal <no-reply@vikasharma.online>",
       to,
       subject,
