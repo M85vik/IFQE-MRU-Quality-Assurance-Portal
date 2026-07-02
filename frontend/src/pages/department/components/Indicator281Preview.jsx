@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import apiClient from '../../../api/axiosConfig';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -34,7 +34,7 @@ const Indicator281Preview = ({ fileKey }) => {
         // S.No | Documents to be uploaded
         // Rows contain: "Details of seats filled against the vacancies available in the CAY verified from Ph.D. office"
         // We count valid data rows (non-empty rows after header) as active scholars
-
+        let colDoc = 1;
         let colCount = 2; // may have a count column
 
         for (let i = 0; i < Math.min(rows.length, 6); i++) {
@@ -43,7 +43,9 @@ const Indicator281Preview = ({ fileKey }) => {
           row.forEach((cell, idx) => {
             if (!cell) return;
             const text = String(cell).toLowerCase().trim();
-            if (text.includes('count') || text.includes('number') || text.includes('no.')) {
+            if (text.includes('documents') || text.includes('details') || text.includes('seats')) {
+              colDoc = idx;
+            } else if (text.includes('count') || text.includes('number') || text.includes('no.')) {
               colCount = idx;
             }
           });

@@ -124,7 +124,7 @@ export default function InternalResultsPage() {
 // }
 
 
-function ResultTable({ school }) {
+function ResultTable({ school, isDepartment }) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
