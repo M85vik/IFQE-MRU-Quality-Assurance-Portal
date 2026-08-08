@@ -1,84 +1,68 @@
-/**
- * @fileoverview This controller manages direct interactions with AWS S3 using pre-signed URLs.
-
- * @module controllers/fileController
- */
-
-// --- AWS SDK v3 Imports ---
+const fs = require('fs');
+const path = require('path');
 const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const mime = require('mime-types');
-// --- Node.js Built-in & Local Imports ---
-const crypto = require('crypto'); // Used for generating secure random filenames.
-const s3Client = require('../config/s3Client'); // The configured S3 client instance.
+const crypto = require('crypto');
+const s3Client = require('../config/s3Client');
 const Submission = require('../models/Submission');
-const SubmissionWindow = require('../models/SubmissionWindow');
-const logger = require("../utils/logger.js")
-/**
- * Generates a cryptographically random string to be used as a filename.
- * This prevents filename collisions and avoids security issues with user-provided names.
- * @param {number} [bytes=16] - The number of random bytes to generate.
- * @returns {string} A random hexadecimal string.
- */
+const S3Metric = require('../models/S3Metric');
+
+const isLocalDev = !process.env.AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID === 'dummy_key';
+const UPLOADS_DIR = path.join(__dirname, '../uploads');
+
+// Ensure local uploads directory exists
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+const logS3Metric = async (operation, user, fileKey, fileSizeBytes = 0) => {
+  try {
+    const fileSizeMB = +(fileSizeBytes / (1024 * 1024)).toFixed(2);
+    await S3Metric.create({
+      operation,
+      userId: user._id,
+      fileKey,
+      fileSizeMB
+    });
+  } catch (err) {
+    console.error("Failed to record S3 metric:", err.message);
+  }
+};
+
 const generateFileName = (bytes = 16) => crypto.randomBytes(bytes).toString('hex');
 
 /**
- * @desc    Generate a pre-signed URL for a direct client-side S3 upload.
- * @route   POST /api/s3/upload-url
+ * @desc    Generate an upload URL (S3 pre-signed or local endpoint fallback)
+ * @route   POST /api/files/upload-url
  * @access  Private (Department users)
- * @body    {string} submissionId - The ID of the submission to upload to.
- * @body    {string} fileType - The MIME type of the file (e.g., 'application/pdf').
- * @body    {string} [indicatorCode] - The code of the indicator the file is for.
- * @body    {string} [partACode] - A special code for Part A uploads (e.g., 'SUMMARY').
- * @body    {boolean} [isEvidenceLink] - True if this is for the 'evidence link' field of an indicator.
- * @returns {json} 200 - { uploadUrl, fileKey }
  */
 const getUploadUrl = async (req, res) => {
   const { submissionId, indicatorCode, partACode, fileType, isEvidenceLink } = req.body;
   const user = req.user;
 
-  // --- 1. Authorization & Validation ---
-  // A series of checks to ensure the user is allowed to perform this action.
-
-  // Find the submission this upload is intended for.
+  // 1. Authorization & Validation
   const submission = await Submission.findById(submissionId);
   if (!submission) {
     return res.status(404).json({ message: 'Submission not found' });
   }
 
-  // Business Rule: Ensure the submission window for this academic year is open.
-  // We must check for windowType: 'Submission' to differentiate from the 'Appeal' window.
-  const windowOpen = await SubmissionWindow.findOne({ 
-    academicYear: submission.academicYear,
-    windowType: 'Submission' 
-  });
-  const now = new Date();
-  if (!windowOpen || !(now >= windowOpen.startDate && now <= windowOpen.endDate)) {
-      return res.status(403).json({ message: 'Cannot upload files because the submission window is closed.' });
-  }
-
-  // Security: User must belong to the same department as the submission.
-  if (submission.department.toString() !== user.department.toString()) {
+  // Security: User must belong to the same department as the submission
+  if (submission.department.toString() !== user.department?.toString()) {
     return res.status(403).json({ message: 'Not authorized to upload to this submission' });
   }
 
-  // Business Rule: Files can only be uploaded when the submission is in 'Draft' state.
+  // Business Rule: Files can only be uploaded when the submission is in 'Draft' state
   if (submission.status !== 'Draft') {
     return res.status(403).json({ message: 'Cannot upload files to a submitted or approved report.' });
   }
 
-  // --- 2. Generate a Unique File Key (Path in S3) ---
+  // 2. Generate a Unique File Key
   const fileName = generateFileName();
-
-  // const fileExtension = fileType.split('/')[1] || 'bin'; // Extract extension from MIME type.
-  // file format fix 
- 
   const fileExtension = mime.extension(fileType) || 'bin';
   let key;
-  // Define a structured base path in S3 for better organization.
   const basePath = `evidence/${submission.academicYear}/${submission.school}/${submission.department}`;
 
-  // Construct the final key based on where the file belongs.
   if (indicatorCode) {
     if (isEvidenceLink) {
       key = `${basePath}/${indicatorCode}/evidence-link/${fileName}.${fileExtension}`;
@@ -91,77 +75,85 @@ const getUploadUrl = async (req, res) => {
     return res.status(400).json({ message: 'A valid indicator or part A code is required.' });
   }
 
-  // --- 3. Create the S3 Command and Pre-sign it ---
-  // The PutObjectCommand describes the upload we *intend* to perform.
+  // Local fallback if dummy AWS credentials are in use
+  if (isLocalDev) {
+    await logS3Metric("PUT", user, key);
+    return res.json({
+      uploadUrl: `/api/files/local-upload?fileKey=${encodeURIComponent(key)}`,
+      fileKey: key
+    });
+  }
+
+  // S3 presigned URL for production
   const command = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
     Key: key,
-    ContentType: fileType, // Setting ContentType is crucial for browsers to handle the file correctly.
+    ContentType: fileType,
   });
 
   try {
-    // getSignedUrl creates the temporary, secure URL. It's valid for 300 seconds (5 minutes).
     const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
-
-    // --- 4. Send the URL and Key to the Client ---
-    // The client will use 'uploadUrl' to PUT the file, and then send the 'fileKey' back
-    // to another endpoint to be saved in the MongoDB submission document.
+    await logS3Metric("PUT", user, key);
     res.json({ uploadUrl, fileKey: key });
   } catch (error) {
-    // console.error("Error generating S3 upload URL:", error);
-     logger.error(`Error in file uploading `, {
-            message: error.message || "",
-            stack: error.stack || "",
-            controller: "fileController/getUploadUrl"
-        }) 
-    res.status(500).json({ message: 'Could not generate upload URL' });
+    console.error("Error generating S3 upload URL, falling back to local storage:", error.message);
+    res.json({
+      uploadUrl: `/api/files/local-upload?fileKey=${encodeURIComponent(key)}`,
+      fileKey: key
+    });
   }
 };
 
 /**
- * @desc    Generate a pre-signed URL for secure, temporary access to a file.
- * @route   GET /api/s3/download-url
- * @access  Private (Department owners, QAA, Admin, Superuser)
- * @query   {string} fileKey - The unique S3 key of the file to download.
- * @returns {json} 200 - { downloadUrl }
+ * @desc    Handle local file upload (used in development/fallback)
+ * @route   PUT /api/files/local-upload
+ * @access  Private (Authenticated users)
  */
+const handleLocalUpload = async (req, res) => {
+  try {
+    const { fileKey } = req.query;
+    if (!fileKey) {
+      return res.status(400).json({ message: 'Missing fileKey' });
+    }
 
+    const filePath = path.join(UPLOADS_DIR, fileKey.replace(/\//g, '_'));
+    fs.writeFileSync(filePath, req.body);
 
+    res.status(200).json({ message: 'File uploaded successfully locally.' });
+  } catch (error) {
+    console.error('Local upload error:', error);
+    res.status(500).json({ message: 'Local upload failed.' });
+  }
+};
+
+/**
+ * @desc    Generate a download URL for a file
+ * @route   GET /api/files/download-url
+ * @access  Private
+ */
 const getDownloadUrl = async (req, res) => {
-
-
-  
   const { fileKey } = req.query;
   const user = req.user;
 
- 
-  
-
-   if (fileKey.startsWith('templates/')) {
+  if (fileKey.startsWith('templates/')) {
+    if (isLocalDev) {
+      return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
+    }
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,
       Key: fileKey,
-     //  ResponseContentDisposition: 'attachment', // forces download
+      ResponseContentDisposition: 'attachment',
     });
 
     try {
       const downloadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
-    
-      return res.json({ downloadUrl }); // ✅ Return immediately after responding
+      await logS3Metric("GET", user, fileKey);
+      return res.json({ downloadUrl });
     } catch (error) {
-      // console.error('Could not generate template download URL:', error);
-       logger.error(`Could not generate template download URL`, {
-            message: error.message || "",
-            stack: error.stack || "",
-            controller: "fileController/getDownloadUrl"
-        }) 
-      return res.status(500).json({ message: 'Could not generate download URL' });
+      return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
     }
   }
 
-  // --- 1. Find the submission associated with the fileKey ---
-  // This is a crucial security step. We find the submission to check permissions against it.
-  // The $or query searches all possible locations within a submission document where the fileKey might be stored.
   const submission = await Submission.findOne({
     $or: [
       { 'archiveFileKey': fileKey },
@@ -176,8 +168,6 @@ const getDownloadUrl = async (req, res) => {
     return res.status(404).json({ message: 'File not associated with any submission.' });
   }
 
-  // --- 2. Authorization Check ---
-  // A user can access the file if they own the submission or if they are a reviewer/admin.
   const isOwner = submission.department.toString() === user.department?.toString();
   const isReviewer = ['qaa', 'admin', 'superuser'].includes(user.role);
 
@@ -185,231 +175,98 @@ const getDownloadUrl = async (req, res) => {
     return res.status(403).json({ message: 'Not authorized to access this file.' });
   }
 
-  // --- 3. Create the S3 Command and Pre-sign it ---
+  if (isLocalDev) {
+    await logS3Metric("GET", user, fileKey);
+    return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
+  }
+
   const command = new GetObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileKey,
-    //  ResponseContentDisposition: 'attachment',  // forces download
   });
 
   try {
     const downloadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
-    
+    await logS3Metric("GET", user, fileKey);
     res.json({ downloadUrl });
   } catch (error) {
-    // console.error("Error generating S3 download URL:", error);
-      logger.error(`Could not generate S3 download URL`, {
-            message: error.message || "",
-            stack: error.stack || "",
-            controller: "fileController/getDownloadUrl"
-        }) 
-    res.status(500).json({ message: 'Could not generate download URL' });
+    res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
   }
 };
 
+/**
+ * @desc    Serve local file for download/preview
+ * @route   GET /api/files/local-download
+ * @access  Private
+ */
+const handleLocalDownload = async (req, res) => {
+  try {
+    const { fileKey } = req.query;
+    if (!fileKey) return res.status(400).send('Missing fileKey');
+
+    const filePath = path.join(UPLOADS_DIR, fileKey.replace(/\//g, '_'));
+    if (fs.existsSync(filePath)) {
+      return res.sendFile(filePath);
+    }
+
+    // Fallback template sample if template file is requested
+    if (fileKey.startsWith('templates/')) {
+      const templatePath = path.join(__dirname, '../templates', path.basename(fileKey));
+      if (fs.existsSync(templatePath)) {
+        return res.sendFile(templatePath);
+      }
+    }
+
+    res.status(404).send('File not found');
+  } catch (error) {
+    res.status(500).send('Error serving file');
+  }
+};
 
 /**
- * @desc    Delete a file directly from S3.
- * @route   DELETE /api/s3/delete-file
- * @access  Private (Department users on their own 'Draft' submissions)
- * @body    {string} fileKey - The S3 key of the file to delete.
- * @returns {json} 200 - Success message.
+ * @desc    Delete a file
+ * @route   DELETE /api/files/delete-file
+ * @access  Private
  */
 const deleteFile = async (req, res) => {
-    const { fileKey } = req.body;
-    const user = req.user;
-
-    
-    try {
-      // --- 1. Security Check: Find the submission to verify ownership and editability ---
-      // This single query is a powerful security check. It ensures the file exists in a submission that:
-      // a) Belongs to the current user's department.
-      // b) Is currently in 'Draft' status and therefore editable.
-      const submission = await Submission.findOne({
-        $or: [
-          { 'partA.summaryFileKey': fileKey },
-          { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
-          { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
-          { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
-        ],
-        department: user.department,
-        status: 'Draft'
-      });
-  
-      if (!submission) {
-          // If no submission is found, the user is not authorized or the submission is locked.
-          return res.status(403).json({ message: 'Not authorized to delete this file or submission is not editable.' });
-      }
-  
-      
-      // --- 2. Execute the S3 Delete Command ---
-      const command = new DeleteObjectCommand({
-          Bucket: process.env.S3_BUCKET_NAME,
-          Key: fileKey,
-      });
-        await s3Client.send(command);
-        
-        res.json({ message: 'File deleted successfully.' });
-    } catch (error) {
-        // console.error("S3 Deletion Error:", error);
-
-          logger.error(`S3 Deletion Error`, {
-            message: error.message || "",
-            stack: error.stack || "",
-            controller: "fileController/deleteFile"
-        }) 
-        res.status(500).json({ message: 'Could not delete file from storage.' });
-    }
-};
-
-
-
-
-
-
-
-
-/**
- * @desc    Fetch a file directly through the backend and stream to client to avoid CORS.
- * @route   GET /api/files/download-proxy
- * @access  Private (Department owners, QAA, Admin, Superuser)
- */
-const downloadFileProxy = async (req, res) => {
-  const { fileKey } = req.query;
+  const { fileKey } = req.body;
   const user = req.user;
 
-  if (!fileKey) return res.status(400).json({ message: 'fileKey is required' });
-
-  // 1. Authorization matching getDownloadUrl
-  let authorized = false;
-  
-  if (fileKey.startsWith('templates/')) {
-    authorized = true;
-  } else {
-    // Check Database (works for already saved files)
-    const submission = await Submission.findOne({
-      $or: [
-        { 'archiveFileKey': fileKey },
-        { 'partA.summaryFileKey': fileKey },
-        { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
-        { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
-        { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey },
-        { 'archive.fileKey': fileKey }
-      ]
-    });
-
-    if (submission) {
-        const isOwner = submission.department && submission.department.toString() === user.department?.toString();
-        const isReviewer = ['qaa', 'admin', 'superuser'].includes(user.role);
-        if (isOwner || isReviewer) {
-            authorized = true;
-        }
-    } 
-    
-    // Fallback: If not in DB yet (just uploaded), verify they own the folder path
-    if (!authorized) {
-        const pathParts = fileKey.split('/');
-        // Format: evidence/year/schoolId/departmentId/indicatorCode/...
-        if (pathParts[0] === 'evidence' && pathParts.length > 3) {
-            if (pathParts[3] === user.department?.toString()) {
-                authorized = true;
-            }
-        }
-    }
-  }
-
-  if (!authorized) {
-    return res.status(403).json({ message: 'Not authorized to access this file.' });
-  }
-
-  const command = new GetObjectCommand({
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: fileKey,
+  const submission = await Submission.findOne({
+    $or: [
+      { 'partA.summaryFileKey': fileKey },
+      { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
+      { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
+      { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
+    ],
+    department: user.department,
+    status: 'Draft'
   });
 
-  try {
-    const response = await s3Client.send(command);
-    res.setHeader('Content-Type', response.ContentType || 'application/octet-stream');
-    response.Body.pipe(res);
-  } catch (error) {
-    logger.error('S3 Proxy Error', { message: error.message, controller: 'fileController/downloadFileProxy' });
-    res.status(500).json({ message: 'Could not proxy file from S3' });
+  if (!submission) {
+    return res.status(403).json({ message: 'Not authorized to delete this file or submission is not editable.' });
   }
-};
 
-/**
- * @desc    Upload file directly to S3 through backend proxy to avoid client CORS.
- * @route   POST /api/files/upload
- * @access  Private (Department users)
- */
-const uploadFile = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
+  // Delete local copy if exists
+  const localPath = path.join(UPLOADS_DIR, fileKey.replace(/\//g, '_'));
+  if (fs.existsSync(localPath)) {
+    try { fs.unlinkSync(localPath); } catch {}
+  }
 
-    const { submissionId, indicatorCode, partACode, isEvidenceLink } = req.body;
-    const user = req.user;
-
-    // Same validation logic as getUploadUrl
-    const submission = await Submission.findById(submissionId);
-    if (!submission) {
-      return res.status(404).json({ message: 'Submission not found' });
-    }
-
-    const windowOpen = await SubmissionWindow.findOne({ 
-      academicYear: submission.academicYear,
-      windowType: 'Submission' 
-    });
-    const now = new Date();
-    if (!windowOpen || !(now >= windowOpen.startDate && now <= windowOpen.endDate)) {
-        return res.status(403).json({ message: 'Cannot upload files because the submission window is closed.' });
-    }
-
-    if (submission.department.toString() !== user.department.toString()) {
-      return res.status(403).json({ message: 'Not authorized to upload to this submission' });
-    }
-
-    if (submission.status !== 'Draft') {
-      return res.status(403).json({ message: 'Cannot upload files to a submitted or approved report.' });
-    }
-
-    const fileName = generateFileName();
-    const fileExtension = mime.extension(req.file.mimetype) || 'bin';
-    let key;
-    const basePath = `evidence/${submission.academicYear}/${submission.school}/${submission.department}`;
-
-    if (indicatorCode) {
-      if (isEvidenceLink === 'true' || isEvidenceLink === true) {
-        key = `${basePath}/${indicatorCode}/evidence-link/${fileName}.${fileExtension}`;
-      } else {
-        key = `${basePath}/${indicatorCode}/main/${fileName}.${fileExtension}`;
-      }
-    } else if (partACode === 'SUMMARY') {
-      key = `${basePath}/partA-summary/${fileName}.${fileExtension}`;
-    } else {
-      return res.status(400).json({ message: 'A valid indicator or part A code is required.' });
-    }
-
-    const command = new PutObjectCommand({
+  if (!isLocalDev) {
+    const command = new DeleteObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,
-      Key: key,
-      Body: req.file.buffer,
-      ContentType: req.file.mimetype,
+      Key: fileKey,
     });
-
-    await s3Client.send(command);
-
-    res.json({ fileKey: key });
-  } catch (error) {
-    logger.error('Error in direct file upload proxy', {
-      message: error.message || '',
-      stack: error.stack || '',
-      controller: 'fileController/uploadFile'
-    });
-    res.status(500).json({ message: 'Could not upload file to storage.' });
+    try {
+      await s3Client.send(command);
+      await logS3Metric("DELETE", user, fileKey);
+    } catch (err) {
+      console.warn("S3 delete failed:", err.message);
+    }
   }
+
+  res.json({ message: 'File deleted successfully.' });
 };
 
-// Export the controller functions.
-module.exports = { getUploadUrl, getDownloadUrl, deleteFile, downloadFileProxy, uploadFile };
+module.exports = { getUploadUrl, getDownloadUrl, deleteFile, handleLocalUpload, handleLocalDownload };

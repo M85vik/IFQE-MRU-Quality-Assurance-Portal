@@ -30,6 +30,8 @@ const useSubmissionStore = create((set, get) => ({
   totalSelfAssessedScore: 0,
   totalReviewScore: 0,
   isLoading: true,
+  isAutoSaving: false,
+  lastSavedAt: null,
   error: null,
 
   initializeForm: async (submissionId) => {
@@ -45,6 +47,7 @@ const useSubmissionStore = create((set, get) => ({
         submission: submissionResponse.data,
         totalSelfAssessedScore: scores.selfAssessedScore,
         totalReviewScore: scores.reviewScore,
+        lastSavedAt: new Date(),
         isLoading: false,
       });
     } catch (err) {
@@ -247,14 +250,16 @@ const useSubmissionStore = create((set, get) => ({
   saveDraft: async () => {
     const { submission } = get();
     if (!submission) throw new Error("No submission data to save.");
+    set({ isAutoSaving: true });
     try {
       const { data } = await apiClient.put(`/submissions/${submission._id}`, {
         partA: submission.partA,
         partB: submission.partB,
       });
-      set({ submission: data }); 
+      set({ submission: data, isAutoSaving: false, lastSavedAt: new Date() }); 
       return data;
     } catch (err) {
+      set({ isAutoSaving: false });
       throw new Error(err.response?.data?.message || 'Failed to save draft.');
     }
   },

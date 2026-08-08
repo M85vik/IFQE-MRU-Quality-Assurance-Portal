@@ -33,15 +33,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
         setProgress(0);
         setError('');
         try {
-            const formData = new FormData();
-            formData.append('file', fileToUpload);
-            formData.append('submissionId', submissionId);
-            Object.keys(identifier).forEach(key => {
-                formData.append(key, identifier[key]);
-            });
-
-            const { data: { fileKey } } = await apiClient.post('/files/upload', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+            const { data: { uploadUrl, fileKey } } = await apiClient.post('/files/upload-url', { submissionId, fileType: fileToUpload.type, ...identifier });
+            const targetUrl = uploadUrl.startsWith('http') ? uploadUrl : `${import.meta.env.VITE_API_URL || ''}${uploadUrl}`;
+            await axios.put(targetUrl, fileToUpload, {
+                headers: { 'Content-Type': fileToUpload.type },
                 onUploadProgress: (progressEvent) => {
                     if (progressEvent.total) {
                         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -52,9 +47,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
             setCurrentFileKey(fileKey);
             onUploadSuccess(fileKey);
         } catch (err: any) {
-            console.error('Upload error:', err?.response?.data || err?.message || err);
-            const backendMessage = err?.response?.data?.message;
-            setError(backendMessage || 'Upload failed. Please try again.');
+            setError(err.response?.data?.message || err.message || 'Upload failed. Please try again.');
         } finally {
             setIsProcessing(false);
         }
@@ -92,7 +85,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
         try {
             const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(currentFileKey)}`);
             if (data?.downloadUrl) {
-                window.open(data.downloadUrl, '_blank');
+                const targetDownloadUrl = data.downloadUrl.startsWith('http') ? data.downloadUrl : `${import.meta.env.VITE_API_URL || ''}${data.downloadUrl}`;
+                window.open(targetDownloadUrl, '_blank');
             } else {
                 setError('Could not generate preview link.');
             }
