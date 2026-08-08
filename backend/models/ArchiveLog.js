@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const archiveLogSchema = new mongoose.Schema({
-  submissionId: { type: mongoose.Schema.Types.ObjectId, ref: "Submission", required: true },
+  submissionId: { type: mongoose.Schema.Types.ObjectId, ref: "Submission" },
   submissionTitle: String,
   school: String,
   department: String,

@@ -1,14 +1,14 @@
 // src/pages/admin/ManageWindowsPage.tsx
 
 import React, { useState, useEffect } from 'react';
-import { getSubmissionWindows, createSubmissionWindow, updateSubmissionWindow, deleteSubmissionWindow } from '../../services/submissionWindowService';
+import { getSubmissionWindows, createSubmissionWindow, updateSubmissionWindow, deleteSubmissionWindow, toggleSubmissionEnabled } from '../../services/submissionWindowService';
 import Card from '../../components/shared/Card';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 interface SubmissionWindow {
   _id: string;
@@ -16,6 +16,7 @@ interface SubmissionWindow {
   startDate: string;
   endDate: string;
   windowType: 'Submission' | 'Appeal';
+  submissionEnabled: boolean;
 }
 
 const ManageWindowsPage: React.FC = () => {
@@ -154,6 +155,7 @@ const ManageWindowsPage: React.FC = () => {
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase">Window Type</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase">Start Date</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase">End Date</th>
+                                    <th className="px-6 py-3 text-center text-xs font-medium uppercase">Submit Enabled</th>
                                     <th className="px-6 py-3 text-right text-xs font-medium uppercase">Actions</th>
                                 </tr>
                             </thead>
@@ -168,6 +170,31 @@ const ManageWindowsPage: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(win.startDate)}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(win.endDate)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            {win.windowType === 'Submission' ? (
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            const result = await toggleSubmissionEnabled(win._id);
+                                                            toast.success(result.message);
+                                                            await fetchWindows();
+                                                        } catch (err: any) {
+                                                            toast.error(err.message || 'Toggle failed.');
+                                                        }
+                                                    }}
+                                                    className="inline-flex items-center gap-1 transition-colors"
+                                                    title={win.submissionEnabled ? 'Click to disable submission' : 'Click to enable submission'}
+                                                >
+                                                    {win.submissionEnabled ? (
+                                                        <ToggleRight size={28} className="text-green-500" />
+                                                    ) : (
+                                                        <ToggleLeft size={28} className="text-red-400" />
+                                                    )}
+                                                </button>
+                                            ) : (
+                                                <span className="text-muted-foreground text-xs">N/A</span>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                             <Button variant="outline" size="sm" onClick={() => handleEdit(win)}><Edit size={14} /></Button>
                                             <Button variant="outline" size="sm" onClick={() => handleDelete(win._id)} className="text-destructive border-destructive/50 hover:bg-destructive/10"><Trash2 size={14} /></Button>
@@ -175,7 +202,7 @@ const ManageWindowsPage: React.FC = () => {
                                     </tr>
                                 )) : (
                                     <tr>
-                                        <td colSpan={5} className="text-center py-8 text-muted-foreground">No windows have been created yet.</td>
+                                        <td colSpan={6} className="text-center py-8 text-muted-foreground">No windows have been created yet.</td>
                                     </tr>
                                 )}
                             </tbody>

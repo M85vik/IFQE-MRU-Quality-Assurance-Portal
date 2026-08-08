@@ -510,6 +510,16 @@ const updateSubmission = async (req, res) => {
             }
 
             if (status === 'Under Review') {
+                // Check if the admin has enabled submission for this window
+                const submissionWindow = await SubmissionWindow.findOne({
+                    academicYear: submission.academicYear,
+                    windowType: 'Submission'
+                });
+                if (submissionWindow && submissionWindow.submissionEnabled === false) {
+                    return res.status(403).json({
+                        message: 'Submission is currently disabled for this academic year by the administrator.'
+                    });
+                }
                 submission.status = 'Under Review';
             }
 

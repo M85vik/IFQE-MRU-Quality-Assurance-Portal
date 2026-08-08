@@ -34,7 +34,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
         setError('');
         try {
             const { data: { uploadUrl, fileKey } } = await apiClient.post('/files/upload-url', { submissionId, fileType: fileToUpload.type, ...identifier });
-            await axios.put(uploadUrl, fileToUpload, {
+            const targetUrl = uploadUrl.startsWith('http') ? uploadUrl : `${import.meta.env.VITE_API_URL || ''}${uploadUrl}`;
+            await axios.put(targetUrl, fileToUpload, {
                 headers: { 'Content-Type': fileToUpload.type },
                 onUploadProgress: (progressEvent) => {
                     if (progressEvent.total) {
@@ -45,8 +46,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
             });
             setCurrentFileKey(fileKey);
             onUploadSuccess(fileKey);
-        } catch (err) {
-            setError('Upload failed. Please try again.');
+        } catch (err: any) {
+            setError(err.response?.data?.message || err.message || 'Upload failed. Please try again.');
         } finally {
             setIsProcessing(false);
         }
@@ -84,7 +85,8 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
         try {
             const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(currentFileKey)}`);
             if (data?.downloadUrl) {
-                window.open(data.downloadUrl, '_blank');
+                const targetDownloadUrl = data.downloadUrl.startsWith('http') ? data.downloadUrl : `${import.meta.env.VITE_API_URL || ''}${data.downloadUrl}`;
+                window.open(targetDownloadUrl, '_blank');
             } else {
                 setError('Could not generate preview link.');
             }

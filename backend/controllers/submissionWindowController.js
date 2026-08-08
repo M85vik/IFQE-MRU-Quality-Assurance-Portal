@@ -100,8 +100,8 @@ const createSubmissionWindow = async (req, res) => {
  * @access  Private/Admin
  */
 const updateSubmissionWindow = async (req, res) => {
-    const { academicYear, startDate, endDate, windowType } = req.body;
-    const user =req.user
+    const { academicYear, startDate, endDate, windowType, submissionEnabled } = req.body;
+    const user = req.user
     try {
         const window = await SubmissionWindow.findById(req.params.id);
 
@@ -109,6 +109,9 @@ const updateSubmissionWindow = async (req, res) => {
             // Update fields only if they are provided in the request body.
             window.academicYear = academicYear || window.academicYear;
             window.windowType = windowType || window.windowType;
+            if (typeof submissionEnabled === 'boolean') {
+                window.submissionEnabled = submissionEnabled;
+            }
 
             if (startDate) {
                 const start = parseDateString(startDate);
@@ -206,11 +209,75 @@ const getCurrentOpenWindow = async (req, res) => {
 };
 
 
+/**
+ * @desc    Toggle the submissionEnabled flag for a submission window.
+ * @route   PATCH /api/submission-windows/:id/toggle
+ * @access  Private/Admin
+ */
+const toggleSubmissionEnabled = async (req, res) => {
+    try {
+        const window = await SubmissionWindow.findById(req.params.id);
+        if (!window) {
+            return res.status(404).json({ message: 'Submission window not found' });
+        }
+
+        window.submissionEnabled = !window.submissionEnabled;
+        await window.save();
+
+        const user = req.user;
+        const now = new Date();
+        const year = now.getFullYear();
+        const academicYear = `${year}-${(year + 1).toString().slice(-2)}`;
+
+        try {
+            await logActivity(
+                user,
+                'Toggle Submission Window',
+                `Window ID: ${window._id}, submissionEnabled: ${window.submissionEnabled}`,
+                academicYear,
+                req.ip
+            );
+        } catch (logError) {
+            console.warn(`⚠️ Activity log failed for toggle on window ${window._id}:`, logError.message);
+        }
+
+        res.json({
+            message: `Submission ${window.submissionEnabled ? 'enabled' : 'disabled'} for ${window.academicYear}`,
+            submissionEnabled: window.submissionEnabled,
+        });
+    } catch (error) {
+        console.error('Error toggling submission window:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+/**
+ * @desc    Get the submissionEnabled status for all Submission-type windows.
+ *          This is accessible by any authenticated user so department users
+ *          can check whether they are allowed to submit.
+ * @route   GET /api/submission-windows/status
+ * @access  Private (any authenticated user)
+ */
+const getWindowStatus = async (req, res) => {
+    try {
+        const windows = await SubmissionWindow.find({ windowType: 'Submission' })
+            .select('academicYear submissionEnabled')
+            .sort({ academicYear: -1 });
+        res.json(windows);
+    } catch (error) {
+        console.error('Error fetching window status:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+
 // Export all controller functions.
 module.exports = {
     getSubmissionWindows,
     createSubmissionWindow,
     updateSubmissionWindow,
     deleteSubmissionWindow,
-    getCurrentOpenWindow
+    getCurrentOpenWindow,
+    toggleSubmissionEnabled,
+    getWindowStatus
 };

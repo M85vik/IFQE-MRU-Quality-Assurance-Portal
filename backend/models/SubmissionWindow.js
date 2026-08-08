@@ -32,6 +32,14 @@ const SubmissionWindowSchema = new mongoose.Schema({
         enum: ['Submission', 'Appeal'], // Can only be one of these two values
         default: 'Submission',
         required: true,
+    },
+    /**
+     * Admin toggle to enable/disable the "Submit for Review" button for this window.
+     * When false, departments can still edit drafts but cannot submit them.
+     */
+    submissionEnabled: {
+        type: Boolean,
+        default: true,
     }
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt fields.
 

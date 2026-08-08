@@ -47,3 +47,21 @@ export const getCurrentWindow = async () => {
     throw new Error('Could not fetch current window');
   }
 };
+
+export const toggleSubmissionEnabled = async (id) => {
+  try {
+    const { data } = await apiClient.patch(`/submission-windows/${id}/toggle`);
+    return data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Could not toggle submission status.');
+  }
+};
+
+export const getWindowStatus = async () => {
+  try {
+    const { data } = await apiClient.get('/submission-windows/status');
+    return data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Could not fetch window status.');
+  }
+};

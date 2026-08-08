@@ -5,13 +5,14 @@ import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
 import FileUploader from '../../components/shared/FileUploader';
-import { Save, Send, FileText, Download, ChevronDown } from 'lucide-react';
+import { Save, Send, FileText, Download, ChevronDown, CheckCircle2, Loader2 } from 'lucide-react';
 import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Scorecard from '../../components/shared/Scorecard';
 import IndicatorItem from './components/IndicatorItem';
 import PartATemplateViewer from './components/PartATemplateViewer';
 import toast from 'react-hot-toast';
+import { getWindowStatus } from '../../services/submissionWindowService';
 
 interface Indicator {
     indicatorCode: string;
@@ -79,12 +80,15 @@ const SubmissionForm: React.FC = () => {
     const [openSubCriterion, setOpenSubCriterion] = useState<string | null>(null);
 
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [isSubmitEnabledByAdmin, setIsSubmitEnabledByAdmin] = useState(true);
 
     const {
         submission,
         indicators,
         totalSelfAssessedScore,
         isLoading,
+        isAutoSaving,
+        lastSavedAt,
         error,
         initializeForm,
         reset,
@@ -93,7 +97,7 @@ const SubmissionForm: React.FC = () => {
         updatePartASummaryFileKey,
         updateIndicatorFileKey,
         updateIndicatorEvidenceLinkFileKey,
-    } = useSubmissionStore<SubmissionStoreState>((state) => state);
+    } = useSubmissionStore<any>((state) => state);
 
     const handleToggleSubCriterion = (subCriteriaCode: string): void => {
         setOpenSubCriterion(prev => (prev === subCriteriaCode ? null : subCriteriaCode));
@@ -105,6 +109,24 @@ const SubmissionForm: React.FC = () => {
         }
         return () => reset();
     }, [id, initializeForm, reset]);
+
+    // Check if the admin has enabled submission for this draft's academic year
+    useEffect(() => {
+        const checkWindowStatus = async () => {
+            if (!submission?.academicYear) return;
+            try {
+                const windows = await getWindowStatus();
+                const match = windows.find((w: any) => w.academicYear === submission.academicYear);
+                if (match) {
+                    setIsSubmitEnabledByAdmin(match.submissionEnabled);
+                }
+            } catch {
+                // If we can't fetch status, default to enabled so we don't block users unnecessarily
+                setIsSubmitEnabledByAdmin(true);
+            }
+        };
+        checkWindowStatus();
+    }, [submission?.academicYear]);
 
     const handleSaveDraft = async () => {
         setIsSaving(true);
@@ -173,7 +195,18 @@ const SubmissionForm: React.FC = () => {
                 <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div>
                         <h1 className="text-3xl font-bold text-foreground">{submission.title || `IFQE Submission: ${submission.academicYear}`}</h1>
-                        <p className="text-slate-900">Status: <span className="font-semibold">{submission.status}</span></p>
+                        <div className="flex items-center gap-3 mt-1">
+                            <p className="text-slate-900">Status: <span className="font-semibold">{submission.status}</span></p>
+                            {isAutoSaving ? (
+                                <span className="inline-flex items-center gap-1.5 text-xs text-blue-700 font-medium bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200 animate-pulse">
+                                    <Loader2 size={13} className="animate-spin text-blue-600" /> Saving changes...
+                                </span>
+                            ) : lastSavedAt ? (
+                                <span className="inline-flex items-center gap-1.5 text-xs text-green-700 font-medium bg-green-50 px-2.5 py-1 rounded-full border border-green-200" title={`All changes saved at ${new Date(lastSavedAt).toLocaleTimeString()}`}>
+                                    <CheckCircle2 size={13} className="text-green-600" /> All changes auto-saved
+                                </span>
+                            ) : null}
+                        </div>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="w-5xl">
@@ -194,9 +227,14 @@ const SubmissionForm: React.FC = () => {
                                 <Save size={18} className="mr-2" /> {saveSuccess ? 'Saved!' : 'Save Draft'}
                             </Button>
 
-                            <Button onClick={handleSubmitForReview} isLoading={isSubmitting} disabled={isFormDisabled}>
+                            <Button onClick={handleSubmitForReview} isLoading={isSubmitting} disabled={isFormDisabled || !isSubmitEnabledByAdmin}
+                                title={!isSubmitEnabledByAdmin ? 'Submission is currently disabled for this academic year by the administrator.' : ''}
+                            >
                                 <Send size={18} className="mr-2" /> Submit for Review
                             </Button>
+                            {!isSubmitEnabledByAdmin && !isFormDisabled && (
+                                <p className="text-xs text-red-500 mt-1">Submission disabled by admin for this year.</p>
+                            )}
                         </div>
                     </div>
                 </div>

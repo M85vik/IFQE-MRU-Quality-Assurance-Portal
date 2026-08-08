@@ -46,7 +46,7 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
     setError('');
 
     try {
-      // Get presigned URL
+      // Get presigned or local upload URL
       const { data: { uploadUrl, fileKey } } = await apiClient.post('/files/upload-url', {
         submissionId,
         fileType: file.type,
@@ -54,8 +54,10 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
         isMultiEvidence: true,
       });
 
-      // Upload to S3
-      await axios.put(uploadUrl, file, {
+      const targetUrl = uploadUrl.startsWith('http') ? uploadUrl : `${import.meta.env.VITE_API_URL || ''}${uploadUrl}`;
+
+      // Upload file
+      await axios.put(targetUrl, file, {
         headers: { 'Content-Type': file.type },
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
@@ -70,9 +72,9 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
       // Remove from uploading list and add to files
       setUploadingFiles(prev => prev.filter(f => f.id !== uploadId));
       onFileAdded(fileKey);
-    } catch (err) {
+    } catch (err: any) {
       setUploadingFiles(prev => prev.filter(f => f.id !== uploadId));
-      setError('Upload failed. Please try again.');
+      setError(err.response?.data?.message || err.message || 'Upload failed. Please try again.');
     }
   };
 
@@ -102,7 +104,8 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
     try {
       const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}`);
       if (data?.downloadUrl) {
-        window.open(data.downloadUrl, '_blank');
+        const targetDownloadUrl = data.downloadUrl.startsWith('http') ? data.downloadUrl : `${import.meta.env.VITE_API_URL || ''}${data.downloadUrl}`;
+        window.open(targetDownloadUrl, '_blank');
       } else {
         setError('Could not generate preview link.');
       }

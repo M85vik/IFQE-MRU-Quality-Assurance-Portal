@@ -11,15 +11,17 @@ const router = express.Router();
 
 // Import controller functions that contain the logic for generating URLs and handling S3 commands.
 
-const { getUploadUrl, getDownloadUrl, deleteFile } = require('../controllers/fileController'); 
-// The user provided 'fileController' in the router, but the controller logic was in 's3Controller'. I've used the correct controller path here. If your file is named fileController.js, you can change this path.
+const { getUploadUrl, getDownloadUrl, deleteFile, handleLocalUpload, handleLocalDownload } = require('../controllers/fileController'); 
 
 // Import the 'protect' middleware to ensure a user is authenticated via JWT.
 const { protect } = require('../middleware/authMiddleware');
 
 
 // --- Route Definitions ---
-// All routes in this file require the user to be authenticated.
+
+// Local upload/download fallback endpoints
+router.put('/local-upload', express.raw({ type: '*/*', limit: '100mb' }), handleLocalUpload);
+router.get('/local-download', handleLocalDownload);
 
 /**
  * @route   POST /api/files/upload-url

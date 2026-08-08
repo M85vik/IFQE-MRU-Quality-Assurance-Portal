@@ -17,7 +17,9 @@ const {
     createSubmissionWindow,
     updateSubmissionWindow,
     deleteSubmissionWindow,
-    getCurrentOpenWindow
+    getCurrentOpenWindow,
+    toggleSubmissionEnabled,
+    getWindowStatus
 } = require('../controllers/submissionWindowController');
 
 // Import middleware for authentication and role-based authorization.
@@ -26,6 +28,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 
 
 router.get('/current', protect, getCurrentOpenWindow);
+router.get('/status', protect, getWindowStatus);
 
 
 // --- Global Middleware for this Router ---
@@ -60,6 +63,8 @@ router.route('/')
     .post(createSubmissionWindow);
 
 // Chains the PUT and DELETE methods for routes that target a specific window by its ID.
+
+router.patch('/:id/toggle', toggleSubmissionEnabled);
 
 router.route('/:id')
     /**
