@@ -18,7 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PutObjectCommand } = require('@aws-sdk/client-s3');
-const chalk = require('chalk'); // For colorful console output
+const chalk = require('chalk'); 
 
 // --- Configuration ---
 require('dotenv').config(); // Load environment variables from .env file

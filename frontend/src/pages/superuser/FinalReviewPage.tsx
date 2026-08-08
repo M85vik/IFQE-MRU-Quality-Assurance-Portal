@@ -61,7 +61,7 @@ interface Submission {
 
 // Indicators that are NOT out of 4
 const INDICATOR_MAX_SCORES: Record<string, number> = {
-   
+
 
 };
 
@@ -76,7 +76,25 @@ const FinalReviewPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { downloadFile, isDownloading } = useSecureDownloader();
+    // const { downloadFile, isDownloading } = useSecureDownloader();
+
+    const { downloadFile } = useSecureDownloader(); // not using global isDownloading state 
+
+    const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
+
+
+   const handleDownload = async (key?: string) => {
+    if (!key || downloadingKey) return;
+
+
+    try {
+        setDownloadingKey(key);
+        await downloadFile(key);
+    } finally {
+        setDownloadingKey(null);
+    }
+};
+
 
     const fetchSubmission = useCallback(async () => {
         setIsLoading(true);
@@ -228,7 +246,7 @@ const FinalReviewPage: React.FC = () => {
                     </h1>
                     <p className="text-muted-foreground">{submission.school.name} - {submission.academicYear}</p>
                 </div>
-                <Button onClick={handleFinalize} isLoading={isSubmitting}   className='border border-white'>
+                <Button onClick={handleFinalize} isLoading={isSubmitting} className='border border-white'>
                     <Check className="mr-2" size={18} />
                     Finalize Score
                 </Button>
@@ -259,10 +277,29 @@ const FinalReviewPage: React.FC = () => {
                                             <div className="flex justify-between items-start mb-4">
                                                 <p className="font-semibold text-foreground flex-1 pr-4">{ind.indicatorCode}: {ind.title}</p>
                                                 <div className="flex-shrink-0 flex flex-wrap items-center gap-2">
-                                                    {ind.fileKey && <Button onClick={() => downloadFile(ind.fileKey)} size="sm" variant="outline" isLoading={isDownloading}>View Main Doc</Button>}
-                                                    {ind.evidenceLinkFileKey && <Button onClick={() => downloadFile(ind.evidenceLinkFileKey)} size="sm" variant="outline" isLoading={isDownloading}>View Evidence Doc</Button>}
+                                                    {ind.fileKey && <Button
+                                                        onClick={() => handleDownload(ind.fileKey)}
+                                                        isLoading={downloadingKey === ind.fileKey}
+
+                                                        size="sm" variant="outline"
+
+
+                                                    >View Main Doc</Button>}
+
+
+                                                    {ind.evidenceLinkFileKey && <Button 
+                                                    
+                                                    onClick={() => handleDownload(ind.evidenceLinkFileKey)}
+                                                    isLoading={downloadingKey === ind.evidenceLinkFileKey}
+                                                    
+                                                    size="sm" variant="outline">
+                                                        View Evidence Doc</Button>}
+
+
                                                     {ind.evidenceFileKeys && ind.evidenceFileKeys.length > 0 && ind.evidenceFileKeys.map((key, idx) => (
-                                                        <Button key={key} onClick={() => downloadFile(key)} size="sm" variant="outline" isLoading={isDownloading}>Evidence {idx + 1}</Button>
+                                                        <Button key={key} 
+                                                        
+                                                        onClick={() => handleDownload(key)} size="sm" variant="outline" isLoading={downloadingKey===key}>Evidence {idx + 1}</Button>
                                                     ))}
                                                 </div>
                                             </div>

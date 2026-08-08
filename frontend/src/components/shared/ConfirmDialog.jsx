@@ -32,7 +32,7 @@ const ConfirmDialog = ({
       <div className="flex items-start space-x-3">
         <AlertTriangle className="text-yellow-500 flex-shrink-0 mt-1" size={22} />
         <div className="text-white leading-relaxed">
-          {message}
+          {message } 
         </div>
       </div>
 

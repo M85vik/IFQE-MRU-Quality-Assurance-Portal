@@ -3,6 +3,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const cookieParser = require('cookie-parser')
 const connectDB = require('./config/db');
 const apiMetricsMiddleware = require('./middleware/apiMetrics');
 const reportRoutes = require("./routes/reportRoutes");
@@ -17,10 +18,14 @@ const app = express();
 const FRONTEND_URL= process.env.FRONTEND_URL
 if(!FRONTEND_URL) throw new Error("Front URL Environment Varibale Not loaded.");
 
+
+
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://ifqe-mru-qa-portal.netlify.app',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'http://localhost:5174'
+
 ];
 
 app.use(cors({
@@ -37,9 +42,13 @@ app.use(cors({
   credentials: true // if sending cookies or auth headers
 }));
 
+
+
+app.use(cookieParser());
+
 app.use(express.json());
 
-app.use(apiMetricsMiddleware); // 👈 Add here before routes
+app.use(apiMetricsMiddleware); 
 app.get('/', (req, res) => {
   res.send('IFQE Portal API is running...');
 });
@@ -57,14 +66,18 @@ app.use('/api/submission-windows', require('./routes/submissionWindowRoutes'));
 app.use('/api/announcements', require('./routes/announcementRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 
+
 app.use('/api/dev', require('./routes/devRoutes'));
 app.use('/api/metrics', require('./routes/metricsRoutes'));
 app.use('/api/system', require('./routes/systemRoutes'));
+
 
 app.use("/api/announcement-email",require("./routes/announcementEmailRoutes"));
 app.use("/api/reports", reportRoutes);
 app.use("/api/result-publication", require("./routes/resultPublicationRoutes"));
 app.use('/api/archives', archiveRoutes);
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
+
+
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 

@@ -7,7 +7,12 @@
 const crypto = require('crypto');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
-const logActivity = require("../utils/logActivity")
+const logger = require("../utils/logger.js");
+const { log } = require('console');
+
+
+
+
 /**
  * @desc    Register a new user.
  * @route   POST /api/users/register
@@ -17,56 +22,50 @@ const logActivity = require("../utils/logActivity")
  * @param   {object} res - The Express response object.
  * @returns {json} 201 - A JSON object with the new user's data and a JWT.
  * @returns {json} 400 - If the email already exists or if user data is invalid.
- */
+*/
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role, department, school } = req.body;
-
     // 1. Check if a user with the given email already exists to prevent duplicates.
     const userExists = await User.findOne({ email });
     if (userExists) {
-      // If the user exists, return a 400 Bad Request status.
+
       return res.status(400).json({ message: 'User with this email already exists' });
     }
 
-    // 2. Create a new user in the database with the provided details.
-    // The password will be automatically hashed by the Mongoose pre-save hook in the User model.
+
     const user = await User.create({ name, email, password, role, department, school });
 
-
-    const now = new Date();
-    const year = now.getFullYear(); // e.g., 2025
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
-
-
-
-    try {
-      await logActivity(
-        req.user,
-        'Create User',
-        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
-        `created ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
-    }
-
-    // 3. If user creation is successful, send back the user's details and a JWT.
     if (user) {
       res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id), // Generate a JWT for the new user.
-      });
+        // token: generateToken(user._id), // Generate a JWT for the new user.
+      })
+
+      logger.info(`New User Created, ${user.name || ""}`, {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        controller: "UserController/registerUser"
+      })
+
+        ;
     } else {
       // This case handles potential Mongoose validation errors during creation.
       res.status(400).json({ message: 'Invalid user data provided' });
     }
   } catch (error) {
-    console.error(`Error in registerUser: ${error.message}`);
+    // console.error(`Error in registerUser: ${error.message}`);
+
+    logger.error(`Error Creating New User `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/registerUser"
+    })
     res.status(500).json({ message: 'Server error during registration' });
   }
 };
@@ -80,9 +79,12 @@ const registerUser = async (req, res) => {
  * @param   {object} res - The Express response object.
  * @returns {json} 200 - A JSON object with the logged-in user's data and a JWT.
  * @returns {json} 401 - If credentials (email or password) are invalid.
- */
+*/
 const loginUser = async (req, res) => {
   try {
+
+    const isProduction = process.env.NODE_ENV === "production";
+
     const { email, password } = req.body;
 
     // 1. Find the user by their email.
@@ -95,24 +97,24 @@ const loginUser = async (req, res) => {
     if (user && (await user.matchPassword(password))) {
       // 3. If credentials are valid, send back user data and a new JWT.
 
-      const now = new Date();
-      const year = now.getFullYear(); // e.g., 2025
-      const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
 
-      const sanitizedUser = user.toObject();
-      delete sanitizedUser.password;
 
-      try {
-        await logActivity(
-          sanitizedUser,
-          'User LoggedIn',
-          `User ID: ${user._id}, Department: ${user?.department || 'NA'}`,
-          `created ${academicYear}`,
-          req.ip
-        );
-      } catch (logError) {
-        console.warn(`⚠️ Activity log failed for User ${req.user._id}:`, logError.message);
-      }
+      logger.info(`LOGGED IN ${user.name || ""}`, {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        school: user.school,
+        controller: "UserController/loginUser"
+      })
+
+      const token = generateToken(user._id);
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: isProduction,        // true in production
+        sameSite: isProduction ? "None" : "Lax"
+      })
 
       res.json({
         _id: user._id,
@@ -121,15 +123,21 @@ const loginUser = async (req, res) => {
         role: user.role,
         department: user.department,
         school: user.school,
-        token: generateToken(user._id),
+        token: token,
       });
     } else {
-      // Security Best Practice: Use a generic error message to prevent attackers
-      // from knowing whether an email address is registered in the system.
+
       res.status(401).json({ message: 'Invalid email or password' });
     }
   } catch (error) {
-    console.error(`Error in loginUser: ${error.message}`);
+
+    // console.error(`Error in loginUser: ${error.message}`);
+
+    logger.error(`Login Error `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/loginUser"
+    })
     res.status(500).json({ message: 'Server error during login' });
   }
 };
@@ -161,7 +169,13 @@ const getAllUsers = async (req, res) => {
     const users = await User.find({}).select('-password -__v');
     return res.status(200).json(users);
   } catch (error) {
-    console.error(`Error in Getting Users: ${error.message}`);
+    // console.error(`Error in Getting Users: ${error.message}`);
+
+    logger.error(`Error Getting All Users `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/getAllUsers"
+    })
     res.status(500).json({ message: 'Error Fetching All Users.' });
   }
 
@@ -169,7 +183,7 @@ const getAllUsers = async (req, res) => {
 
 
 
-
+// To change User's Roles ( admin, qaa, superuser, reviewer)
 const updateUserRole = async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
@@ -180,30 +194,29 @@ const updateUserRole = async (req, res) => {
   try {
 
     const user = await User.findById(id);
+    const copyUser = user
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
     user.role = role;
     await user.save();
 
+    logger.info(`User Role Changed, ${user.name || " "}`, {
 
-    const now = new Date();
-    const year = now.getFullYear(); // e.g., 2025
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
-    try {
-      await logActivity(
-        req.user,
-        'Update User',
-        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
-        `updated ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn(`⚠️ Activity log failed for User ${req.params.id}:`, logError.message);
-    }
+      Role: `from ${copyUser.role || " "} to ${role || " "}`,
+      controller: "UserController/updateUserRole"
+
+    })
 
     return res.status(200).json({ message: 'Role updated successfully.', user });
   } catch (error) {
-    console.error(`Error Updating User: ${error.message}`);
+
+    logger.error(`Error Updating User Role`, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/updateUserRole"
+    })
+
+    // console.error(`Error Updating User: ${error.message}`);
     res.status(500).json({ message: 'Error Updating User.' });
   }
 };
@@ -212,6 +225,7 @@ const updateUserRole = async (req, res) => {
 
 
 const updateUserPassword = async (req, res) => {
+
   const { id } = req.params;
   const { password, masterKey } = req.body;
 
@@ -222,9 +236,34 @@ const updateUserPassword = async (req, res) => {
   }
 
   const MASTER_KEY = process.env.MASTER_KEY;
-  if (!masterKey) {
-    return res.status(403).json({ message: 'Invalid master key.' });
+
+  console.log("MASTER KEY FROM SERVER :", MASTER_KEY);
+  
+  console.log("master key from user : ", masterKey);
+  
+  if (!MASTER_KEY) {
+
+    logger.warn(`User Password Not Changed`, {
+      masterKeySys: MASTER_KEY,
+      controller: "UserController/updateUserPassword"
+    })
+    return res.status(500).json({
+      message: 'Server misconfigured: MASTER_KEY missing',
+    });
   }
+
+  if (!masterKey) {
+    logger.warn(`User Password Not Changed`, {
+      masterKeySys: MASTER_KEY,
+      masterKey: masterKey,
+      controller: "UserController/updateUserPassword"
+    })
+    return res.status(400).json({
+      message: 'Master key is required',
+    });
+  }
+
+
 
   const inputKeyBuffer = Buffer.from(masterKey);
   const storedKeyBuffer = Buffer.from(MASTER_KEY);
@@ -246,26 +285,24 @@ const updateUserPassword = async (req, res) => {
     user.password = password;
     await user.save();
 
-    const year = new Date().getFullYear();
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`;
+    logger.info(`User Password Changed, ${user.name || " "}`, {
 
-    try {
-      await logActivity(
-        req.user,
-        'Update User Password',
-        `User ID: ${user._id}, Department: ${req.user?.department || 'NA'}`,
-        `updated ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn('⚠️ Activity log failed:', logError.message);
-    }
+      name: user.name || " ",
+      school: user.school || " ",
+      department: user.department || " ",
+      controller: "UserController/updateUserPassword"
+    })
 
     return res.status(200).json({
       message: 'Password updated successfully.',
     });
   } catch (error) {
-    console.error('Error Updating User:', error.message);
+    // console.error('Error Updating User:', error.message);
+    logger.error(`Error Updating User Password`, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/updateUserPassword"
+    })
     return res.status(500).json({
       message: 'Internal server error.',
     });
@@ -279,25 +316,25 @@ const deleteUser = async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
+    const copyUser = user
     await user.deleteOne();
-    const now = new Date();
-    const year = now.getFullYear(); // e.g., 2025
-    const academicYear = `${year}-${(year + 1).toString().slice(-2)}`; // e.g., "2025-26"
-    try {
-      await logActivity(
-        req.user,
-        'Deleted User',
-        `User ID: ${req.user._id}, Department: ${req.user?.department || 'NA'}`,
-        `deleted ${academicYear}`,
-        req.ip
-      );
-    } catch (logError) {
-      console.warn(`⚠️ Activity log failed for User ${req.params.id}:`, logError.message);
-    }
 
+    logger.info(`User Deleted, ${copyUser.name || " "}`, {
+
+      name: copyUser.name || " ",
+      school: copyUser.school || " ",
+      department: copyUser.department || " ",
+      controller: "UserController/deleteUser"
+
+    })
     return res.status(200).json({ message: 'User deleted successfully.' });
   } catch (error) {
-    console.error(`Error Deleting User: ${error.message}`);
+    // console.error(`Error Deleting User: ${error.message}`);
+    logger.error(`Error Deleting User `, {
+      message: error.message || "",
+      stack: error.stack || "",
+      controller: "UserController/deleteUser"
+    })
     res.status(500).json({ message: 'Error Deleting User.' });
 
   }

@@ -137,7 +137,7 @@ const AdminSubmissionOverridePage = () => {
           <tbody className='text-white '>
             {submissions.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-6 text-gray-500">
+                <td colSpan={4} className="text-center py-6 text-white">
                   No submissions found for selected academic year.
                 </td>
               </tr>

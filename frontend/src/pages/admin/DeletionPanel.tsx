@@ -148,14 +148,14 @@ const DeletionPanel: React.FC = () => {
               You are about to <strong className="text-red-600">permanently delete</strong> the
               submission:
             </p>
-            <p className="mt-1 text-lg font-semibold text-foreground">
-              {targetSubmission?.title}
+            <p className="mt-1 text-md font-mono  text-white">
+              { `Title : `+targetSubmission?.title}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               Type the exact title below to confirm:
             </p>
             <input
-              className="w-full mt-2 border p-2 rounded-md"
+              className="w-full mt-2 border p-2 rounded-md text-black"
               placeholder="Enter submission title"
               value={confirmation}
               onChange={(e) => setConfirmation(e.target.value)}

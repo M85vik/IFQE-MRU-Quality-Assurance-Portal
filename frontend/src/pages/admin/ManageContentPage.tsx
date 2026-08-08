@@ -227,14 +227,14 @@ const ManageContentPage: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right  text-sm font-medium space-x-2">
-                                                <Button
+                                                {/* <Button
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={() => sendAnnouncementEmail(ann._id)}
                                                     className="text-blue-600 border-blue-300 gap-1 hover:bg-blue-50"
                                                 >
                                                     <Megaphone size={14} /> Email
-                                                </Button>
+                                                </Button> */}
                                                 <Button variant="outline" size="sm" className='gap-1' onClick={() => handleEdit(ann)}><Edit size={14}  /> Edit</Button>
                                                 <Button variant="outline" size="sm" onClick={() => handleDelete(ann._id)} className="text-destructive border-destructive/50 hover:bg-destructive/10 gap-1"><Trash2 size={14} />Delete</Button>
                                             </td>

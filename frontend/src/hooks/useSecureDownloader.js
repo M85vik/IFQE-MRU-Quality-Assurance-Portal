@@ -19,7 +19,7 @@ const useSecureDownloader = () => {
 
             // download fix 
             // const { data } = await apiClient.get(`/files/download-url?fileKey=${fileKey}`);
-            const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}`);
+            const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}&t=${Date.now()}`);
             if (data && data.downloadUrl) {
 
 

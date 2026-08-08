@@ -132,11 +132,11 @@ function ResultTable({ school, isDepartment }) {
           <tr>
             <th className="p-3">S. No.</th>
             <th className="p-3 text-left">Criteria</th>
-            {!isDepartment && <th className="p-3 text-center">Weightage</th>}
-            {!isDepartment && <th className="p-3 text-center">Max Marks</th>}
-            {!isDepartment && <th className="p-3 text-center">Marks Awarded</th>}
-            {!isDepartment && <th className="p-3 text-center">% Achieved</th>}
-            {!isDepartment && <th className="p-3 text-center">Weighted</th>}
+            { <th className="p-3 text-center">Weightage</th>}
+            {<th className="p-3 text-center">Max Marks</th>}
+            {<th className="p-3 text-center">Marks Awarded</th>}
+            {<th className="p-3 text-center">% Achieved</th>}
+            {<th className="p-3 text-center">Weighted</th>}
           </tr>
         </thead>
 
@@ -145,17 +145,17 @@ function ResultTable({ school, isDepartment }) {
             <tr key={row.code} className="even:bg-gray-50 hover:bg-[#FAF3E1] transition">
               <td className="p-3 text-center">{row.sNo}</td>
               <td className="p-3">{row.name}</td>
-              {!isDepartment && <td className="p-3 text-center">{row.weightage}%</td>}
-              {!isDepartment && <td className="p-3 text-center">{row.maxMarks}</td>}
-              {!isDepartment && <td className="p-3 text-center">{row.marksAwarded}</td>}
-              {!isDepartment && (
+              {<td className="p-3 text-center">{row.weightage}%</td>}
+              {<td className="p-3 text-center">{row.maxMarks}</td>}
+              {<td className="p-3 text-center">{row.marksAwarded}</td>}
+              {(
                 <td className="p-3 text-center">
                   <span className="px-3 py-1 rounded-md bg-[#FFA240] text-[#000000] font-semibold">
                     {row.percentage}%
                   </span>
                 </td>
               )}
-              {!isDepartment && (
+              { (
                 <td className="p-3 text-center font-bold text-[#000000]">
                   {row.weightedScore}
                 </td>
@@ -163,8 +163,8 @@ function ResultTable({ school, isDepartment }) {
             </tr>
           ))}
 
-          {/* Final Score Row (Only show for non-departments) */}
-          {!isDepartment && (
+          
+          {(
             <tr className="bg-[#FFA240] font-bold border-t">
               <td colSpan={6} className="p-3 text-right text-[#000000]">
                 FINAL SCORE

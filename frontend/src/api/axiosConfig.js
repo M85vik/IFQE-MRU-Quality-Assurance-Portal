@@ -9,24 +9,27 @@ const apiUrl = import.meta.env.VITE_API_URL;
 if(!apiUrl) throw new Error("Base Url environment variable not loaded.")
 const apiClient = axios.create({
   
-  baseURL:`${apiUrl}/api`
+  baseURL:`${apiUrl}/api`,
+   withCredentials: true // sending cookies
 });
 
 
 
+// Now using cookies so no need for adding authorization header
+
 // Request Interceptor
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().userInfo?.token;
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// apiClient.interceptors.request.use(
+//   (config) => {
+//     const token = useAuthStore.getState().userInfo?.token;
+//     if (token) {
+//       config.headers['Authorization'] = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 // Response Interceptor
 apiClient.interceptors.response.use(

@@ -2206,17 +2206,17 @@ const indicators = [
   },
   {
     indicatorCode: "5.2",
-    title: "INFRASTRUCTURE MAINTENANCE AND AMBIENCE",
+    title: "INFRASTRUCTURE MAINTENANCE, AMBIENCE, FEEDBACK & ITS IMPLEMENTATION",
     criterionCode: "5",
     subCriterionCode: "5.1",
     templateFileKey: "templates/5.2_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
-      excellent: { score: 4, description: "All laboratories/MOOT court, classrooms, faculty rooms, and notice boards are well-maintained with complete documentation..." },
-      veryGood: { score: 3, description: "Facilities are well-maintained with partial documentation..." },
-      satisfactory: { score: 2, description: "Facilities are partially maintained, with partial documentation..." },
-      needsImprovement: { score: 1, description: "Facilities are functioning but poorly maintained, with no proper documentation..." },
-      notSatisfactory: { score: 0, description: "Facilities are not maintained..." },
+      excellent: { score: 4, description: "All laboratories/MOOT court, classrooms, faculty rooms, and notice boards are well-maintained with complete documentation. Feedback taken and action taken recommended through Academic Council/ Board of Studies/ IQAC" },
+      veryGood: { score: 3, description: "Facilities are well-maintained with partial documentation. Feedback taken with action taken" },
+      satisfactory: { score: 2, description: "Facilities are partially maintained, with partial documentation. Feedback taken and partially action taken" },
+      needsImprovement: { score: 1, description: "Facilities are functioning but poorly maintained, with no proper documentation. Feedback done but not analyzed" },
+      notSatisfactory: { score: 0, description: "Facilities are not maintained. Feedback not done" },
     },
     guidelines: {
       text: [
@@ -2225,38 +2225,19 @@ const indicators = [
         " 3.Audit & Inspection Reports",
         " 4.Updated Notice Boards",
         " 5.Maintained ambience hygiene of the school ",
-        " 6.Fire Safety and & Emergency Equipment Records"
+        " 6.Fire Safety and & Emergency Equipment Records",
+        " 7.Analysis report of feedback",
+        " 8.Action taken report",
+        " 9.Minutes of Meeting of AC/BOS/IQAC highlighting recommendation"
       ],
     }
   },
   {
     indicatorCode: "5.3",
-    title: "INFRASTRUCTURE FEEDBACK & ITS IMPLEMENTATION",
-    criterionCode: "5",
-    subCriterionCode: "5.1",
-    templateFileKey: "templates/5.3_Template.xlsx",
-     requiresEvidenceLink: true,
-    rubric: {
-      excellent: { score: 4, description: "Feedback taken and action taken recommended through Academic Council/ Board of Studies/ IQAC" },
-      veryGood: { score: 3, description: "Feedback taken with action taken" },
-      satisfactory: { score: 2, description: "Feedback taken and partially action taken" },
-      needsImprovement: { score: 1, description: "Feedback done but not analyzed" },
-      notSatisfactory: { score: 0, description: "Feedback not done" },
-    },
-    guidelines: {
-      text: [
-        " 1.Analysis report of feedback",
-        " 2.Action taken report",
-        " 3.Minutes of Meeting of AC/BOS/IQAC highlighting recommendation"
-      ],
-    }
-  },
-  {
-    indicatorCode: "5.4",
     title: "NEW LABORATORY SET UP & PURCHASE OF NEW EQUIPMENTS",
     criterionCode: "5",
     subCriterionCode: "5.1",
-    templateFileKey: "templates/5.4_Template.xlsx",
+    templateFileKey: "templates/5.3_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "15-20L" },
@@ -2274,54 +2255,35 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.5",
-    title: "DEPARTMENTAL LIBRARY",
+    indicatorCode: "5.4",
+    title: "DEPARTMENTAL LIBRARY AND NO. OF BOOKS PROCURED IN LIBRARY",
     criterionCode: "5",
     subCriterionCode: "5.1",
-    templateFileKey: "templates/5.5_Template.xlsx",
+    templateFileKey: "templates/5.4_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
-      excellent: { score: 4, description: "Available with issue register for faculty and students both." },
-      veryGood: { score: 3, description: "Available with issue register but access limited only for faculty." },
-      satisfactory: { score: 2, description: "Available but issue register is not available." },
-      needsImprovement: { score: 1, description: "Available but students and faculty are not aware about it, no issue register." },
-      notSatisfactory: { score: 0, description: "Not available" },
+      excellent: { score: 4, description: "Departmental library available with issue register for faculty and students both. Books procured >=20" },
+      veryGood: { score: 3, description: "Departmental library available with issue register but access limited only for faculty. Books procured >=15" },
+      satisfactory: { score: 2, description: "Departmental library available but issue register is not available. Books procured >=10" },
+      needsImprovement: { score: 1, description: "Departmental library available but students and faculty are not aware about it, no issue register. Books procured 1-10" },
+      notSatisfactory: { score: 0, description: "Departmental library not available. Books procured 0" },
     },
     guidelines: {
       text: [
         " 1.List of books available in the departmental library",
-        " 2.Issue register"
-      ],
-    }
-  },
-  {
-    indicatorCode: "5.6",
-    title: "NO. OF BOOKS PROCURED IN THE LIBRARY",
-    criterionCode: "5",
-    subCriterionCode: "5.1",
-    templateFileKey: "templates/5.6_Template.xlsx",
-     requiresEvidenceLink: true,
-    rubric: {
-      excellent: { score: 4, description: ">=20" },
-      veryGood: { score: 3, description: ">=15" },
-      satisfactory: { score: 2, description: ">=10" },
-      needsImprovement: { score: 1, description: "1-10" },
-      notSatisfactory: { score: 0, description: "0" },
-    },
-    guidelines: {
-      text: [
-        " 1.Approval document for  books procurement during assessment year",
-        " 2.Verified list of books procured from library"
+        " 2.Issue register",
+        " 3.Approval document for books procurement during assessment year",
+        " 4.Verified list of books procured from library"
       ],
       remarks: "Unique book titles are required"
     }
   },
   {
-    indicatorCode: "5.7",
+    indicatorCode: "5.5",
     title: "NO. OF CLASSROOMS WITH AV FACILITIES",
     criterionCode: "5",
     subCriterionCode: "5.1",
-    templateFileKey: "templates/5.7_Template.xlsx",
+    templateFileKey: "templates/5.5_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "40%" },
@@ -2340,11 +2302,11 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.8",
+    indicatorCode: "5.6",
     title: "SCHOOL NEWSLETTER",
     criterionCode: "5",
     subCriterionCode: "5.1",
-    templateFileKey: "templates/5.8_Template.xlsx",
+    templateFileKey: "templates/5.6_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Content is rich and relevant, layout is clear and engaging, language is error-free, design is creative and appealing..." },
@@ -2362,11 +2324,11 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.9",
+    indicatorCode: "5.7",
     title: "ACCREDITATION/ RANKING/ RATING",
     criterionCode: "5",
     subCriterionCode: "5.1",
-    templateFileKey: "templates/5.9_Template.xlsx",
+    templateFileKey: "templates/5.7_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Yes" },
@@ -2379,11 +2341,11 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.10",
+    indicatorCode: "5.8",
     title: "WEBSITE OUTLOOK",
     criterionCode: "5",
     subCriterionCode: "5.1",
-    templateFileKey: "templates/5.10_Template.xlsx",
+    templateFileKey: "templates/5.8_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Fully updated" },

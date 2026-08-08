@@ -11,16 +11,15 @@ const Submission = require('../models/Submission');
 const Indicator = require('../models/Indicator');
 const User = require('../models/User');
 const SubmissionWindow = require('../models/SubmissionWindow');
-
+const logger = require("../utils/logger.js")
 
 // --- Service & Utility Imports ---
-const { createSubmissionArchive } = require('../utils/archiveService');
+
 const { DeleteObjectCommand, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 
 const s3Client = require('../config/s3Client');
 
 
-const logActivity = require("../utils/logActivity.js")
 
 require('../models/School');
 require('../models/Department');
@@ -42,11 +41,23 @@ const deleteS3Object = async (key) => {
             Key: key,
         });
         await s3Client.send(command);
-        console.log(`Successfully deleted orphaned file: ${key} from S3.`);
+        // console.log(`Successfully deleted orphaned file: ${key} from S3.`);
+
+        logger.info(`Deleted Orphaned File : ${key}`, {
+            fileKey: key || "",
+            controller: "submissionController/deleteS3Object"
+        })
+
     } catch (error) {
         // We log the error but don't throw it, as failing to delete an old file
         // should not block the main update operation.
-        console.error(`Failed to delete file ${key} from S3:`, error);
+        // console.error(`Failed to delete file ${key} from S3:`, error);
+
+        logger.error(`Failed to delete file ${key} from S3: `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/deleteS3Object"
+        })
     }
 };
 
@@ -76,7 +87,7 @@ const isSubmissionWindowOpen = async (academicYear) => {
  */
 const createSubmission = async (req, res) => {
     const { academicYear, title, submissionType } = req.body;
-    const user = req.user;
+
     //Add here logic if submission for that year already exist submission should not be allowed 
 
     // 1. Authorization & Validation
@@ -95,15 +106,7 @@ const createSubmission = async (req, res) => {
         return res.status(400).json({ message: 'User is not correctly associated with a department and school.' });
     }
 
-    // Prevent duplicate submissions with the same title for the same department and year.
-    // const existingSubmission = await Submission.findOne({
-    //     department: fullUser.department._id,
-    //     academicYear,
-    //     title,
-    // });
-    // if (existingSubmission) {
-    //     return res.status(400).json({ message: `A submission with this title for ${academicYear} already exists.` });
-    // }
+
 
     // Prevent duplicate submissions for the same department and academic year
     const existingSubmission = await Submission.findOne({
@@ -208,23 +211,23 @@ const createSubmission = async (req, res) => {
     try {
         const createdSubmission = await submission.save();
 
-        try {
-            await logActivity(
-                user,
-                'Create Submission',
-                `Submission ID: ${user._id}, Department: ${submission.department}`,
-                submission.academicYear,
-                req.ip
-            );
-
-            console.log("LOG REGISTERED");
-
-        } catch (logError) {
-            console.warn(`⚠️ Activity log failed for submission ${req.params.id}:`, logError.message);
-        }
 
         res.status(201).json(createdSubmission);
+
+        logger.info(`Submission Created By: ${fullUser.name || " "}`, {
+            name: fullUser.name || " ",
+            role: fullUser.role || " ",
+            department: fullUser.department || " ",
+            school: fullUser.school || " ",
+            controller: "submissionController/createSubmission"
+        })
+
     } catch (error) {
+        logger.error(`Error Creating Submission `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/createSubmission"
+        })
         res.status(400).json({ message: 'Error creating submission', error: error.message });
     }
 };
@@ -234,184 +237,6 @@ const createSubmission = async (req, res) => {
  * @route   PUT /api/submissions/:id
  * @access  Private (Department, QAA, Superuser)
  */
-// const updateSubmission = async (req, res) => {
-//     try {
-//         const submission = await Submission.findById(req.params.id).populate('school department');
-//         if (!submission) {
-//             return res.status(404).json({ message: 'Submission not found' });
-//         }
-
-//         const { role } = req.user;
-//         const { partA, partB, status, appeal } = req.body;
-//         const oldFileKeys = []; // Collect files to delete AFTER successful DB save
-
-//         // ==========================
-//         // 🚀 DEPARTMENT UPDATE LOGIC
-//         // ==========================
-//         if (role === 'department') {
-//             const windowOpen = await isSubmissionWindowOpen(submission.academicYear);
-//             if (!windowOpen) {
-//                 return res.status(403).json({ message: `Submission window for ${submission.academicYear} is closed.` });
-//             }
-//             if (submission.status !== 'Draft') {
-//                 return res.status(403).json({ message: 'Submission is locked for editing.' });
-//             }
-
-//             // ---- PART A ----
-//             if (partA && partA.summaryFileKey !== submission.partA.summaryFileKey) {
-//                 if (submission.partA.summaryFileKey) {
-//                     oldFileKeys.push(submission.partA.summaryFileKey);
-//                 }
-//                 submission.partA.summaryFileKey = partA.summaryFileKey;
-//                 submission.markModified('partA');
-//             }
-
-//             // ---- PART B ----
-//             if (partB?.criteria) {
-//                 for (const reqCrit of partB.criteria) {
-//                     const dbCrit = submission.partB.criteria.find(c => c.criteriaCode === reqCrit.criteriaCode);
-//                     if (!dbCrit) continue;
-
-//                     for (const reqSub of reqCrit.subCriteria) {
-//                         const dbSub = dbCrit.subCriteria.find(sc => sc.subCriteriaCode === reqSub.subCriteriaCode);
-//                         if (!dbSub) continue;
-
-//                         for (const reqInd of reqSub.indicators) {
-//                             const dbInd = dbSub.indicators.find(i => i.indicatorCode === reqInd.indicatorCode);
-//                             if (!dbInd) continue;
-
-//                             // --- MAIN FILE ---
-//                             if (reqInd.fileKey !== dbInd.fileKey) {
-//                                 if (dbInd.fileKey && reqInd.fileKey) {
-//                                     oldFileKeys.push(dbInd.fileKey);
-//                                 }
-//                                 dbInd.fileKey = reqInd.fileKey; // can be null or string
-//                             }
-
-//                             // --- EVIDENCE LINK FILE ---
-//                             if (reqInd.evidenceLinkFileKey !== dbInd.evidenceLinkFileKey) {
-//                                 if (dbInd.evidenceLinkFileKey && reqInd.evidenceLinkFileKey) {
-//                                     oldFileKeys.push(dbInd.evidenceLinkFileKey);
-//                                 }
-//                                 dbInd.evidenceLinkFileKey = reqInd.evidenceLinkFileKey;
-//                             }
-//                         }
-//                     }
-//                 }
-
-//                 submission.markModified('partB');
-//             }
-
-//             if (status === 'Under Review') submission.status = 'Under Review';
-
-//             const updatedSubmission = await submission.save();
-
-//             // Only delete after DB update is successful
-//             for (const key of oldFileKeys) {
-//                 await deleteS3Object(key);
-//             }
-
-//             return res.json(updatedSubmission);
-//         }
-
-//         // ==========================
-//         // 🧐 QAA UPDATE LOGIC
-//         // ==========================
-//         if (role === 'qaa') {
-//             if (submission.status !== 'Under Review') {
-//                 return res.status(403).json({ message: 'Not allowed. Submission not under review.' });
-//             }
-
-//             if (partB?.criteria) {
-//                 submission.partB.criteria.forEach(dbCrit => {
-//                     const reqCrit = partB.criteria.find(c => c.criteriaCode === dbCrit.criteriaCode);
-//                     if (!reqCrit) return;
-//                     dbCrit.reviewScore = reqCrit.reviewScore;
-//                     dbCrit.subCriteria.forEach(dbSub => {
-//                         const reqSub = reqCrit.subCriteria.find(sc => sc.subCriteriaCode === dbSub.subCriteriaCode);
-//                         if (!reqSub) return;
-//                         dbSub.remark = reqSub.remark;
-//                         dbSub.indicators.forEach(dbInd => {
-//                             const reqInd = reqSub.indicators.find(i => i.indicatorCode === dbInd.indicatorCode);
-//                             if (!reqInd) return;
-//                             dbInd.reviewScore = reqInd.reviewScore;
-//                             dbInd.reviewRemark = reqInd.reviewRemark;
-//                         });
-//                     });
-//                 });
-//                 submission.markModified('partB');
-//             }
-
-//             if (status === 'Pending Final Approval') submission.status = status;
-//             const updated = await submission.save();
-//             return res.json(updated);
-//         }
-
-//         // ==========================
-//         // 👑 SUPERUSER UPDATE LOGIC
-//         // ==========================
-//         if (role === 'superuser') {
-//             if (!['Pending Final Approval', 'Appeal Submitted'].includes(submission.status)) {
-//                 return res.status(403).json({ message: 'Submission not ready for final decision.' });
-//             }
-
-//             if (submission.status === 'Appeal Submitted') {
-//                 appeal.indicators.forEach(ai => {
-//                     submission.partB.criteria.forEach(c =>
-//                         c.subCriteria.forEach(sc => {
-//                             const ind = sc.indicators.find(i => i.indicatorCode === ai.indicatorCode);
-//                             if (ind) ind.finalScore = ai.finalScore;
-//                         })
-//                     );
-//                     const dbAI = submission.appeal.indicators.find(i => i.indicatorCode === ai.indicatorCode);
-//                     if (dbAI) dbAI.superuserDecisionComment = ai.superuserDecisionComment;
-//                 });
-
-//                 submission.status = 'Appeal Closed';
-//                 submission.appeal.status = 'Closed';
-//                 submission.appeal.closedOn = new Date();
-
-//                 if (!submission.archiveFileKey) {
-//                     submission.archiveFileKey = await createSubmissionArchive(submission);
-//                 }
-
-//             } else {
-//                 partB.criteria.forEach(reqCrit => {
-//                     const dbCrit = submission.partB.criteria.find(c => c.criteriaCode === reqCrit.criteriaCode);
-//                     if (!dbCrit) return;
-//                     dbCrit.finalScore = reqCrit.finalScore;
-//                     reqCrit.subCriteria.forEach(reqSub => {
-//                         const dbSub = dbCrit.subCriteria.find(sc => sc.subCriteriaCode === reqSub.subCriteriaCode);
-//                         if (!dbSub) return;
-//                         dbSub.superuserRemark = reqSub.superuserRemark;
-//                         reqSub.indicators.forEach(reqInd => {
-//                             const dbInd = dbSub.indicators.find(i => i.indicatorCode === reqInd.indicatorCode);
-//                             if (dbInd) {
-//                                 dbInd.finalScore = reqInd.finalScore;
-//                                 dbInd.superuserRemark = reqInd.superuserRemark;
-//                             }
-//                         });
-//                     });
-//                 });
-
-//                 submission.status = 'Completed';
-//                 submission.archiveFileKey = await createSubmissionArchive(submission);
-//             }
-
-//             submission.markModified('partB');
-//             submission.markModified('appeal');
-
-//             const updated = await submission.save();
-//             return res.json(updated);
-//         }
-
-//         return res.status(403).json({ message: 'Unauthorized action' });
-
-//     } catch (error) {
-//         console.error("❌ Error in updateSubmission:", error);
-//         res.status(500).json({ message: "Server Error", error: error.message });
-//     }
-// };
 
 
 const updateSubmission = async (req, res) => {
@@ -445,13 +270,14 @@ const updateSubmission = async (req, res) => {
             // PART A update
             if (partA) {
                 if (
-                    submission.partA.summaryFileKey &&
+                    partA.summaryFileKey !== undefined && 
                     submission.partA.summaryFileKey !== partA.summaryFileKey
                 ) {
-                    oldFileKeys.push(submission.partA.summaryFileKey);
+                    if (submission.partA.summaryFileKey) {
+                         oldFileKeys.push(submission.partA.summaryFileKey);
+                    }
+                    submission.partA.summaryFileKey = partA.summaryFileKey;
                 }
-
-                submission.partA.summaryFileKey = partA.summaryFileKey;
                 submission.markModified('partA');
             }
 
@@ -476,13 +302,13 @@ const updateSubmission = async (req, res) => {
                             if (!dbInd) continue;
 
                             // FILE KEY update
-                            if (reqInd.fileKey && reqInd.fileKey !== dbInd.fileKey) {
+                            if (reqInd.fileKey !== undefined && reqInd.fileKey !== dbInd.fileKey) {
                                 if (dbInd.fileKey) oldFileKeys.push(dbInd.fileKey);
                                 dbInd.fileKey = reqInd.fileKey;
                             }
 
                             // EVIDENCE LINK update (single file - legacy)
-                            if (reqInd.evidenceLinkFileKey && reqInd.evidenceLinkFileKey !== dbInd.evidenceLinkFileKey) {
+                            if (reqInd.evidenceLinkFileKey !== undefined && reqInd.evidenceLinkFileKey !== dbInd.evidenceLinkFileKey) {
                                 if (dbInd.evidenceLinkFileKey) oldFileKeys.push(dbInd.evidenceLinkFileKey);
                                 dbInd.evidenceLinkFileKey = reqInd.evidenceLinkFileKey;
                             }
@@ -496,7 +322,7 @@ const updateSubmission = async (req, res) => {
                                 oldFileKeys.push(...removedKeys);
                                 dbInd.evidenceFileKeys = reqInd.evidenceFileKeys;
                                 // Explicitly mark this specific path as modified to ensure Mongoose saves it
-                                submission.markModified('partB'); 
+                                submission.markModified('partB');
                             }
 
                             // ⭐ Save self score
@@ -610,7 +436,7 @@ const updateSubmission = async (req, res) => {
                 submission.appeal.status = 'Closed';
                 submission.appeal.closedOn = new Date();
 
-              
+
             } else {
                 // Final approval
                 for (const reqCriterion of partB.criteria) {
@@ -655,7 +481,12 @@ const updateSubmission = async (req, res) => {
         return res.status(403).json({ message: 'Unauthorized action' });
 
     } catch (error) {
-        console.error("Error in updateSubmission:", error);
+        // console.error("Error in updateSubmission:", error);
+        logger.error(`Error Updating Submission `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/updateSubmission"
+        })
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
@@ -700,7 +531,12 @@ const getMyDepartmentSubmissions = async (req, res) => {
 
         res.json(processedSubmissions);
     } catch (error) {
-        console.error("Error fetching department submissions:", error);
+        // console.error("Error fetching department submissions:", error);
+        logger.error(`Error Getting My Department Submissions `, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/getMyDepartmentSubmissions"
+        })
         res.status(500).json({ message: "Server Error" });
     }
 };
@@ -741,7 +577,12 @@ const getSubmissionsForReview = async (req, res) => {
         const validSubmissions = submissions.filter(s => s.school && s.department);
         res.json(validSubmissions);
     } catch (error) {
-        console.error("Error fetching review queue:", error);
+        // console.error("Error fetching review queue:", error);
+        logger.error(`Error Fetching Submissions For Review`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/getMySubmissionsForReview"
+        })
         res.status(500).json({ message: "Server Error" });
     }
 };
@@ -761,7 +602,12 @@ const getApprovedSubmissions = async (req, res) => {
             .sort({ academicYear: -1, updatedAt: -1 }); // Show newest first.
         res.json(submissions);
     } catch (error) {
-        console.error("Error fetching approved submissions:", error);
+        // console.error("Error fetching approved submissions:", error);
+        logger.error(`Error Fetching Approved Submissions`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/getApprovedSubmissions"
+        })
         res.status(500).json({ message: "Server Error" });
     }
 };
@@ -795,6 +641,11 @@ const getSubmissionById = async (req, res) => {
 
         res.json(submission);
     } catch (error) {
+        logger.error(`Error Fetching Submission By ID`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/getSubmissionById"
+        })
         res.status(500).json({ message: "An unexpected server error occurred." });
     }
 };
@@ -814,6 +665,11 @@ const getSubmissionsForSuperuser = async (req, res) => {
             .sort({ status: 1, updatedAt: 1 }); // Sort to prioritize approvals, then by oldest.
         res.json(submissions);
     } catch (error) {
+        logger.error(`Error Fetching Submissions For SuperUser`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/getSubmissionsForSuperuser"
+        })
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -860,9 +716,20 @@ const submitAppeal = async (req, res) => {
         submission.hasAppealed = true; // Flag to prevent multiple appeals.
 
         await submission.save();
+
+        logger.info(`Appeal Submitted By: ${submission.school || "unknown "}`, {
+            submissionID: submission._id || "unknown",
+            controller: "submissionWindowController/submitAppeal"
+        })
+
         res.json({ message: 'Appeal submitted successfully.' });
 
     } catch (error) {
+        logger.error(`Error Submitting Appeal`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/submitAppeal"
+        })
         res.status(500).json({ message: 'Server error while submitting appeal.' });
     }
 };
@@ -911,27 +778,46 @@ const deleteSubmission = async (req, res) => {
 
 
         //after new archive logics 
-           // 🆕 New archive system
-    if (submission.archive?.fileKey) {
-      fileKeys.push({ Key: submission.archive.fileKey });
-    }
+        // 🆕 New archive system
+        if (submission.archive?.fileKey) {
+            fileKeys.push({ Key: submission.archive.fileKey });
+        }
 
-        console.log(`🧾 Found ${fileKeys.length} files to delete from S3.`);
+        // console.log(`🧾 Found ${fileKeys.length} files to delete from S3.`);
+
+        logger.info(`🧾 Found ${fileKeys.length} files to delete from S3.`, {
+            name: user.name || "",
+            email: user.email || "",
+            role: user.role || "",
+            controller: "submissionWindowController/deleteSubmission"
+        })
 
         // 3️⃣ Delete from S3 first
         if (fileKeys.length > 0) {
             const command = new DeleteObjectsCommand({
                 Bucket: process.env.S3_BUCKET_NAME,
                 Delete: { Objects: fileKeys },
-                
+
             });
 
-          
+
             try {
                 await s3Client.send(command);
-                console.log('✅ S3 deletion successful.');
+                // console.log('✅ S3 deletion successful.');
+                logger.info(`✅ S3 deletion successful.`, {
+                    name: user.name || "",
+                    email: user.email || "",
+                    role: user.role || "",
+                    controller: "submissionWindowController/deleteSubmission"
+                })
+
             } catch (s3Error) {
-                console.error('❌ S3 deletion failed:', s3Error.message);
+                // console.error('❌ S3 deletion failed:', s3Error.message);
+                logger.error(`❌ S3 deletion failed:`, {
+                    message: s3Error.message || "",
+                    stack: s3Error.stack || "",
+                    controller: "submssionController/deleteSubmission"
+                })
                 // Stop here — don't delete from DB
                 return res.status(500).json({
                     message: 'Failed to delete files from S3. Submission not removed from database.',
@@ -942,24 +828,26 @@ const deleteSubmission = async (req, res) => {
 
         // 4️⃣ Delete from Mongo only if S3 succeeded
         await Submission.findByIdAndDelete(req.params.id);
-        console.log('✅ Submission deleted from MongoDB.');
+        // console.log('✅ Submission deleted from MongoDB.');
 
 
-        try {
-            await logActivity(
-                user,
-                'Deleted Submission',
-                `Submission ID: ${req.params.id}, Department: ${submission.department}`,
-                submission.academicYear,
-                req.ip
-            );
-        } catch (logError) {
-            console.warn(`⚠️ Activity log failed for submission ${req.params.id}:`, logError.message);
-        }
+        logger.info(`✅ Submission deleted from MongoDB.`, {
+            name: user.name || "",
+            email: user.email || "",
+            role: user.role || "",
+            controller: "submissionWindowController/deleteSubmission"
+        })
+
 
         res.status(200).json({ message: 'Submission and all related files deleted successfully.' });
     } catch (error) {
-        console.error('❌ Error deleting submission:', error);
+        // console.error('❌ Error deleting submission:', error);
+
+        logger.error(`❌ Error deleting submission`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/deleteSubmission"
+        })
         res.status(500).json({
             message: 'Failed to delete submission',
             error: error.message,
@@ -993,7 +881,12 @@ const getSubmissionStatus = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("❌ Error Getting Submission Status :", error);
+        // console.error("❌ Error Getting Submission Status :", error);
+        logger.error(`❌ Error Getting Submission Status`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/getSubmissionStatus"
+        })
         res.status(500).json({
             message: "Failed to Get Submission Status",
             error: error.message,
@@ -1004,59 +897,74 @@ const getSubmissionStatus = async (req, res) => {
 
 
 const updateSubmissionStatusByAdmin = async (req, res) => {
-  const { id } = req.params;
-  const { status, reason } = req.body;
+    try {
+        const { id } = req.params;
+        const { status, reason } = req.body;
 
-  if (!status) {
-    return res.status(400).json({ message: 'Status is required.' });
-  }
+        if (!status) {
+            return res.status(400).json({ message: 'Status is required.' });
+        }
 
-  const submission = await Submission.findById(id);
-  if (!submission) {
-    return res.status(404).json({ message: 'Submission not found.' });
-  }
+        const submission = await Submission.findById(id);
+        if (!submission) {
+            return res.status(404).json({ message: 'Submission not found.' });
+        }
 
-  submission.status = status;
+        submission.status = status;
 
-  submission.adminOverride = {
-    by: req.user._id,
-    reason: reason || 'Manual override',
-    at: new Date(),
-  };
+        submission.adminOverride = {
+            by: req.user._id,
+            reason: reason || 'Manual override',
+            at: new Date(),
+        };
 
-  await submission.save();
+        await submission.save();
 
-  res.status(200).json({
-    message: 'Submission status updated by admin.',
-  });
+        res.status(200).json({
+            message: 'Submission status updated by admin.',
+        });
+    } catch (error) {
+
+        logger.error(`❌ Error Updating Submission Status`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/updateSubmissionStatusByAdmin"
+        })
+
+    }
 };
 
 
 
 const getSubmissionsByAcademicYear = async (req, res) => {
-  const { academicYear } = req.params;
+    const { academicYear } = req.params;
 
-  if (!academicYear) {
-    return res.status(400).json({
-      message: 'Academic year is required.',
-    });
-  }
+    if (!academicYear) {
+        return res.status(400).json({
+            message: 'Academic year is required.',
+        });
+    }
 
-  try {
-    const submissions = await Submission.find({
-      academicYear,
-    })
-      .select('title status department createdAt academicYear')
-      .populate('department', 'name')
-      .sort({ createdAt: -1 });
+    try {
+        const submissions = await Submission.find({
+            academicYear,
+        })
+            .select('title status department createdAt academicYear')
+            .populate('department', 'name')
+            .sort({ createdAt: -1 });
 
-    res.status(200).json(submissions);
-  } catch (error) {
-    console.error('Error fetching submissions by academic year:', error);
-    res.status(500).json({
-      message: 'Failed to fetch submissions.',
-    });
-  }
+        res.status(200).json(submissions);
+    } catch (error) {
+        // console.error('Error fetching submissions by academic year:', error);
+        logger.error(`❌ Error fetching submissions by academic year`, {
+            message: error.message || "",
+            stack: error.stack || "",
+            controller: "submssionController/getSubmissionsByAcademicYear"
+        })
+        res.status(500).json({
+            message: 'Failed to fetch submissions.',
+        });
+    }
 };
 
 

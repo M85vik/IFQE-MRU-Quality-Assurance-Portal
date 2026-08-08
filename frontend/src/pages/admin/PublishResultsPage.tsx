@@ -138,7 +138,7 @@ export default function PublishResultsPage() {
             )}
           </div>
         ) : (
-          <p className="text-gray-500 italic">
+          <p className="text-white italic">
             Select an academic year to manage publication status…
           </p>
         )}
