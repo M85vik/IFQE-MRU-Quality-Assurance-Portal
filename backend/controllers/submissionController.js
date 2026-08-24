@@ -36,6 +36,12 @@ const deleteS3Object = async (key) => {
     // If no key is provided, do nothing.
     if (!key) return;
     try {
+        const UPLOADS_DIR = path.join(__dirname, '../uploads');
+        const localPath = path.join(UPLOADS_DIR, key.replace(/\//g, '_'));
+        if (fs.existsSync(localPath)) {
+            try { fs.unlinkSync(localPath); } catch {}
+        }
+
         const command = new DeleteObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME,
             Key: key,
@@ -265,98 +271,154 @@ const updateSubmission = async (req, res) => {
                 });
             }
 
-            const oldFileKeys = [];
+            const maxRetries = 5;
+            let attempt = 0;
 
-            // PART A update
-            if (partA) {
-                if (
-                    partA.summaryFileKey !== undefined && 
-                    submission.partA.summaryFileKey !== partA.summaryFileKey
-                ) {
-                    if (submission.partA.summaryFileKey) {
-                         oldFileKeys.push(submission.partA.summaryFileKey);
+            while (attempt < maxRetries) {
+                attempt++;
+                try {
+                    // Re-fetch latest document state from DB to handle concurrent updates cleanly
+                    const latestSub = await Submission.findById(req.params.id).populate('school department');
+                    if (!latestSub || latestSub.status !== 'Draft') {
+                        return res.status(403).json({ message: 'Submission state changed or unavailable.' });
                     }
-                    submission.partA.summaryFileKey = partA.summaryFileKey;
-                }
-                submission.markModified('partA');
-            }
 
-            // PART B update
-            if (partB?.criteria) {
-                for (const reqCriterion of partB.criteria) {
-                    const dbCriterion = submission.partB.criteria.find(
-                        c => c.criteriaCode === reqCriterion.criteriaCode
-                    );
-                    if (!dbCriterion) continue;
+                    const oldFileKeys = [];
 
-                    for (const reqSub of reqCriterion.subCriteria) {
-                        const dbSub = dbCriterion.subCriteria.find(
-                            sc => sc.subCriteriaCode === reqSub.subCriteriaCode
-                        );
-                        if (!dbSub) continue;
+                    // PART A update
+                    if (partA) {
+                        if (
+                            partA.summaryFileKey !== undefined && 
+                            submission.partA?.summaryFileKey !== partA.summaryFileKey
+                        ) {
+                            if (submission.partA?.summaryFileKey) {
+                                oldFileKeys.push(submission.partA.summaryFileKey);
+                            }
+                            latestSub.partA.summaryFileKey = partA.summaryFileKey;
+                        }
+                        latestSub.markModified('partA');
+                    }
 
-                        for (const reqInd of reqSub.indicators) {
-                            const dbInd = dbSub.indicators.find(
-                                i => i.indicatorCode === reqInd.indicatorCode
+                    // PART B update
+                    if (partB?.criteria) {
+                        for (const reqCriterion of partB.criteria) {
+                            const latestCriterion = latestSub.partB.criteria.find(
+                                c => c.criteriaCode === reqCriterion.criteriaCode
                             );
-                            if (!dbInd) continue;
+                            const initialCriterion = submission.partB.criteria.find(
+                                c => c.criteriaCode === reqCriterion.criteriaCode
+                            );
+                            if (!latestCriterion || !initialCriterion) continue;
 
-                            // FILE KEY update
-                            if (reqInd.fileKey !== undefined && reqInd.fileKey !== dbInd.fileKey) {
-                                if (dbInd.fileKey) oldFileKeys.push(dbInd.fileKey);
-                                dbInd.fileKey = reqInd.fileKey;
-                            }
-
-                            // EVIDENCE LINK update (single file - legacy)
-                            if (reqInd.evidenceLinkFileKey !== undefined && reqInd.evidenceLinkFileKey !== dbInd.evidenceLinkFileKey) {
-                                if (dbInd.evidenceLinkFileKey) oldFileKeys.push(dbInd.evidenceLinkFileKey);
-                                dbInd.evidenceLinkFileKey = reqInd.evidenceLinkFileKey;
-                            }
-
-                            // EVIDENCE FILE KEYS update (multi-file)
-                            if (Array.isArray(reqInd.evidenceFileKeys)) {
-                                // Find keys that were removed and queue them for S3 cleanup
-                                const removedKeys = (dbInd.evidenceFileKeys || []).filter(
-                                    key => !reqInd.evidenceFileKeys.includes(key)
+                            for (const reqSub of reqCriterion.subCriteria) {
+                                const latestSubCrit = latestCriterion.subCriteria.find(
+                                    sc => sc.subCriteriaCode === reqSub.subCriteriaCode
                                 );
-                                oldFileKeys.push(...removedKeys);
-                                dbInd.evidenceFileKeys = reqInd.evidenceFileKeys;
-                                // Explicitly mark this specific path as modified to ensure Mongoose saves it
-                                submission.markModified('partB');
-                            }
+                                const initialSubCrit = initialCriterion.subCriteria.find(
+                                    sc => sc.subCriteriaCode === reqSub.subCriteriaCode
+                                );
+                                if (!latestSubCrit || !initialSubCrit) continue;
 
-                            // ⭐ Save self score
-                            if (reqInd.selfAssessedScore !== undefined && reqInd.selfAssessedScore !== null) {
-                                dbInd.selfAssessedScore = reqInd.selfAssessedScore;
+                                for (const reqInd of reqSub.indicators) {
+                                    const latestInd = latestSubCrit.indicators.find(
+                                        i => i.indicatorCode === reqInd.indicatorCode
+                                    );
+                                    const initialInd = initialSubCrit.indicators.find(
+                                        i => i.indicatorCode === reqInd.indicatorCode
+                                    );
+                                    if (!latestInd || !initialInd) continue;
+
+                                    // FILE KEY update
+                                    if (reqInd.fileKey !== undefined && reqInd.fileKey !== initialInd.fileKey) {
+                                        if (initialInd.fileKey) oldFileKeys.push(initialInd.fileKey);
+                                        latestInd.fileKey = reqInd.fileKey;
+                                    }
+
+                                    // EVIDENCE LINK update (single file - legacy)
+                                    if (reqInd.evidenceLinkFileKey !== undefined && reqInd.evidenceLinkFileKey !== initialInd.evidenceLinkFileKey) {
+                                        if (initialInd.evidenceLinkFileKey) oldFileKeys.push(initialInd.evidenceLinkFileKey);
+                                        latestInd.evidenceLinkFileKey = reqInd.evidenceLinkFileKey;
+                                    }
+
+                                    // EVIDENCE FILE KEYS update (multi-file, concurrency safe merge)
+                                    if (Array.isArray(reqInd.evidenceFileKeys)) {
+                                        const initialKeys = initialInd.evidenceFileKeys || [];
+                                        const latestKeys = latestInd.evidenceFileKeys || [];
+
+                                        // Keys explicitly removed by this user request
+                                        const explicitlyRemoved = initialKeys.filter(k => !reqInd.evidenceFileKeys.includes(k));
+                                        oldFileKeys.push(...explicitlyRemoved);
+
+                                        // Keys added concurrently by another request
+                                        const concurrentlyAdded = latestKeys.filter(k => !initialKeys.includes(k));
+
+                                        // Merge requested keys with concurrently added keys, excluding explicitly removed keys
+                                        const mergedKeys = Array.from(
+                                            new Set([...reqInd.evidenceFileKeys, ...concurrentlyAdded].filter(k => !explicitlyRemoved.includes(k)))
+                                        );
+                                        latestInd.evidenceFileKeys = mergedKeys;
+                                    }
+
+                                    // ⭐ Save self score
+                                    if (reqInd.selfAssessedScore !== undefined && reqInd.selfAssessedScore !== null) {
+                                        latestInd.selfAssessedScore = reqInd.selfAssessedScore;
+                                    }
+                                }
                             }
                         }
+                        latestSub.markModified('partB');
                     }
-                }
-                submission.markModified('partB');
-            }
 
-            if (status === 'Under Review') {
-                // Check if the admin has enabled submission for this window
-                const submissionWindow = await SubmissionWindow.findOne({
-                    academicYear: submission.academicYear,
-                    windowType: 'Submission'
-                });
-                if (submissionWindow && submissionWindow.submissionEnabled === false) {
-                    return res.status(403).json({
-                        message: 'Submission is currently disabled for this academic year by the administrator.'
+                    if (status === 'Under Review') {
+                        // Check if the admin has enabled submission for this window
+                        const submissionWindow = await SubmissionWindow.findOne({
+                            academicYear: latestSub.academicYear,
+                            windowType: 'Submission'
+                        });
+                        if (submissionWindow && submissionWindow.submissionEnabled === false) {
+                            return res.status(403).json({
+                                message: 'Submission is currently disabled for this academic year by the administrator.'
+                            });
+                        }
+                        latestSub.status = 'Under Review';
+                    }
+
+                    const updatedSubmission = await latestSub.save();
+
+                    // Safety check before file deletion: verify key is no longer referenced anywhere in updatedSubmission
+                    const finalFileKeys = new Set();
+                    if (updatedSubmission.partA?.summaryFileKey) finalFileKeys.add(updatedSubmission.partA.summaryFileKey);
+                    updatedSubmission.partB?.criteria?.forEach(c => {
+                        c.subCriteria?.forEach(sc => {
+                            sc.indicators?.forEach(ind => {
+                                if (ind.fileKey) finalFileKeys.add(ind.fileKey);
+                                if (ind.evidenceLinkFileKey) finalFileKeys.add(ind.evidenceLinkFileKey);
+                                if (Array.isArray(ind.evidenceFileKeys)) {
+                                    ind.evidenceFileKeys.forEach(k => finalFileKeys.add(k));
+                                }
+                            });
+                        });
                     });
+
+                    // AFTER successful DB save → delete old files safely
+                    for (const key of oldFileKeys) {
+                        if (key && !finalFileKeys.has(key)) {
+                            await deleteS3Object(key);
+                        }
+                    }
+
+                    return res.json(updatedSubmission);
+                } catch (err) {
+                    if (err.name === 'VersionError' && attempt < maxRetries) {
+                        logger.warn(`VersionError detected on attempt ${attempt}/${maxRetries}, retrying update...`, {
+                            controller: "submissionController/updateSubmission"
+                        });
+                        await new Promise(r => setTimeout(r, 50 * attempt));
+                        continue;
+                    }
+                    throw err;
                 }
-                submission.status = 'Under Review';
             }
-
-            const updatedSubmission = await submission.save();
-
-            // AFTER successful DB save → delete old files
-            for (const key of oldFileKeys) {
-                await deleteS3Object(key);
-            }
-
-            return res.json(updatedSubmission);
         }
 
         // --------------------------------------------------

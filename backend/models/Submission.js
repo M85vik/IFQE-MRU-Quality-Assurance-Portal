@@ -116,5 +116,7 @@ const SubmissionSchema = new mongoose.Schema({
   hasAppealed: { type: Boolean, default: false },
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt fields.
 
+SubmissionSchema.set('optimisticConcurrency', true);
+
 // Creates and exports the Submission model.
 module.exports = mongoose.model('Submission', SubmissionSchema);
