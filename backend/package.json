@@ -9,6 +9,7 @@
     "data:import": "node utils/seeder.js",
     "data:destroy": "node utils/seeder.js -d",
     "uploadTemplates": "node utils/populateTemplates.js",
+    "backup:s3": "node utils/backupS3.js",
     "start": "node server.js"
   },
   "keywords": [],

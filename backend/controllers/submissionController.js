@@ -68,13 +68,37 @@ const deleteS3Object = async (key) => {
 };
 
 /**
+ * Returns both possible string representations of an academic year.
+ * e.g. "2024-25" → ["2024-25", "2024-2025"]
+ *      "2024-2025" → ["2024-2025", "2024-25"]
+ * This ensures DB lookups succeed regardless of which format was stored.
+ */
+const getAcademicYearVariants = (academicYear) => {
+    if (!academicYear) return [academicYear];
+    const parts = academicYear.split('-');
+    if (parts.length !== 2) return [academicYear];
+    const startYear = parts[0];
+    const endPart = parts[1];
+    if (endPart.length === 4) {
+        // "2024-2025" → also try "2024-25"
+        return [academicYear, `${startYear}-${endPart.slice(-2)}`];
+    } else if (endPart.length === 2) {
+        // "2024-25" → also try "2024-2025"
+        const fullEnd = startYear.slice(0, 2) + endPart;
+        return [academicYear, `${startYear}-${fullEnd}`];
+    }
+    return [academicYear];
+};
+
+/**
  * Checks if the main submission window for a given academic year is currently open.
- * @param {string} academicYear - The academic year to check (e.g., "2023-2024").
+ * @param {string} academicYear - The academic year to check (e.g., "2023-2024" or "2023-24").
  * @returns {Promise<boolean>} - True if the window is open, false otherwise.
  */
 const isSubmissionWindowOpen = async (academicYear) => {
-    // Correctly query for a 'Submission' type window to distinguish it from an 'Appeal' window.
-    const window = await SubmissionWindow.findOne({ academicYear, windowType: 'Submission' });
+    // Query with both format variants so "2024-25" matches a window stored as "2024-2025" and vice-versa.
+    const variants = getAcademicYearVariants(academicYear);
+    const window = await SubmissionWindow.findOne({ academicYear: { $in: variants }, windowType: 'Submission' });
     if (!window) return false;
 
     const now = new Date();
@@ -372,7 +396,7 @@ const updateSubmission = async (req, res) => {
                     if (status === 'Under Review') {
                         // Check if the admin has enabled submission for this window
                         const submissionWindow = await SubmissionWindow.findOne({
-                            academicYear: latestSub.academicYear,
+                            academicYear: { $in: getAcademicYearVariants(latestSub.academicYear) },
                             windowType: 'Submission'
                         });
                         if (submissionWindow && submissionWindow.submissionEnabled === false) {
@@ -761,7 +785,7 @@ const submitAppeal = async (req, res) => {
 
         // Business Rule: Check if the specific 'Appeal' window is open for this academic year.
         const appealWindow = await SubmissionWindow.findOne({
-            academicYear: submission.academicYear,
+            academicYear: { $in: getAcademicYearVariants(submission.academicYear) },
             windowType: 'Appeal'
         });
 

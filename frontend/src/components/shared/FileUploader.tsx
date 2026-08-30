@@ -83,7 +83,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onUploadSuccess, onRemove, 
         setIsPreviewing(true);
         setError('');
         try {
-            const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(currentFileKey)}`);
+            const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(currentFileKey)}&submissionId=${encodeURIComponent(submissionId)}`);
             if (data?.downloadUrl) {
                 const targetDownloadUrl = data.downloadUrl.startsWith('http') ? data.downloadUrl : `${import.meta.env.VITE_API_URL || ''}${data.downloadUrl}`;
                 window.open(targetDownloadUrl, '_blank');
