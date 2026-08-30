@@ -32,3 +32,11 @@ Thumbs.db
 *.sln
 *.sw?
 *.local
+
+# S3 Bucket Backups and Uploads
+s3_backup/
+backend/s3_backup/
+uploads/
+backend/uploads/
+m85vik-devlopment/
+backend/m85vik-devlopment/

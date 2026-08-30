@@ -102,7 +102,7 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
     setError('');
 
     try {
-      const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}`);
+      const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}&submissionId=${encodeURIComponent(submissionId)}`);
       if (data?.downloadUrl) {
         const targetDownloadUrl = data.downloadUrl.startsWith('http') ? data.downloadUrl : `${import.meta.env.VITE_API_URL || ''}${data.downloadUrl}`;
         window.open(targetDownloadUrl, '_blank');

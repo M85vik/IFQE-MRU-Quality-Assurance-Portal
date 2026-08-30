@@ -132,8 +132,12 @@ const handleLocalUpload = async (req, res) => {
  * @access  Private
  */
 const getDownloadUrl = async (req, res) => {
-  const { fileKey } = req.query;
+  const { fileKey, submissionId } = req.query;
   const user = req.user;
+
+  if (!fileKey) {
+    return res.status(400).json({ message: 'Missing fileKey' });
+  }
 
   if (fileKey.startsWith('templates/')) {
     if (isLocalDev) {
@@ -154,17 +158,48 @@ const getDownloadUrl = async (req, res) => {
     }
   }
 
-  const submission = await Submission.findOne({
-    $or: [
-      { 'archiveFileKey': fileKey },
-      { 'partA.summaryFileKey': fileKey },
-      { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
-      { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
-      { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
-    ]
-  });
+  let submission = null;
+  if (submissionId) {
+    submission = await Submission.findById(submissionId);
+  }
 
   if (!submission) {
+    submission = await Submission.findOne({
+      $or: [
+        { 'archiveFileKey': fileKey },
+        { 'partA.summaryFileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
+      ]
+    });
+  }
+
+  if (!submission) {
+    // Fallback: If submission document is not found or not yet saved, check if fileKey path belongs to user's department
+    const parts = fileKey.split('/');
+    const keyDeptId = parts[3];
+    const isOwnerByPath = user.department && keyDeptId === user.department.toString();
+    const isReviewer = ['qaa', 'admin', 'superuser'].includes(user.role);
+
+    if (isOwnerByPath || isReviewer) {
+      if (isLocalDev) {
+        await logS3Metric("GET", user, fileKey);
+        return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
+      }
+      const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: fileKey,
+      });
+      try {
+        const downloadUrl = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+        await logS3Metric("GET", user, fileKey);
+        return res.json({ downloadUrl });
+      } catch (error) {
+        return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
+      }
+    }
+
     return res.status(404).json({ message: 'File not associated with any submission.' });
   }
 
