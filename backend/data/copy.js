@@ -318,16 +318,17 @@ const indicators = [
     templateFileKey: "templates/1.4.1_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
-      excellent: { score: 4, description: "Well-defined BOS-approved CAPS, comprehensive result analysis, and detailed action taken reports are available in 100% of course files" },
-      veryGood: { score: 3, description: "BOS-approved CAPs, result analysis, and action taken reports are available in >=85% of course files" },
-      satisfactory: { score: 2, description: "BOS-approved CAPs and result analysis reports exist in >=70% of course files, but action taken reports are not well-defined" },
-      needsImprovement: { score: 1, description: "BOS-approved CAPs and result analysis reports exist in >=50% of course files, but action taken reports are either missing or not well-defined" },
-      notSatisfactory: { score: 0, description: "CAPs, result analysis, and action taken reports are available in less than 50% of course files, with significant gaps in documentation and implementation" },
+      excellent: { score: 4, description: ">=4.5" },
+      veryGood: { score: 3, description: ">=4" },
+      satisfactory: { score: 2, description: ">=3.5" },
+      needsImprovement: { score: 1, description: ">=3" },
+      notSatisfactory: { score: 0, description: "<3" },
     },
     guidelines: {
       text: [
         "1.Course Files",
-        "2.CAPs approved in BoS"
+        "2.CAPs approved in BoS",
+        "3.Average course file score from TQS"
       ],
     }
   },
@@ -339,72 +340,30 @@ const indicators = [
     templateFileKey: "templates/1.4.2_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
-      excellent: { score: 4, description: "Well defined rubrics, 100% certificates or project reports available" },
-      veryGood: { score: 3, description: "" },
-      satisfactory: { score: 2, description: "" },
-      needsImprovement: { score: 1, description: "" },
-      notSatisfactory: { score: 0, description: "Less than 100% certificates or reports available" },
+      excellent: { score: 4, description: "SOP implemented, Evaluation through Rubrics" },
+      veryGood: { score: 3, description: "SOP partially implemented, Evaluation through rubrics" },
+      satisfactory: { score: 2, description: "SOP not available, Evaluation through rubrics" },
+      needsImprovement: { score: 1, description: "SOP & Rubrics available but not implemented" },
+      notSatisfactory: { score: 0, description: "SOP & Rubrics not available" },
     },
     guidelines: {
       text: [
         "1.Rubrics for Project Evaluation & Industrial Training.",
         "2.Certificates of all students.",
-        "3.Project/ Industrial Training Reports."
+        "3.Project/ Industrial Training Reports.",
+        "4.SOP of Project/Industrial Internship allocation and evaluation",
+        "5.Rubrics for Project Evaluation & Industrial Training."
       ],
       formula: " (No. of certificates/ Total no. of eligible students undergoing interships/project)*100",
     }
   },
 
-  // --- Sub-Criteria 1.5: PERFORMANCE AND EVALUATION ANALYSIS [cite: 151]
+  // --- Sub-Criteria 1.5: ATTAINMENT OF COURSE OUTCOMES [cite: 154]
   {
     indicatorCode: "1.5.1",
-    title: "Number of Students eligible for the exam",
-    criterionCode: "1",
-    subCriterionCode: "1.5",
-    templateFileKey: "templates/1.5.1_Template.xlsx",
-     requiresEvidenceLink: true,
-    rubric: {
-      excellent: { score: 4, description: "100%" },
-      veryGood: { score: 3, description: ">=80%" },
-      satisfactory: { score: 2, description: ">=70%" },
-      needsImprovement: { score: 1, description: ">=60%" },
-      notSatisfactory: { score: 0, description: "<=50%" },
-    },
-    guidelines: {
-      text: [
-        "List of the students eligible verfiied from Examination Cell."
-      ],
-      formula: " (No. of students elgible /total no. of students) *100"
-    }
-  },
-  {
-    indicatorCode: "1.5.2",
-    title: "Pass percentage/ Completion Rate",
-    criterionCode: "1",
-    subCriterionCode: "1.5",
-    templateFileKey: "templates/NO_Template.xlsx",
-     requiresEvidenceLink: true,
-    rubric: {
-      excellent: { score: 4, description: ">=90%" },
-      veryGood: { score: 3, description: ">=80%" },
-      satisfactory: { score: 2, description: ">=70%" },
-      needsImprovement: { score: 1, description: ">=60%" },
-      notSatisfactory: { score: 0, description: "<=50%" },
-    },
-    guidelines: {
-      text: [
-        "List of the students passed verified from Examination Cell."
-      ],
-      formula: "(No. of students passed /total no. of students)*100",
-    }
-  },
-
-  // --- Sub-Criteria 1.6: ATTAINMENT OF COURSE OUTCOMES [cite: 154]
-  {
-    indicatorCode: "1.6.1",
     title: "Program Articulation Matrix",
     criterionCode: "1",
-    subCriterionCode: "1.6",
+    subCriterionCode: "1.5",
     templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
@@ -421,10 +380,10 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "1.6.2",
+    indicatorCode: "1.5.2",
     title: "Assessment methods and processes contributing to attainment of COs being followed",
     criterionCode: "1",
-    subCriterionCode: "1.6",
+    subCriterionCode: "1.5",
     templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
@@ -441,11 +400,11 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "1.6.3",
+    indicatorCode: "1.5.3",
     title: "Direct and indirect Attainment of Course Outcomes of all Courses with Respect to Set Attainment Targets",
     criterionCode: "1",
-    subCriterionCode: "1.6",
-    templateFileKey: "templates/1.6.3_Template.xlsx",
+    subCriterionCode: "1.5",
+    templateFileKey: "templates/1.5.3_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "CO Targets of >=80% courses attained" },
@@ -462,11 +421,11 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "1.6.4",
+    indicatorCode: "1.5.4",
     title: "Overall attainment of Program Outcomes and Program Specific Outcomes & ATR",
     criterionCode: "1",
-    subCriterionCode: "1.6",
-    templateFileKey: "templates/1.6.4_Template.xlsx",
+    subCriterionCode: "1.5",
+    templateFileKey: "templates/1.5.4_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: "Overall PO attainment target of >=80% PO's/PSO's attained and continuous improvement strategies are in place" },
@@ -594,7 +553,7 @@ const indicators = [
       text: [
         " 1.Google Scholar citation to be mentioned in Data template 4.1"
       ],
-      formula: " Total number of citations for the school/ Total number of paper"
+      formula: " Citation value of school plus H-Index of the school, sourced through IRNS/ Total number of paper"
     }
   },
   {
@@ -1607,23 +1566,44 @@ const indicators = [
   },
   {
     indicatorCode: "3.7.4",
-    title: "Graduation outcome",
+    title: "Number of Students eligible for the exam",
     criterionCode: "3",
     subCriterionCode: "3.7",
-    templateFileKey: "templates/3.7.4_Template.xlsx",
+    templateFileKey: "templates/1.5.1_Template.xlsx",
+     requiresEvidenceLink: true,
+    rubric: {
+      excellent: { score: 4, description: "100%" },
+      veryGood: { score: 3, description: ">=80%" },
+      satisfactory: { score: 2, description: ">=70%" },
+      needsImprovement: { score: 1, description: ">=60%" },
+      notSatisfactory: { score: 0, description: "<=50%" },
+    },
+    guidelines: {
+      text: [
+        "List of the students eligible verfiied from Examination Cell."
+      ],
+      formula: " (No. of students elgible /total no. of students) *100"
+    }
+  },
+  {
+    indicatorCode: "3.7.5",
+    title: "Pass percentage/ Completion Rate",
+    criterionCode: "3",
+    subCriterionCode: "3.7",
+    templateFileKey: "templates/NO_Template.xlsx",
      requiresEvidenceLink: true,
     rubric: {
       excellent: { score: 4, description: ">=90%" },
       veryGood: { score: 3, description: ">=80%" },
       satisfactory: { score: 2, description: ">=70%" },
       needsImprovement: { score: 1, description: ">=60%" },
-      notSatisfactory: { score: 0, description: "<60%" },
+      notSatisfactory: { score: 0, description: "<=50%" },
     },
     guidelines: {
       text: [
-        "1.List of Students graduated as per the Convocation data"
-        ],
-        formula: "No. of student graduated as per convocation data*100/Sanctioned Intake"
+        "List of the students passed verified from Examination Cell."
+      ],
+      formula: "(No. of students passed /total no. of students)*100",
     }
   },
 
@@ -2252,7 +2232,7 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.4",
+    indicatorCode: "5.5",
     title: "NEW LABORATORY SET UP & PURCHASE OF NEW EQUIPMENTS",
     criterionCode: "5",
     subCriterionCode: "5.1",
@@ -2274,7 +2254,7 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.5",
+    indicatorCode: "5.6",
     title: "DEPARTMENTAL LIBRARY",
     criterionCode: "5",
     subCriterionCode: "5.1",
@@ -2295,7 +2275,7 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.6",
+    indicatorCode: "5.7",
     title: "NO. OF BOOKS PROCURED IN THE LIBRARY",
     criterionCode: "5",
     subCriterionCode: "5.1",
@@ -2317,7 +2297,7 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.7",
+    indicatorCode: "5.8",
     title: "NO. OF CLASSROOMS WITH AV FACILITIES",
     criterionCode: "5",
     subCriterionCode: "5.1",
@@ -2340,7 +2320,7 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.8",
+    indicatorCode: "5.9",
     title: "SCHOOL NEWSLETTER",
     criterionCode: "5",
     subCriterionCode: "5.1",
@@ -2362,7 +2342,7 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.9",
+    indicatorCode: "5.10",
     title: "ACCREDITATION/ RANKING/ RATING",
     criterionCode: "5",
     subCriterionCode: "5.1",
@@ -2379,7 +2359,7 @@ const indicators = [
     }
   },
   {
-    indicatorCode: "5.10",
+    indicatorCode: "5.11",
     title: "WEBSITE OUTLOOK",
     criterionCode: "5",
     subCriterionCode: "5.1",
@@ -2393,6 +2373,29 @@ const indicators = [
     guidelines: {
       text: [
         "Website status to be verified by MRU Website Coordinator"
+      ],
+    }
+  },
+  {
+    indicatorCode: "5.4",
+    title: "Active MoUs with organizations /industry",
+    criterionCode: "5",
+    subCriterionCode: "5.1",
+    templateFileKey: "templates/2.6.2_Template.xlsx",
+     requiresEvidenceLink: true,
+    rubric: {
+      excellent: { score: 4, description: ">=8" },
+      veryGood: { score: 3, description: ">=6" },
+      satisfactory: { score: 2, description: ">=4" },
+      needsImprovement: { score: 1, description: ">=1" },
+      notSatisfactory: { score: 0, description: "0" }
+    },
+    guidelines: {
+      text: [
+        " 1.List of Active MOU",
+        " 2.Details of the partners/organisation with which MOU has been signed",
+        " 3.Signed copy of MoU",
+        " 4.List of collaborative "
       ],
     }
   },
