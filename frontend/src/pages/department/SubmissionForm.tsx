@@ -186,16 +186,7 @@ const SubmissionForm: React.FC = () => {
     if (!submission) return <Alert message="Could not load submission data." type="error" />;
 
     const isFormDisabled = submission.status !== 'Draft';
-    const criteriaList = [...submission.partB.criteria].sort((a, b) => {
-        const partsA = a.criteriaCode.split('.').map(Number);
-        const partsB = b.criteriaCode.split('.').map(Number);
-        for(let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
-            const valA = partsA[i] || 0;
-            const valB = partsB[i] || 0;
-            if (valA !== valB) return valA - valB;
-        }
-        return 0;
-    });
+    const criteriaList = [...submission.partB.criteria].sort((a, b) => a.criteriaCode.localeCompare(b.criteriaCode, undefined, { numeric: true }));
     const activeCriterion = criteriaList.find(c => c.criteriaCode === activeTab);
 
     return (
@@ -298,16 +289,7 @@ const SubmissionForm: React.FC = () => {
                                     <h2 className="text-2xl font-bold text-foreground">Criterion {activeCriterion.criteriaCode}: {activeCriterion.title}</h2>
                                 </div>
                                 <div className="space-y-2">
-                                    {[...activeCriterion.subCriteria].sort((a, b) => {
-                                        const partsA = a.subCriteriaCode.split('.').map(Number);
-                                        const partsB = b.subCriteriaCode.split('.').map(Number);
-                                        for(let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
-                                            const valA = partsA[i] || 0;
-                                            const valB = partsB[i] || 0;
-                                            if (valA !== valB) return valA - valB;
-                                        }
-                                        return 0;
-                                    }).map(sc => (
+                                    {[...activeCriterion.subCriteria].sort((a, b) => a.subCriteriaCode.localeCompare(b.subCriteriaCode, undefined, { numeric: true })).map(sc => (
                                         <div key={sc.subCriteriaCode} className="border border-border rounded-md overflow-hidden bg-card">
                                             <button
                                                 onClick={() => handleToggleSubCriterion(sc.subCriteriaCode)}
@@ -320,21 +302,7 @@ const SubmissionForm: React.FC = () => {
                                             </button>
                                             {openSubCriterion === sc.subCriteriaCode && (
                                                 <div className="border-t border-border">
-                                                    {[...sc.indicators].sort((a, b) => {
-                                                        const numA = parseInt(a.indicatorCode.split('.')[1] || '0', 10);
-                                                        const numB = parseInt(b.indicatorCode.split('.')[1] || '0', 10);
-                                                        // Handle sub-indicators like 1.5.1 if they exist by checking length, but here a simple parseInt on the last or second part works for 5.10. 
-                                                        // Wait, indicatorCode is like '5.10', so split('.')[1] is '10'.
-                                                        // What if indicatorCode is '3.10.1'? Then we should sort by each part.
-                                                        const partsA = a.indicatorCode.split('.').map(Number);
-                                                        const partsB = b.indicatorCode.split('.').map(Number);
-                                                        for(let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
-                                                            const valA = partsA[i] || 0;
-                                                            const valB = partsB[i] || 0;
-                                                            if (valA !== valB) return valA - valB;
-                                                        }
-                                                        return 0;
-                                                    }).map(subInd => {
+                                                    {[...sc.indicators].sort((a, b) => a.indicatorCode.localeCompare(b.indicatorCode, undefined, { numeric: true })).map(subInd => {
                                                         const fullIndicator = indicators.find(i => i.indicatorCode === subInd.indicatorCode);
                                                         if (!fullIndicator) return null;
                                                         return (
