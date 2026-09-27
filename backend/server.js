@@ -24,7 +24,9 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://ifqe-mru-qa-portal.netlify.app',
   'http://localhost:5173',
-  'http://localhost:5174'
+  'http://localhost:5174',
+  'https://ifqe.in',
+  'https://www.ifqe.in',
 
 ];
 
