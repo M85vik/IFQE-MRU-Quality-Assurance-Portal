@@ -186,7 +186,7 @@ const SubmissionForm: React.FC = () => {
     if (!submission) return <Alert message="Could not load submission data." type="error" />;
 
     const isFormDisabled = submission.status !== 'Draft';
-    const criteriaList = [...submission.partB.criteria].sort((a, b) => a.criteriaCode.localeCompare(b.criteriaCode));
+    const criteriaList = [...submission.partB.criteria].sort((a, b) => a.criteriaCode.localeCompare(b.criteriaCode, undefined, { numeric: true }));
     const activeCriterion = criteriaList.find(c => c.criteriaCode === activeTab);
 
     return (
@@ -289,7 +289,7 @@ const SubmissionForm: React.FC = () => {
                                     <h2 className="text-2xl font-bold text-foreground">Criterion {activeCriterion.criteriaCode}: {activeCriterion.title}</h2>
                                 </div>
                                 <div className="space-y-2">
-                                    {[...activeCriterion.subCriteria].sort((a, b) => a.subCriteriaCode.localeCompare(b.subCriteriaCode)).map(sc => (
+                                    {[...activeCriterion.subCriteria].sort((a, b) => a.subCriteriaCode.localeCompare(b.subCriteriaCode, undefined, { numeric: true })).map(sc => (
                                         <div key={sc.subCriteriaCode} className="border border-border rounded-md overflow-hidden bg-card">
                                             <button
                                                 onClick={() => handleToggleSubCriterion(sc.subCriteriaCode)}
@@ -302,7 +302,7 @@ const SubmissionForm: React.FC = () => {
                                             </button>
                                             {openSubCriterion === sc.subCriteriaCode && (
                                                 <div className="border-t border-border">
-                                                    {[...sc.indicators].sort((a, b) => a.indicatorCode.localeCompare(b.indicatorCode)).map(subInd => {
+                                                    {[...sc.indicators].sort((a, b) => a.indicatorCode.localeCompare(b.indicatorCode, undefined, { numeric: true })).map(subInd => {
                                                         const fullIndicator = indicators.find(i => i.indicatorCode === subInd.indicatorCode);
                                                         if (!fullIndicator) return null;
                                                         return (
