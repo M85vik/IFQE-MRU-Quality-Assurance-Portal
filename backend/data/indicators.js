@@ -559,11 +559,8 @@ module.exports = [
     },
     "guidelines": {
       "text": [
-        "1.Rubrics for Project Evaluation & Industrial Training.",
-        "2.Certificates of all students.",
-        "3.Project/ Industrial Training Reports.",
-        "4.SOP of Project/Industrial Internship allocation and evaluation",
-        "5.Rubrics for Project Evaluation & Industrial Training."
+        "1.SOP of Project/Industrial Internship allocation and evaluation",
+        "2.Rubrics for Project Evaluation & Industrial Training."
       ],
       "formula": " (No. of certificates/ Total no. of eligible students undergoing interships/project)*100"
     }
