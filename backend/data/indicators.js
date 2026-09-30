@@ -493,7 +493,7 @@ module.exports = [
   },
   {
     "indicatorCode": "1.4.1",
-    "title": "Evaluation of Continuous Assessment: Assignments, Tests, Mid-Term, etc.",
+    "title": "Evaluation of Continuous Assessment: Assignments, Tests, Mid-Term, etc. through Course file Score from TQS",
     "criterionCode": "1",
     "subCriterionCode": "1.4",
     "templateFileKey": "templates/1.4.1_Template.xlsx",
