@@ -842,7 +842,7 @@ module.exports = [
   },
   {
     "indicatorCode": "2.1.4",
-    "title": "Median value of citations - Google",
+    "title": "Citations Value of School (IRINS)",
     "criterionCode": "2",
     "subCriterionCode": "2.1",
     "templateFileKey": "templates/NO_Template.xlsx",
@@ -871,7 +871,8 @@ module.exports = [
     },
     "guidelines": {
       "text": [
-        " 1.Google Scholar citation to be mentioned in Data template 4.1"
+        " 1.Google Scholar citation to be mentioned in Data template 4.1",
+        " 2.Citation value of school plus H-Index of the school, sourced through IRNS"
       ],
       "formula": " Citation value of school plus H-Index of the school, sourced through IRNS/ Total number of paper"
     }
@@ -949,7 +950,8 @@ module.exports = [
       "6.Attendance of the participants",
       "7.Events reports along with geotag photographs and captions",
       "8.Feedback",
-      "9.Certification"
+      "9.Certification",
+      "10.Research InsightX sessions to be included; points credited to the department of the faculty member conducting the session."
     ]
   },
   {
@@ -1291,23 +1293,23 @@ module.exports = [
     "rubric": {
       "excellent": {
         "score": 4,
-        "description": ">=0.5%"
+        "description": ">=1%"
       },
       "veryGood": {
         "score": 3,
-        "description": "0.5-0.26%"
+        "description": "0.75-0.99%"
       },
       "satisfactory": {
         "score": 2,
-        "description": "0.15-0.25%"
+        "description": "0.05-0.74%"
       },
       "needsImprovement": {
         "score": 1,
-        "description": "<0.15%"
+        "description": "0.25-0.49%"
       },
       "notSatisfactory": {
         "score": 0,
-        "description": "0"
+        "description": "0.15-0.24%"
       }
     },
     "guidelines": {
@@ -1569,7 +1571,8 @@ module.exports = [
         " 4. Name of the Scholars",
         " 5.Name of the Supervisor & Co-Supervisor",
         " 6.Degree award notification",
-        " 7.Ph.D. certificate"
+        " 7.Ph.D. certificate",
+        " 8.Data to be reported as per the last Convocation, i.e., February 2026."
       ],
       "formula": "(Number of degrees awarded for scholars excluding last 3 years of active scholars/Total no. of active scholars excluding last 3 years of active scholars)*100"
     }
@@ -1782,7 +1785,8 @@ module.exports = [
         " 2.Induction Report with Photographs",
         " 3.Student attendance record",
         " 4.Absentees list and reason",
-        " 5.Feedback"
+        " 5.Feedback",
+        " 6.Communication mail to be included as part of the required supporting documents."
       ]
     }
   },
@@ -1834,23 +1838,23 @@ module.exports = [
     "rubric": {
       "excellent": {
         "score": 4,
-        "description": "Regular planned meeting of mentor mentee (at least once in a month) along with their MOM and Action Taken Report with other relevant documents."
+        "description": "4(6) meetings"
       },
       "veryGood": {
         "score": 3,
-        "description": "Regular meetings are planned with little bit delay(1 meeting in two months). MOM and Mentor-Mentee file is available with relevant information."
+        "description": "3(4) meetings"
       },
       "satisfactory": {
         "score": 2,
-        "description": "Meeting once or twice in semester with brief documentations in mentor-mentee files."
+        "description": "2(3) meetings"
       },
       "needsImprovement": {
         "score": 1,
-        "description": "Meetings are very irregular without prior plannings with lack of documentations."
+        "description": "1-2 (irregular) meetings"
       },
       "notSatisfactory": {
         "score": 0,
-        "description": "No structured meetings were planned in the semester. Mentor-Mentee file is missing."
+        "description": "0 meetings"
       }
     },
     "guidelines": {
@@ -2330,7 +2334,8 @@ module.exports = [
         "1.List of students placed/self employed/gone for higher studies with full details",
         " 2.List of total outgoing students",
         " 3.Proof of placement/higher studies/self-employment (offer letter / appointment letter, I card, admission letter, etc.)"
-      ]
+      ],
+      "formula": "(Number of students placed/ Sanctioned Intake) *100"
     }
   },
   {
@@ -2443,14 +2448,14 @@ module.exports = [
     },
     "guidelines": {
       "text": [
-        "List of the students eligible verfiied from Examination Cell."
+        "List of the students eligible (except Detain student) verified from Examination Cell."
       ],
-      "formula": " (No. of students elgible /total no. of students) *100"
+      "formula": "(No. of students eligible /total no. of students (Actual Strength including detain students)) *100"
     }
   },
   {
     "indicatorCode": "3.7.5",
-    "title": "Pass percentage/ Completion Rate",
+    "title": "Pass percentage - year wise",
     "criterionCode": "3",
     "subCriterionCode": "3.7",
     "templateFileKey": "templates/NO_Template.xlsx",
@@ -2546,7 +2551,8 @@ module.exports = [
         "2.Offer letter for internship",
         "3.In-house project details",
         "4.Internship completion certificate",
-        "5.Front Page and Certificate Page of the Project Report"
+        "5.Front Page and Certificate Page of the Project Report",
+        "6.Scope expanded to also include Social Internships; 100% certificates must be available."
       ],
       "formula": " (Number of students going for paid internship/Number of students going for internship)*100"
     }
@@ -2752,23 +2758,23 @@ module.exports = [
     "rubric": {
       "excellent": {
         "score": 4,
-        "description": ">=7"
+        "description": "10 (≥7)"
       },
       "veryGood": {
         "score": 3,
-        "description": ">=5"
+        "description": "8 (≥5)"
       },
       "satisfactory": {
         "score": 2,
-        "description": ">=3"
+        "description": "6 (≥3)"
       },
       "needsImprovement": {
         "score": 1,
-        "description": ">=1"
+        "description": "4 (≥1)"
       },
       "notSatisfactory": {
         "score": 0,
-        "description": "No events"
+        "description": "< 2 events (0)"
       }
     },
     "guidelines": {
@@ -3455,7 +3461,8 @@ module.exports = [
       "text": [
         " 1.Analysis report of feedback",
         " 2.Action taken report",
-        " 3.Minutes of Meeting of AC/BOS/IQAC highlighting recommendation"
+        " 3.Minutes of Meeting of AC/BOS/IQAC highlighting recommendation",
+        " 4.SSS (Student Satisfaction Survey) report to be considered as the basis for feedback."
       ]
     },
     "templateFileKey": "templates/5.3_Template.xlsx"
@@ -3566,7 +3573,8 @@ module.exports = [
     "guidelines": {
       "text": [
         " 1.List of books available in the departmental library",
-        " 2.Issue register"
+        " 2.Issue register",
+        " 3.A formal SOP must be provided for maintenance of the departmental library."
       ]
     },
     "templateFileKey": "templates/5.5_Template.xlsx"
