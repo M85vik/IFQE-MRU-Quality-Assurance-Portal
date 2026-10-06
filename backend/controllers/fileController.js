@@ -141,7 +141,7 @@ const getDownloadUrl = async (req, res) => {
 
   if (fileKey.startsWith('templates/')) {
     if (isLocalDev) {
-      return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
+      return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}&t=${Date.now()}` });
     }
     const command = new GetObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME,
@@ -154,7 +154,7 @@ const getDownloadUrl = async (req, res) => {
       await logS3Metric("GET", user, fileKey);
       return res.json({ downloadUrl });
     } catch (error) {
-      return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
+      return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}&t=${Date.now()}` });
     }
   }
 
