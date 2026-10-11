@@ -2189,6 +2189,7 @@ module.exports = [
     "criterionCode": "3",
     "subCriterionCode": "3.5",
     "templateFileKey": "templates/3.5.2_Template.xlsx",
+    "requiresEvidenceLink": true,
     "rubric": {
       "excellent": {
         "score": 4,
