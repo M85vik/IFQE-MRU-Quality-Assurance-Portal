@@ -8,6 +8,7 @@ import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import apiClient from '../../api/axiosConfig';
 import { UploadCloud, File as FileIcon, X, AlertTriangle, Lock, Loader2, Eye } from 'lucide-react';
+import FilePreviewModal from './FilePreviewModal';
 
 interface MultiFileUploaderProps {
   submissionId: string;
@@ -36,7 +37,8 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
 }) => {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [removingKeys, setRemovingKeys] = useState<Set<string>>(new Set());
-  const [previewingKeys, setPreviewingKeys] = useState<Set<string>>(new Set());
+  const [previewFileKey, setPreviewFileKey] = useState<string | null>(null);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [error, setError] = useState('');
 
   const handleUpload = async (file: File) => {
@@ -97,27 +99,9 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
     }
   };
 
-  const handlePreview = async (fileKey: string) => {
-    setPreviewingKeys(prev => new Set(prev).add(fileKey));
-    setError('');
-
-    try {
-      const { data } = await apiClient.get(`/files/download-url?fileKey=${encodeURIComponent(fileKey)}&submissionId=${encodeURIComponent(submissionId)}`);
-      if (data?.downloadUrl) {
-        const targetDownloadUrl = data.downloadUrl.startsWith('http') ? data.downloadUrl : `${import.meta.env.VITE_API_URL || ''}${data.downloadUrl}`;
-        window.open(targetDownloadUrl, '_blank');
-      } else {
-        setError('Could not generate preview link.');
-      }
-    } catch (err) {
-      setError('Failed to preview file. Please try again.');
-    } finally {
-      setPreviewingKeys(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(fileKey);
-        return newSet;
-      });
-    }
+  const handlePreview = (fileKey: string) => {
+    setPreviewFileKey(fileKey);
+    setIsPreviewModalOpen(true);
   };
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -179,15 +163,10 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
                 {/* Preview Button */}
                 <button
                   onClick={() => handlePreview(fileKey)}
-                  disabled={previewingKeys.has(fileKey)}
-                  className="text-blue-600 opacity-70 hover:opacity-100 p-1 rounded-full hover:bg-blue-100 disabled:opacity-30"
+                  className="text-blue-600 opacity-70 hover:opacity-100 p-1 rounded-full hover:bg-blue-100 transition-colors"
                   title="Preview file"
                 >
-                  {previewingKeys.has(fileKey) ? (
-                    <Loader2 size={18} className="animate-spin" />
-                  ) : (
-                    <Eye size={18} />
-                  )}
+                  <Eye size={18} />
                 </button>
                 {/* Delete Button */}
                 {!isDisabled && (
@@ -270,6 +249,17 @@ const MultiFileUploader: React.FC<MultiFileUploaderProps> = ({
           <span>{error}</span>
         </div>
       )}
+
+      {/* File Preview Modal */}
+      <FilePreviewModal
+        isOpen={isPreviewModalOpen}
+        onClose={() => {
+          setIsPreviewModalOpen(false);
+          setPreviewFileKey(null);
+        }}
+        fileKey={previewFileKey}
+        submissionId={submissionId}
+      />
     </div>
   );
 };

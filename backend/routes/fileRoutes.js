@@ -11,7 +11,7 @@ const router = express.Router();
 
 // Import controller functions that contain the logic for generating URLs and handling S3 commands.
 
-const { getUploadUrl, getDownloadUrl, deleteFile, handleLocalUpload, handleLocalDownload } = require('../controllers/fileController'); 
+const { getUploadUrl, getDownloadUrl, viewFile, deleteFile, handleLocalUpload, handleLocalDownload } = require('../controllers/fileController'); 
 
 // Import the 'protect' middleware to ensure a user is authenticated via JWT.
 const { protect } = require('../middleware/authMiddleware');
@@ -38,6 +38,13 @@ router.post('/upload-url', protect, getUploadUrl);
  * @access  Private (Authenticated users)
  */
 router.get('/download-url', protect, getDownloadUrl);
+
+/**
+ * @route   GET /api/files/view-file
+ * @desc    Streams or displays a file inline for in-browser preview without downloading.
+ * @access  Private (Authenticated users)
+ */
+router.get('/view-file', protect, viewFile);
 
 /**
  * @route   DELETE /api/files/delete-file
