@@ -215,9 +215,17 @@ const getDownloadUrl = async (req, res) => {
     return res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
   }
 
+  const isView = req.query.view === 'true';
+  const ext = path.extname(fileKey).toLowerCase();
+  const detectedMimeType = mime.lookup(ext) || 'application/octet-stream';
+
   const command = new GetObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME,
     Key: fileKey,
+    ...(isView ? {
+      ResponseContentDisposition: `inline; filename="${path.basename(fileKey)}"`,
+      ResponseContentType: detectedMimeType
+    } : {})
   });
 
   try {
@@ -226,6 +234,114 @@ const getDownloadUrl = async (req, res) => {
     res.json({ downloadUrl });
   } catch (error) {
     res.json({ downloadUrl: `/api/files/local-download?fileKey=${encodeURIComponent(fileKey)}` });
+  }
+};
+
+/**
+ * @desc    Stream or serve file inline for viewing (PDF, Image, Excel)
+ * @route   GET /api/files/view-file
+ * @access  Private
+ */
+const viewFile = async (req, res) => {
+  const { fileKey, submissionId } = req.query;
+  const user = req.user;
+
+  if (!fileKey) {
+    return res.status(400).json({ message: 'Missing fileKey' });
+  }
+
+  // Template files can also be viewed inline if requested
+  if (fileKey.startsWith('templates/')) {
+    const ext = path.extname(fileKey).toLowerCase();
+    const detectedMimeType = mime.lookup(ext) || 'application/octet-stream';
+    const fileName = path.basename(fileKey);
+    res.setHeader('Content-Type', detectedMimeType);
+    res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+
+    if (isLocalDev) {
+      const templatePath = path.join(__dirname, '../templates', fileName);
+      if (fs.existsSync(templatePath)) {
+        return res.sendFile(templatePath);
+      }
+      return res.status(404).send('Template file not found');
+    }
+
+    try {
+      const command = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: fileKey,
+      });
+      const s3Response = await s3Client.send(command);
+      await logS3Metric("GET", user, fileKey);
+      return s3Response.Body.pipe(res);
+    } catch (error) {
+      console.error('Error fetching template for view:', error.message);
+      return res.status(404).json({ message: 'Template not found' });
+    }
+  }
+
+  let submission = null;
+  if (submissionId) {
+    submission = await Submission.findById(submissionId);
+  }
+
+  if (!submission) {
+    submission = await Submission.findOne({
+      $or: [
+        { 'archiveFileKey': fileKey },
+        { 'partA.summaryFileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.fileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.evidenceLinkFileKey': fileKey },
+        { 'partB.criteria.subCriteria.indicators.evidenceFileKeys': fileKey }
+      ]
+    });
+  }
+
+  if (!submission) {
+    const parts = fileKey.split('/');
+    const keyDeptId = parts[3];
+    const isOwnerByPath = user.department && keyDeptId === user.department.toString();
+    const isReviewer = ['qaa', 'admin', 'superuser'].includes(user.role);
+
+    if (!isOwnerByPath && !isReviewer) {
+      return res.status(404).json({ message: 'File not associated with any submission.' });
+    }
+  } else {
+    const isOwner = submission.department.toString() === user.department?.toString();
+    const isReviewer = ['qaa', 'admin', 'superuser'].includes(user.role);
+
+    if (!isOwner && !isReviewer) {
+      return res.status(403).json({ message: 'Not authorized to access this file.' });
+    }
+  }
+
+  const ext = path.extname(fileKey).toLowerCase();
+  const detectedMimeType = mime.lookup(ext) || 'application/octet-stream';
+  const fileName = path.basename(fileKey);
+
+  res.setHeader('Content-Type', detectedMimeType);
+  res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+
+  if (isLocalDev) {
+    const filePath = path.join(UPLOADS_DIR, fileKey.replace(/\//g, '_'));
+    if (fs.existsSync(filePath)) {
+      await logS3Metric("GET", user, fileKey);
+      return res.sendFile(filePath);
+    }
+    return res.status(404).send('File not found');
+  }
+
+  try {
+    const command = new GetObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: fileKey,
+    });
+    const s3Response = await s3Client.send(command);
+    await logS3Metric("GET", user, fileKey);
+    s3Response.Body.pipe(res);
+  } catch (error) {
+    console.error('Error streaming file from S3:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve file for viewing.' });
   }
 };
 
@@ -304,4 +420,4 @@ const deleteFile = async (req, res) => {
   res.json({ message: 'File deleted successfully.' });
 };
 
-module.exports = { getUploadUrl, getDownloadUrl, deleteFile, handleLocalUpload, handleLocalDownload };
+module.exports = { getUploadUrl, getDownloadUrl, viewFile, deleteFile, handleLocalUpload, handleLocalDownload };
