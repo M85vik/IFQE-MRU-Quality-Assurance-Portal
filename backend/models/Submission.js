@@ -25,7 +25,14 @@ const IndicatorSubmissionSchema = new mongoose.Schema({
   fileKey: { type: String },             // S3 key for the main evidence file
   evidenceLinkFileKey: { type: String }, // S3 key for an additional evidence link file (legacy, single file)
   evidenceFileKeys: [{ type: String }],  // Array of S3 keys for multiple evidence documents
-  selfAssessedScore: { type: Number },   // Score given by the department
+  selfAssessedScore: { type: Number },   // Score given by the department (total sum)
+  selfAssessedScoreGovt: { type: Number }, // Score for Govt (0-4) (2.3)
+  selfAssessedScoreNonGovt: { type: Number }, // Score for Non Govt/Industry (0-4) (2.3)
+  selfAssessedScoreInstitutional: { type: Number }, // Score for Institutional (0-4) (2.3)
+  selfAssessedScoreWorkshopTraining: { type: Number }, // Score for Workshop / Training (0-4) (4.2.1)
+  selfAssessedScoreConferences: { type: Number }, // Score for Conferences (0-4) (4.2.1)
+  selfAssessedScoreSeminar: { type: Number }, // Score for Seminar (0-4) (4.2.1)
+  selfAssessedScoreFDP: { type: Number }, // Score for FDP Organized (0-4) (4.2.1)
   reviewScore: { type: Number },         // Score given by the QAA reviewer
   reviewRemark: { type: String },        // Comment from the QAA reviewer
   finalScore: { type: Number },          // Final score after superuser approval

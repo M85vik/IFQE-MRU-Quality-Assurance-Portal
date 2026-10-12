@@ -82,6 +82,9 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
     }
   };
 
+  const isCriterion23 = subCriteriaCode === '2.3' || indicator.indicatorCode?.startsWith('2.3.');
+  const isCriterion421 = indicator.indicatorCode === '4.2.1';
+
   const rubricOptions = [
     { value: 4, label: "4 - Excellent" },
     { value: 3, label: "3 - Very Good" },
@@ -187,32 +190,257 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
             )}
 
             {/* Self Rating */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1">
-                Self Assessed Rating (0-4)
-              </label>
-              <select
-                className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
-                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                value={submissionIndicator.selfAssessedScore ?? ''}
-                onChange={(e) =>
-                  updateIndicatorSelfScore(
-                    criterionCode,
-                    subCriteriaCode,
-                    indicator.indicatorCode,
-                    e.target.value
-                  )
-                }
-                disabled={isDisabled}
-              >
-                <option value="" disabled className="text-gray-500 font-semibold">
-                  -- Select a score --
-                </option>
-                {rubricOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
+            {isCriterion23 ? (
+              <div className="space-y-4">
+                {/* 1. Govt Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Govt
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreGovt ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'govt'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 2. Non-Govt / Industry Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Non govt/Industry
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreNonGovt ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'nonGovt'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 3. Institutional Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Institutional
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreInstitutional ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'institutional'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Total indicator score badge */}
+                <div className="flex items-center justify-between text-xs font-semibold text-gray-700 bg-blue-50 px-3 py-2 rounded-md border border-blue-200">
+                  <span>Total Indicator Score:</span>
+                  <span className="text-sm font-bold text-blue-700">
+                    {(submissionIndicator.selfAssessedScoreGovt ?? 0) + (submissionIndicator.selfAssessedScoreNonGovt ?? 0) + (submissionIndicator.selfAssessedScoreInstitutional ?? 0)} / 12
+                  </span>
+                </div>
+              </div>
+            ) : isCriterion421 ? (
+              <div className="space-y-4">
+                {/* 1. Workshop / Training Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Workshop / Training
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreWorkshopTraining ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'workshopTraining'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 2. Conferences Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Conferences
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreConferences ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'conferences'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 3. Seminar Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Seminar
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreSeminar ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'seminar'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 4. FDP Organized Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - FDP Organized
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreFDP ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'fdp'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Total indicator score badge */}
+                <div className="flex items-center justify-between text-xs font-semibold text-gray-700 bg-blue-50 px-3 py-2 rounded-md border border-blue-200">
+                  <span>Total Indicator Score:</span>
+                  <span className="text-sm font-bold text-blue-700">
+                    {(submissionIndicator.selfAssessedScoreWorkshopTraining ?? 0) + (submissionIndicator.selfAssessedScoreConferences ?? 0) + (submissionIndicator.selfAssessedScoreSeminar ?? 0) + (submissionIndicator.selfAssessedScoreFDP ?? 0)} / 16
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                  Self Assessed Rating (0-4)
+                </label>
+                <select
+                  className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                    focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  value={submissionIndicator.selfAssessedScore ?? ''}
+                  onChange={(e) =>
+                    updateIndicatorSelfScore(
+                      criterionCode,
+                      subCriteriaCode,
+                      indicator.indicatorCode,
+                      e.target.value
+                    )
+                  }
+                  disabled={isDisabled}
+                >
+                  <option value="" disabled className="text-gray-500 font-semibold">
+                    -- Select a score --
+                  </option>
+                  {rubricOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ module.exports = {
     code: "C2",
     name: "Criteria 2: Research, Innovation & Impact",
     weightage: 25,
-    maxMarks: 128,
+    maxMarks: 160,
   },
   C3: {
     code: "C3",
@@ -23,7 +23,7 @@ module.exports = {
     code: "C4",
     name: "Criteria 4: Faculty Development & Diversity",
     weightage: 10,
-    maxMarks: 64,
+    maxMarks: 76,
   },
   C5: {
     code: "C5",

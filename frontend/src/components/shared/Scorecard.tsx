@@ -8,7 +8,7 @@ interface ScorecardProps {
 }
 
 
-const Scorecard: React.FC<ScorecardProps> = ({ title, score, maxScore = 500, colorClass = "bg-primary" }) => {
+const Scorecard: React.FC<ScorecardProps> = ({ title, score, maxScore = 544, colorClass = "bg-primary" }) => {
     const numericScore = typeof score === 'number' ? score : 0;
     const percentage = maxScore > 0 ? (numericScore / maxScore) * 100 : 0;
 
