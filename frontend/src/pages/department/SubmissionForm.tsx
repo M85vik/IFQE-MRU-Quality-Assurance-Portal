@@ -32,6 +32,13 @@ interface SubCriterionSubmission {
         fileKey: string | null;
         evidenceLinkFileKey: string | null;
         selfAssessedScore?: number;
+        selfAssessedScoreGovt?: number;
+        selfAssessedScoreNonGovt?: number;
+        selfAssessedScoreInstitutional?: number;
+        selfAssessedScoreWorkshopTraining?: number;
+        selfAssessedScoreConferences?: number;
+        selfAssessedScoreSeminar?: number;
+        selfAssessedScoreFDP?: number;
     }[];
 }
 
@@ -200,6 +207,7 @@ const SubmissionForm: React.FC = () => {
                             <Scorecard
                                 title="Total Self-Assessed Score"
                                 score={totalSelfAssessedScore}
+                                maxScore={544}
                                 colorClass="bg-primary"
                             />
                         </div>
