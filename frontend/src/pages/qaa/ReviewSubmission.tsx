@@ -316,21 +316,7 @@ const ReviewSubmission: React.FC = () => {
                                                         </div>
                                                         <div>
                                                             <label className="block text-sm font-medium text-foreground mb-1">Review Score</label>
-                                                          
-                                                            {/* <select
-                                                            className="w-full p-2 border border-input rounded-md bg-card focus:ring-ring focus:border-ring"
-                                                            value={ind.reviewScore ?? ind.selfAssessedScore ?? ''}
-                                                            onChange={(e) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'reviewScore'], e.target.value === '' ? null : Number(e.target.value))}
-                                                        >
-                                                            <option value="">Set score...</option>
-                                                            {[4,3,2,1,0].map(v => <option key={v} value={v}>{v}</option>)}
-                                                        </select> */}
-
-
-                                                            {/* 👇 Place this BEFORE JSX */}
-
-
-                                                       {(() => {
+                                                            {(() => {
                                                                 const maxScore = INDICATOR_MAX_SCORES[ind.indicatorCode] ?? 4;
                                                                 return (
                                                                     <select
@@ -350,7 +336,6 @@ const ReviewSubmission: React.FC = () => {
                                                                     </select>
                                                                 );
                                                             })()}
-
                                                         </div>
                                                     </div>
 

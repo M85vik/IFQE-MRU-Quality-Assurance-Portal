@@ -84,6 +84,7 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
 
   const isCriterion23 = subCriteriaCode === '2.3' || indicator.indicatorCode?.startsWith('2.3.');
   const isCriterion421 = indicator.indicatorCode === '4.2.1';
+  const isNoScoreIndicator = ['3.1.2', '3.1.3', '3.1.5'].includes(indicator.indicatorCode);
 
   const rubricOptions = [
     { value: 4, label: "4 - Excellent" },
@@ -190,7 +191,11 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
             )}
 
             {/* Self Rating */}
-            {isCriterion23 ? (
+            {isNoScoreIndicator ? (
+              <div className="bg-gray-50 border border-gray-200 rounded-md p-3 text-sm text-gray-600">
+                <span className="font-semibold text-gray-700">Self Assessment:</span> Qualitative Metric (No score required)
+              </div>
+            ) : isCriterion23 ? (
               <div className="space-y-4">
                 {/* 1. Govt Rating */}
                 <div>

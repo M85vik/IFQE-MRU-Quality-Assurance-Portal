@@ -330,52 +330,6 @@ const FinalReviewPage: React.FC = () => {
                                                     <p className="text-sm">Reviewer 1 Score: <span className="font-bold">{ind.reviewScore ?? 'N/A'}</span></p>
 
                                                     <div>
-
-
-                                                        {/* <Input
-                                                            id={`finalScore-${ind.indicatorCode}`}
-                                                            label="Final Score (0-4)"
-                                                            type="number"
-                                                            min={0}
-                                                            max={4}
-                                                            step={1}
-                                                            onKeyDown={(e) => e.preventDefault()}
-                                                            value={ind.finalScore ?? ind.reviewScore ?? ''}
-                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'], e.target.value === '' ? null : Number(e.target.value))}
-                                                            disabled={!isEditable || isSubmitting}
-                                                            className={!isEditable ? 'bg-muted' : ''}
-                                                        /> */}
-
-
-
-                                                        {/* <label
-                                                            htmlFor={`finalScore-${ind.indicatorCode}`}
-                                                            className="block text-sm font-medium text-foreground mb-1"
-                                                        >
-                                                            Final Score (0–4)
-                                                        </label>
-                                                        <select
-                                                            id={`finalScore-${ind.indicatorCode}`}
-                                                            value={ind.finalScore ?? ''}
-                                                            onChange={(e) =>
-                                                                handleStateChange(
-                                                                    ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'],
-                                                                    e.target.value === '' ? null : Number(e.target.value)
-                                                                )
-                                                            }
-                                                            disabled={!isEditable || isSubmitting}
-                                                            className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted' : ''}`}
-                                                        >
-                                                            <option value="">Select score</option>
-                                                            {[0, 1, 2, 3, 4].map((score) => (
-                                                                <option key={score} value={score}>
-                                                                    {score}
-                                                                </option>
-                                                            ))}
-                                                        </select> */}
-
-
-
                                                         <label
                                                             htmlFor={`finalScore-${ind.indicatorCode}`}
                                                             className="block text-sm font-medium text-foreground mb-1"

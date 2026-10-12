@@ -384,7 +384,9 @@ const updateSubmission = async (req, res) => {
                                     }
 
                                     // ⭐ Save self score
-                                    if (reqInd.selfAssessedScore !== undefined) {
+                                    if (['3.1.2', '3.1.3', '3.1.5'].includes(latestInd.indicatorCode)) {
+                                        latestInd.selfAssessedScore = null;
+                                    } else if (reqInd.selfAssessedScore !== undefined) {
                                         latestInd.selfAssessedScore = reqInd.selfAssessedScore;
                                     }
                                     if ('selfAssessedScoreGovt' in reqInd) {

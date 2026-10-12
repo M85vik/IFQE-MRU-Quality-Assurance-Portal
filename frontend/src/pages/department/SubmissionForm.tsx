@@ -298,7 +298,7 @@ const SubmissionForm: React.FC = () => {
                                             {openSubCriterion === sc.subCriteriaCode && (
                                                 <div className="border-t border-border">
                                                     {[...sc.indicators].sort((a, b) => a.indicatorCode.localeCompare(b.indicatorCode, undefined, { numeric: true })).map(subInd => {
-                                                        const fullIndicator = indicators.find(i => i.indicatorCode === subInd.indicatorCode);
+                                                        const fullIndicator = indicators.find((i: any) => i.indicatorCode === subInd.indicatorCode);
                                                         if (!fullIndicator) return null;
                                                         return (
                                                             <IndicatorItem
