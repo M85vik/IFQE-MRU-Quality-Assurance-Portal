@@ -5,12 +5,17 @@ import { fetchAllIndicators } from '../services/indicatorService';
 import apiClient from '../api/axiosConfig';
 import toast from 'react-hot-toast';
 
+const NO_SCORE_INDICATORS = ['3.1.2', '3.1.3', '3.1.5'];
+
 const calculateScores = (submission) => {
     let selfAssessedScore = 0;
     let reviewScore = 0;
     submission?.partB?.criteria?.forEach(criterion => {
         criterion.subCriteria?.forEach(sc => {
             sc.indicators?.forEach(ind => {
+                if (NO_SCORE_INDICATORS.includes(ind.indicatorCode)) {
+                    ind.selfAssessedScore = null;
+                }
                 let indSelf = ind.selfAssessedScore;
                 const is23 = sc.subCriteriaCode === '2.3' || ind.indicatorCode?.startsWith('2.3.');
                 if (is23) {
@@ -197,6 +202,7 @@ const useSubmissionStore = create((set, get) => ({
   },
 
   updateIndicatorSelfScore: (criterionCode, subCriteriaCode, indicatorCode, score, category) => {
+    if (NO_SCORE_INDICATORS.includes(indicatorCode)) return;
     set((state) => {
       if (!state.submission) return {};
       const newSubmission = JSON.parse(JSON.stringify(state.submission));
