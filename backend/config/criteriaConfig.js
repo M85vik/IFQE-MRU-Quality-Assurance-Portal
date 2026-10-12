@@ -17,7 +17,7 @@ module.exports = {
     code: "C3",
     name: "Criteria 3: Student Lifecycle & Engagement",
     weightage: 20,
-    maxMarks: 124,
+    maxMarks: 128,
   },
   C4: {
     code: "C4",
