@@ -2488,6 +2488,42 @@ module.exports = [
     }
   },
   {
+    "indicatorCode": "3.7.6",
+    "title": "Graduation outcome - as per convocation, Feb. 2026",
+    "criterionCode": "3",
+    "subCriterionCode": "3.7",
+    "templateFileKey": "templates/3.7.6_Template.xlsx",
+    "requiresEvidenceLink": true,
+    "rubric": {
+      "excellent": {
+        "score": 4,
+        "description": ">=90%"
+      },
+      "veryGood": {
+        "score": 3,
+        "description": "80%-89%"
+      },
+      "satisfactory": {
+        "score": 2,
+        "description": "70%-79%"
+      },
+      "needsImprovement": {
+        "score": 1,
+        "description": "60%-69%"
+      },
+      "notSatisfactory": {
+        "score": 0,
+        "description": "Below 60%"
+      }
+    },
+    "guidelines": {
+      "text": [
+        "1. List of Students graduated as per the Convocation data"
+      ],
+      "formula": "No. of student graduated as per convocation data*100/Sanctioned Intake"
+    }
+  },
+  {
     "indicatorCode": "3.8.1",
     "title": "Percentage of students going for internships/in-house projects as per scheme",
     "criterionCode": "3",
