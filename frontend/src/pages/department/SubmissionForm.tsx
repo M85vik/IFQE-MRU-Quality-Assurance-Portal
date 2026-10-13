@@ -207,7 +207,7 @@ const SubmissionForm: React.FC = () => {
                             <Scorecard
                                 title="Total Self-Assessed Score"
                                 score={totalSelfAssessedScore}
-                                maxScore={548}
+                                maxScore={500}
                                 colorClass="bg-primary"
                             />
                         </div>
