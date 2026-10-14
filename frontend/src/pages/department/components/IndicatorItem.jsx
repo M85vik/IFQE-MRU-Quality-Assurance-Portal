@@ -9,30 +9,6 @@ import RubricViewer from './RubricViewer';
 import GuidelinesViewer from './GuidelinesViewer';
 import Button from '../../../components/shared/Button';
 import toast from 'react-hot-toast';
-import Indicator3103Preview from './Indicator3103Preview';
-import Indicator115Preview from './Indicator115Preview';
-import Indicator116Preview from './Indicator116Preview';
-import Indicator117Preview from './Indicator117Preview';
-import Indicator211Preview from './Indicator211Preview';
-import Indicator212Preview from './Indicator212Preview';
-import Indicator213Preview from './Indicator213Preview';
-import Indicator216Preview from './Indicator216Preview';
-import Indicator311Preview from './Indicator311Preview';
-import Indicator341Preview from './Indicator341Preview';
-import Indicator342Preview from './Indicator342Preview';
-import Indicator343Preview from './Indicator343Preview';
-import Indicator344Preview from './Indicator344Preview';
-import Indicator345Preview from './Indicator345Preview';
-import Indicator351Preview from './Indicator351Preview';
-import Indicator353Preview from './Indicator353Preview';
-import Indicator371Preview from './Indicator371Preview';
-import Indicator381Preview from './Indicator381Preview';
-import Indicator391Preview from './Indicator391Preview';
-import Indicator223Preview from './Indicator223Preview';
-import Indicator231Preview from './Indicator231Preview';
-import Indicator251Preview from './Indicator251Preview';
-import Indicator281Preview from './Indicator281Preview';
-import Indicator282Preview from './Indicator282Preview';
 
 const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, onFileRemove }) => {
   const [isRubricModalOpen, setIsRubricModalOpen] = useState(false);
@@ -106,6 +82,10 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
     }
   };
 
+  const isCriterion23 = subCriteriaCode === '2.3' || indicator.indicatorCode?.startsWith('2.3.');
+  const isCriterion421 = indicator.indicatorCode === '4.2.1';
+  const isNoScoreIndicator = ['3.1.2', '3.1.3', '3.1.5'].includes(indicator.indicatorCode);
+
   const rubricOptions = [
     { value: 4, label: "4 - Excellent" },
     { value: 3, label: "3 - Very Good" },
@@ -158,79 +138,6 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
               )}
             </div>
             
-            {/* Template Summary Analysis Components */}
-            {indicator.indicatorCode === '3.10.3' && submissionIndicator.fileKey && (
-               <Indicator3103Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '1.1.5' && submissionIndicator.fileKey && (
-               <Indicator115Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '1.1.6' && submissionIndicator.fileKey && (
-               <Indicator116Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '1.1.7' && submissionIndicator.fileKey && (
-               <Indicator117Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.1.1' && submissionIndicator.fileKey && (
-               <Indicator211Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.1.2' && submissionIndicator.fileKey && (
-               <Indicator212Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.1.3' && submissionIndicator.fileKey && (
-               <Indicator213Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.1.6' && submissionIndicator.fileKey && (
-               <Indicator216Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.1.1' && submissionIndicator.fileKey && (
-               <Indicator311Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.4.1' && submissionIndicator.fileKey && (
-               <Indicator341Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.4.2' && submissionIndicator.fileKey && (
-               <Indicator342Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.4.3' && submissionIndicator.fileKey && (
-               <Indicator343Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.4.4' && submissionIndicator.fileKey && (
-               <Indicator344Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.4.5' && submissionIndicator.fileKey && (
-               <Indicator345Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.5.1' && submissionIndicator.fileKey && (
-               <Indicator351Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.5.3' && submissionIndicator.fileKey && (
-               <Indicator353Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.7.1' && submissionIndicator.fileKey && (
-               <Indicator371Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.8.1' && submissionIndicator.fileKey && (
-               <Indicator381Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '3.9.1' && submissionIndicator.fileKey && (
-               <Indicator391Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.2.3' && submissionIndicator.fileKey && (
-               <Indicator223Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.3.1' && submissionIndicator.fileKey && (
-               <Indicator231Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.5.1' && submissionIndicator.fileKey && (
-               <Indicator251Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.8.1' && submissionIndicator.fileKey && (
-               <Indicator281Preview fileKey={submissionIndicator.fileKey} />
-            )}
-            {indicator.indicatorCode === '2.8.2' && submissionIndicator.fileKey && (
-               <Indicator282Preview fileKey={submissionIndicator.fileKey} />
-            )}
             
           </div>
 
@@ -252,7 +159,7 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
             </div>
 
             {/* Upload Evidence Documents (Multiple) */}
-            {indicator.requiresEvidenceLink && (
+            {(indicator.requiresEvidenceLink || indicator.indicatorCode === '3.5.2') && (
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   Upload Evidence Documents
@@ -284,32 +191,261 @@ const IndicatorItem = ({ indicator, criterionCode, subCriteriaCode, isDisabled, 
             )}
 
             {/* Self Rating */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1">
-                Self Assessed Rating (0-4)
-              </label>
-              <select
-                className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
-                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                value={submissionIndicator.selfAssessedScore ?? ''}
-                onChange={(e) =>
-                  updateIndicatorSelfScore(
-                    criterionCode,
-                    subCriteriaCode,
-                    indicator.indicatorCode,
-                    e.target.value
-                  )
-                }
-                disabled={isDisabled}
-              >
-                <option value="" disabled className="text-gray-500 font-semibold">
-                  -- Select a score --
-                </option>
-                {rubricOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
+            {isNoScoreIndicator ? (
+              <div className="bg-gray-50 border border-gray-200 rounded-md p-3 text-sm text-gray-600">
+                <span className="font-semibold text-gray-700">Self Assessment:</span> Qualitative Metric (No score required)
+              </div>
+            ) : isCriterion23 ? (
+              <div className="space-y-4">
+                {/* 1. Govt Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Govt
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreGovt ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'govt'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 2. Non-Govt / Industry Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Non govt/Industry
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreNonGovt ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'nonGovt'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 3. Institutional Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Institutional
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreInstitutional ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'institutional'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Total indicator score badge */}
+                <div className="flex items-center justify-between text-xs font-semibold text-gray-700 bg-blue-50 px-3 py-2 rounded-md border border-blue-200">
+                  <span>Total Indicator Score:</span>
+                  <span className="text-sm font-bold text-blue-700">
+                    {(submissionIndicator.selfAssessedScoreGovt ?? 0) + (submissionIndicator.selfAssessedScoreNonGovt ?? 0) + (submissionIndicator.selfAssessedScoreInstitutional ?? 0)} / 12
+                  </span>
+                </div>
+              </div>
+            ) : isCriterion421 ? (
+              <div className="space-y-4">
+                {/* 1. Workshop / Training Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Workshop / Training
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreWorkshopTraining ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'workshopTraining'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 2. Conferences Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Conferences
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreConferences ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'conferences'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 3. Seminar Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - Seminar
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreSeminar ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'seminar'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 4. FDP Organized Rating */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-1">
+                    Self Assessment Rating (0-4) - FDP Organized
+                  </label>
+                  <select
+                    className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    value={submissionIndicator.selfAssessedScoreFDP ?? ''}
+                    onChange={(e) =>
+                      updateIndicatorSelfScore(
+                        criterionCode,
+                        subCriteriaCode,
+                        indicator.indicatorCode,
+                        e.target.value,
+                        'fdp'
+                      )
+                    }
+                    disabled={isDisabled}
+                  >
+                    <option value="" disabled className="text-gray-500 font-semibold">
+                      -- Select a score --
+                    </option>
+                    {rubricOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Total indicator score badge */}
+                <div className="flex items-center justify-between text-xs font-semibold text-gray-700 bg-blue-50 px-3 py-2 rounded-md border border-blue-200">
+                  <span>Total Indicator Score:</span>
+                  <span className="text-sm font-bold text-blue-700">
+                    {(submissionIndicator.selfAssessedScoreWorkshopTraining ?? 0) + (submissionIndicator.selfAssessedScoreConferences ?? 0) + (submissionIndicator.selfAssessedScoreSeminar ?? 0) + (submissionIndicator.selfAssessedScoreFDP ?? 0)} / 16
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                  Self Assessed Rating (0-4)
+                </label>
+                <select
+                  className="w-full p-2 border border-blue-400 rounded-md shadow-sm text-gray-900 bg-gray-50 
+                    focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  value={submissionIndicator.selfAssessedScore ?? ''}
+                  onChange={(e) =>
+                    updateIndicatorSelfScore(
+                      criterionCode,
+                      subCriteriaCode,
+                      indicator.indicatorCode,
+                      e.target.value
+                    )
+                  }
+                  disabled={isDisabled}
+                >
+                  <option value="" disabled className="text-gray-500 font-semibold">
+                    -- Select a score --
+                  </option>
+                  {rubricOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
 import FileUploader from '../../components/shared/FileUploader';
-import { Save, Send, FileText, Download, ChevronDown, CheckCircle2, Loader2 } from 'lucide-react';
+import { Save, Send, FileText, Download, ChevronDown } from 'lucide-react';
 import Modal from '../../components/shared/Modal';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Scorecard from '../../components/shared/Scorecard';
@@ -32,6 +32,13 @@ interface SubCriterionSubmission {
         fileKey: string | null;
         evidenceLinkFileKey: string | null;
         selfAssessedScore?: number;
+        selfAssessedScoreGovt?: number;
+        selfAssessedScoreNonGovt?: number;
+        selfAssessedScoreInstitutional?: number;
+        selfAssessedScoreWorkshopTraining?: number;
+        selfAssessedScoreConferences?: number;
+        selfAssessedScoreSeminar?: number;
+        selfAssessedScoreFDP?: number;
     }[];
 }
 
@@ -87,8 +94,6 @@ const SubmissionForm: React.FC = () => {
         indicators,
         totalSelfAssessedScore,
         isLoading,
-        isAutoSaving,
-        lastSavedAt,
         error,
         initializeForm,
         reset,
@@ -195,24 +200,14 @@ const SubmissionForm: React.FC = () => {
                 <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
                     <div>
                         <h1 className="text-3xl font-bold text-foreground">{submission.title || `IFQE Submission: ${submission.academicYear}`}</h1>
-                        <div className="flex items-center gap-3 mt-1">
-                            <p className="text-slate-900">Status: <span className="font-semibold">{submission.status}</span></p>
-                            {isAutoSaving ? (
-                                <span className="inline-flex items-center gap-1.5 text-xs text-blue-700 font-medium bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200 animate-pulse">
-                                    <Loader2 size={13} className="animate-spin text-blue-600" /> Saving changes...
-                                </span>
-                            ) : lastSavedAt ? (
-                                <span className="inline-flex items-center gap-1.5 text-xs text-green-700 font-medium bg-green-50 px-2.5 py-1 rounded-full border border-green-200" title={`All changes saved at ${new Date(lastSavedAt).toLocaleTimeString()}`}>
-                                    <CheckCircle2 size={13} className="text-green-600" /> All changes auto-saved
-                                </span>
-                            ) : null}
-                        </div>
+                        <p className="text-slate-900 mt-1">Status: <span className="font-semibold">{submission.status}</span></p>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="w-5xl">
                             <Scorecard
                                 title="Total Self-Assessed Score"
                                 score={totalSelfAssessedScore}
+                                maxScore={500}
                                 colorClass="bg-primary"
                             />
                         </div>
@@ -303,7 +298,7 @@ const SubmissionForm: React.FC = () => {
                                             {openSubCriterion === sc.subCriteriaCode && (
                                                 <div className="border-t border-border">
                                                     {[...sc.indicators].sort((a, b) => a.indicatorCode.localeCompare(b.indicatorCode, undefined, { numeric: true })).map(subInd => {
-                                                        const fullIndicator = indicators.find(i => i.indicatorCode === subInd.indicatorCode);
+                                                        const fullIndicator = indicators.find((i: any) => i.indicatorCode === subInd.indicatorCode);
                                                         if (!fullIndicator) return null;
                                                         return (
                                                             <IndicatorItem

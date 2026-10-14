@@ -16,6 +16,13 @@ interface Indicator {
     evidenceLinkFileKey?: string;
     evidenceFileKeys?: string[];
     selfAssessedScore?: number;
+    selfAssessedScoreGovt?: number;
+    selfAssessedScoreNonGovt?: number;
+    selfAssessedScoreInstitutional?: number;
+    selfAssessedScoreWorkshopTraining?: number;
+    selfAssessedScoreConferences?: number;
+    selfAssessedScoreSeminar?: number;
+    selfAssessedScoreFDP?: number;
     reviewScore?: number;
     reviewRemark?: string;
 }
@@ -63,7 +70,11 @@ const SaveStatusIndicator = ({ status }: { status: 'idle' | 'saving' | 'saved' |
 
 // Indicators that are NOT out of 4
 const INDICATOR_MAX_SCORES: Record<string, number> = {
-  
+  '2.3.1': 12,
+  '2.3.2': 12,
+  '2.3.3': 12,
+  '2.3.4': 12,
+  '4.2.1': 16,
 };
 
 
@@ -292,24 +303,20 @@ const ReviewSubmission: React.FC = () => {
                                                         <div className="text-center">
                                                             <label className="block text-xs font-medium text-muted-foreground">Dept. Score</label>
                                                             <p className="text-2xl font-bold text-foreground">{ind.selfAssessedScore ?? 'N/A'}</p>
+                                                            {ind.indicatorCode?.startsWith('2.3.') && (ind.selfAssessedScoreGovt != null || ind.selfAssessedScoreNonGovt != null || ind.selfAssessedScoreInstitutional != null) && (
+                                                                <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+                                                                    Govt: {ind.selfAssessedScoreGovt ?? '-'} | Non-Govt: {ind.selfAssessedScoreNonGovt ?? '-'} | Inst: {ind.selfAssessedScoreInstitutional ?? '-'}
+                                                                </p>
+                                                            )}
+                                                            {ind.indicatorCode === '4.2.1' && (ind.selfAssessedScoreWorkshopTraining != null || ind.selfAssessedScoreConferences != null || ind.selfAssessedScoreSeminar != null || ind.selfAssessedScoreFDP != null) && (
+                                                                <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+                                                                    W/T: {ind.selfAssessedScoreWorkshopTraining ?? '-'} | Conf: {ind.selfAssessedScoreConferences ?? '-'} | Sem: {ind.selfAssessedScoreSeminar ?? '-'} | FDP: {ind.selfAssessedScoreFDP ?? '-'}
+                                                                </p>
+                                                            )}
                                                         </div>
                                                         <div>
                                                             <label className="block text-sm font-medium text-foreground mb-1">Review Score</label>
-                                                          
-                                                            {/* <select
-                                                            className="w-full p-2 border border-input rounded-md bg-card focus:ring-ring focus:border-ring"
-                                                            value={ind.reviewScore ?? ind.selfAssessedScore ?? ''}
-                                                            onChange={(e) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'reviewScore'], e.target.value === '' ? null : Number(e.target.value))}
-                                                        >
-                                                            <option value="">Set score...</option>
-                                                            {[4,3,2,1,0].map(v => <option key={v} value={v}>{v}</option>)}
-                                                        </select> */}
-
-
-                                                            {/* 👇 Place this BEFORE JSX */}
-
-
-                                                       {(() => {
+                                                            {(() => {
                                                                 const maxScore = INDICATOR_MAX_SCORES[ind.indicatorCode] ?? 4;
                                                                 return (
                                                                     <select
@@ -329,7 +336,6 @@ const ReviewSubmission: React.FC = () => {
                                                                     </select>
                                                                 );
                                                             })()}
-
                                                         </div>
                                                     </div>
 

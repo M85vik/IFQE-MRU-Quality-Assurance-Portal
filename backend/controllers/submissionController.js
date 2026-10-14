@@ -384,8 +384,31 @@ const updateSubmission = async (req, res) => {
                                     }
 
                                     // ⭐ Save self score
-                                    if (reqInd.selfAssessedScore !== undefined && reqInd.selfAssessedScore !== null) {
+                                    if (['3.1.2', '3.1.3', '3.1.5'].includes(latestInd.indicatorCode)) {
+                                        latestInd.selfAssessedScore = null;
+                                    } else if (reqInd.selfAssessedScore !== undefined) {
                                         latestInd.selfAssessedScore = reqInd.selfAssessedScore;
+                                    }
+                                    if ('selfAssessedScoreGovt' in reqInd) {
+                                        latestInd.selfAssessedScoreGovt = reqInd.selfAssessedScoreGovt;
+                                    }
+                                    if ('selfAssessedScoreNonGovt' in reqInd) {
+                                        latestInd.selfAssessedScoreNonGovt = reqInd.selfAssessedScoreNonGovt;
+                                    }
+                                    if ('selfAssessedScoreInstitutional' in reqInd) {
+                                        latestInd.selfAssessedScoreInstitutional = reqInd.selfAssessedScoreInstitutional;
+                                    }
+                                    if ('selfAssessedScoreWorkshopTraining' in reqInd) {
+                                        latestInd.selfAssessedScoreWorkshopTraining = reqInd.selfAssessedScoreWorkshopTraining;
+                                    }
+                                    if ('selfAssessedScoreConferences' in reqInd) {
+                                        latestInd.selfAssessedScoreConferences = reqInd.selfAssessedScoreConferences;
+                                    }
+                                    if ('selfAssessedScoreSeminar' in reqInd) {
+                                        latestInd.selfAssessedScoreSeminar = reqInd.selfAssessedScoreSeminar;
+                                    }
+                                    if ('selfAssessedScoreFDP' in reqInd) {
+                                        latestInd.selfAssessedScoreFDP = reqInd.selfAssessedScoreFDP;
                                     }
                                 }
                             }

@@ -5,16 +5,46 @@ import { fetchAllIndicators } from '../services/indicatorService';
 import apiClient from '../api/axiosConfig';
 import toast from 'react-hot-toast';
 
+const NO_SCORE_INDICATORS = ['3.1.2', '3.1.3', '3.1.5'];
+
 const calculateScores = (submission) => {
     let selfAssessedScore = 0;
     let reviewScore = 0;
     submission?.partB?.criteria?.forEach(criterion => {
         criterion.subCriteria?.forEach(sc => {
             sc.indicators?.forEach(ind => {
-                if (typeof ind.selfAssessedScore === 'number') {
-                    selfAssessedScore += ind.selfAssessedScore;
+                if (NO_SCORE_INDICATORS.includes(ind.indicatorCode)) {
+                    ind.selfAssessedScore = null;
                 }
-                const scoreToUse = typeof ind.reviewScore === 'number' ? ind.reviewScore : ind.selfAssessedScore;
+                let indSelf = ind.selfAssessedScore;
+                const is23 = sc.subCriteriaCode === '2.3' || ind.indicatorCode?.startsWith('2.3.');
+                if (is23) {
+                    const hasBreakdown = ind.selfAssessedScoreGovt !== undefined || 
+                                         ind.selfAssessedScoreNonGovt !== undefined || 
+                                         ind.selfAssessedScoreInstitutional !== undefined;
+                    if (hasBreakdown) {
+                        indSelf = (ind.selfAssessedScoreGovt ?? 0) + 
+                                  (ind.selfAssessedScoreNonGovt ?? 0) + 
+                                  (ind.selfAssessedScoreInstitutional ?? 0);
+                        ind.selfAssessedScore = indSelf;
+                    }
+                } else if (ind.indicatorCode === '4.2.1') {
+                    const has421Breakdown = ind.selfAssessedScoreWorkshopTraining !== undefined ||
+                                            ind.selfAssessedScoreConferences !== undefined ||
+                                            ind.selfAssessedScoreSeminar !== undefined ||
+                                            ind.selfAssessedScoreFDP !== undefined;
+                    if (has421Breakdown) {
+                        indSelf = (ind.selfAssessedScoreWorkshopTraining ?? 0) +
+                                  (ind.selfAssessedScoreConferences ?? 0) +
+                                  (ind.selfAssessedScoreSeminar ?? 0) +
+                                  (ind.selfAssessedScoreFDP ?? 0);
+                        ind.selfAssessedScore = indSelf;
+                    }
+                }
+                if (typeof indSelf === 'number') {
+                    selfAssessedScore += indSelf;
+                }
+                const scoreToUse = typeof ind.reviewScore === 'number' ? ind.reviewScore : indSelf;
                 if (typeof scoreToUse === 'number') {
                     reviewScore += scoreToUse;
                 }
@@ -171,7 +201,8 @@ const useSubmissionStore = create((set, get) => ({
     });
   },
 
-  updateIndicatorSelfScore: (criterionCode, subCriteriaCode, indicatorCode, score) => {
+  updateIndicatorSelfScore: (criterionCode, subCriteriaCode, indicatorCode, score, category) => {
+    if (NO_SCORE_INDICATORS.includes(indicatorCode)) return;
     set((state) => {
       if (!state.submission) return {};
       const newSubmission = JSON.parse(JSON.stringify(state.submission));
@@ -181,7 +212,48 @@ const useSubmissionStore = create((set, get) => ({
           .find(i => i.indicatorCode === indicatorCode);
       if (indicator) {
         const newScore = parseInt(score, 10);
-        indicator.selfAssessedScore = isNaN(newScore) ? undefined : newScore;
+        const parsedScore = isNaN(newScore) ? undefined : newScore;
+
+        if (category === 'govt') {
+          indicator.selfAssessedScoreGovt = parsedScore;
+        } else if (category === 'nonGovt') {
+          indicator.selfAssessedScoreNonGovt = parsedScore;
+        } else if (category === 'institutional') {
+          indicator.selfAssessedScoreInstitutional = parsedScore;
+        } else if (category === 'workshopTraining') {
+          indicator.selfAssessedScoreWorkshopTraining = parsedScore;
+        } else if (category === 'conferences') {
+          indicator.selfAssessedScoreConferences = parsedScore;
+        } else if (category === 'seminar') {
+          indicator.selfAssessedScoreSeminar = parsedScore;
+        } else if (category === 'fdp') {
+          indicator.selfAssessedScoreFDP = parsedScore;
+        } else {
+          indicator.selfAssessedScore = parsedScore;
+        }
+
+        const is23 = subCriteriaCode === '2.3' || indicator.indicatorCode?.startsWith('2.3.');
+        const is421 = indicator.indicatorCode === '4.2.1';
+        if (is23) {
+          const g = indicator.selfAssessedScoreGovt;
+          const ng = indicator.selfAssessedScoreNonGovt;
+          const inst = indicator.selfAssessedScoreInstitutional;
+          if (g !== undefined || ng !== undefined || inst !== undefined) {
+            indicator.selfAssessedScore = (g ?? 0) + (ng ?? 0) + (inst ?? 0);
+          } else {
+            indicator.selfAssessedScore = undefined;
+          }
+        } else if (is421) {
+          const wt = indicator.selfAssessedScoreWorkshopTraining;
+          const conf = indicator.selfAssessedScoreConferences;
+          const sem = indicator.selfAssessedScoreSeminar;
+          const fdp = indicator.selfAssessedScoreFDP;
+          if (wt !== undefined || conf !== undefined || sem !== undefined || fdp !== undefined) {
+            indicator.selfAssessedScore = (wt ?? 0) + (conf ?? 0) + (sem ?? 0) + (fdp ?? 0);
+          } else {
+            indicator.selfAssessedScore = undefined;
+          }
+        }
       }
       const scores = calculateScores(newSubmission);
       return { 

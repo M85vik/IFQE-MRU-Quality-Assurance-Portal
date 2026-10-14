@@ -501,30 +501,28 @@ module.exports = [
     "rubric": {
       "excellent": {
         "score": 4,
-        "description": ">=4.5"
+        "description": "Course File Score from Teaching Quality Score>=4.5"
       },
       "veryGood": {
         "score": 3,
-        "description": ">=4"
+        "description": "Course File Score from Teaching Quality Score>=4"
       },
       "satisfactory": {
         "score": 2,
-        "description": ">=3.5"
+        "description": "Course File Score from Teaching Quality Score>=3.5"
       },
       "needsImprovement": {
         "score": 1,
-        "description": ">=3"
+        "description": "Course File Score from Teaching Quality Score>=3"
       },
       "notSatisfactory": {
         "score": 0,
-        "description": "<3"
+        "description": "Course File Score from Teaching Quality Score<3"
       }
     },
     "guidelines": {
       "text": [
-        "1.Course Files",
-        "2.CAPs approved in BoS",
-        "3.Average course file score from TQS"
+        "1.Average course file score from TQS"
       ]
     }
   },
@@ -871,10 +869,9 @@ module.exports = [
     },
     "guidelines": {
       "text": [
-        " 1.Google Scholar citation to be mentioned in Data template 4.1",
-        " 2.Citation value of school plus H-Index of the school, sourced through IRNS"
+        " IRINS citation to be mentioned in Data template 4.1"
       ],
-      "formula": " Citation value of school plus H-Index of the school, sourced through IRNS/ Total number of paper"
+      "formula": "Total number of citations for the school/ Total number of paper"
     }
   },
   {
@@ -2192,6 +2189,7 @@ module.exports = [
     "criterionCode": "3",
     "subCriterionCode": "3.5",
     "templateFileKey": "templates/3.5.2_Template.xlsx",
+    "requiresEvidenceLink": true,
     "rubric": {
       "excellent": {
         "score": 4,
@@ -2490,6 +2488,42 @@ module.exports = [
     }
   },
   {
+    "indicatorCode": "3.7.6",
+    "title": "Graduation outcome - as per convocation, Feb. 2026",
+    "criterionCode": "3",
+    "subCriterionCode": "3.7",
+    "templateFileKey": "templates/3.7.6_Template.xlsx",
+    "requiresEvidenceLink": true,
+    "rubric": {
+      "excellent": {
+        "score": 4,
+        "description": ">=90%"
+      },
+      "veryGood": {
+        "score": 3,
+        "description": "80%-89%"
+      },
+      "satisfactory": {
+        "score": 2,
+        "description": "70%-79%"
+      },
+      "needsImprovement": {
+        "score": 1,
+        "description": "60%-69%"
+      },
+      "notSatisfactory": {
+        "score": 0,
+        "description": "Below 60%"
+      }
+    },
+    "guidelines": {
+      "text": [
+        "1. List of Students graduated as per the Convocation data"
+      ],
+      "formula": "No. of student graduated as per convocation data*100/Sanctioned Intake"
+    }
+  },
+  {
     "indicatorCode": "3.8.1",
     "title": "Percentage of students going for internships/in-house projects as per scheme",
     "criterionCode": "3",
@@ -2758,19 +2792,19 @@ module.exports = [
     "rubric": {
       "excellent": {
         "score": 4,
-        "description": "10 (≥7)"
+        "description": ">=10 (≥7)"
       },
       "veryGood": {
         "score": 3,
-        "description": "8 (≥5)"
+        "description": "8-10 (≥5)"
       },
       "satisfactory": {
         "score": 2,
-        "description": "6 (≥3)"
+        "description": "5-7 (≥3)"
       },
       "needsImprovement": {
         "score": 1,
-        "description": "4 (≥1)"
+        "description": "2-4 (≥1)"
       },
       "notSatisfactory": {
         "score": 0,
@@ -3422,9 +3456,11 @@ module.exports = [
         " 1.Lab/MOOT Court Manuals & SOPs",
         " 2.Maintenance & Servicing Records",
         " 3.Audit & Inspection Reports",
-        " 4.Updated Notice Boards",
-        " 5.Maintained ambience hygiene of the school ",
-        " 6.Fire Safety and & Emergency Equipment Records"
+        " 4.Lab Manuals",
+        " 5.Lab Evaluation Sheets",
+        " 6.Updated Notice Boards",
+        " 7.Maintained ambience and hygiene of the school",
+        " 8.Fire Safety & Emergency Equipment Records"
       ]
     },
     "templateFileKey": "templates/5.2_Template.xlsx"

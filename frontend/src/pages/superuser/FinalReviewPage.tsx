@@ -16,6 +16,13 @@ interface Indicator {
     evidenceLinkFileKey?: string;
     evidenceFileKeys?: string[];
     selfAssessedScore?: number;
+    selfAssessedScoreGovt?: number;
+    selfAssessedScoreNonGovt?: number;
+    selfAssessedScoreInstitutional?: number;
+    selfAssessedScoreWorkshopTraining?: number;
+    selfAssessedScoreConferences?: number;
+    selfAssessedScoreSeminar?: number;
+    selfAssessedScoreFDP?: number;
     reviewScore?: number;
     reviewRemark?: string;
     finalScore?: number;
@@ -61,8 +68,11 @@ interface Submission {
 
 // Indicators that are NOT out of 4
 const INDICATOR_MAX_SCORES: Record<string, number> = {
-
-
+  '2.3.1': 12,
+  '2.3.2': 12,
+  '2.3.3': 12,
+  '2.3.4': 12,
+  '4.2.1': 16,
 };
 
 
@@ -307,55 +317,19 @@ const FinalReviewPage: React.FC = () => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                 <div className="space-y-3">
                                                     <p className="text-sm">Self-Assessed: <span className="font-bold">{ind.selfAssessedScore ?? 'N/A'}</span></p>
+                                                    {ind.indicatorCode?.startsWith('2.3.') && (ind.selfAssessedScoreGovt != null || ind.selfAssessedScoreNonGovt != null || ind.selfAssessedScoreInstitutional != null) && (
+                                                        <p className="text-xs text-muted-foreground">
+                                                            (Govt: {ind.selfAssessedScoreGovt ?? '-'}, Non-Govt: {ind.selfAssessedScoreNonGovt ?? '-'}, Inst: {ind.selfAssessedScoreInstitutional ?? '-'})
+                                                        </p>
+                                                    )}
+                                                    {ind.indicatorCode === '4.2.1' && (ind.selfAssessedScoreWorkshopTraining != null || ind.selfAssessedScoreConferences != null || ind.selfAssessedScoreSeminar != null || ind.selfAssessedScoreFDP != null) && (
+                                                        <p className="text-xs text-muted-foreground">
+                                                            (Workshop/Training: {ind.selfAssessedScoreWorkshopTraining ?? '-'}, Conf: {ind.selfAssessedScoreConferences ?? '-'}, Sem: {ind.selfAssessedScoreSeminar ?? '-'}, FDP: {ind.selfAssessedScoreFDP ?? '-'})
+                                                        </p>
+                                                    )}
                                                     <p className="text-sm">Reviewer 1 Score: <span className="font-bold">{ind.reviewScore ?? 'N/A'}</span></p>
 
                                                     <div>
-
-
-                                                        {/* <Input
-                                                            id={`finalScore-${ind.indicatorCode}`}
-                                                            label="Final Score (0-4)"
-                                                            type="number"
-                                                            min={0}
-                                                            max={4}
-                                                            step={1}
-                                                            onKeyDown={(e) => e.preventDefault()}
-                                                            value={ind.finalScore ?? ind.reviewScore ?? ''}
-                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'], e.target.value === '' ? null : Number(e.target.value))}
-                                                            disabled={!isEditable || isSubmitting}
-                                                            className={!isEditable ? 'bg-muted' : ''}
-                                                        /> */}
-
-
-
-                                                        {/* <label
-                                                            htmlFor={`finalScore-${ind.indicatorCode}`}
-                                                            className="block text-sm font-medium text-foreground mb-1"
-                                                        >
-                                                            Final Score (0–4)
-                                                        </label>
-                                                        <select
-                                                            id={`finalScore-${ind.indicatorCode}`}
-                                                            value={ind.finalScore ?? ''}
-                                                            onChange={(e) =>
-                                                                handleStateChange(
-                                                                    ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'],
-                                                                    e.target.value === '' ? null : Number(e.target.value)
-                                                                )
-                                                            }
-                                                            disabled={!isEditable || isSubmitting}
-                                                            className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted' : ''}`}
-                                                        >
-                                                            <option value="">Select score</option>
-                                                            {[0, 1, 2, 3, 4].map((score) => (
-                                                                <option key={score} value={score}>
-                                                                    {score}
-                                                                </option>
-                                                            ))}
-                                                        </select> */}
-
-
-
                                                         <label
                                                             htmlFor={`finalScore-${ind.indicatorCode}`}
                                                             className="block text-sm font-medium text-foreground mb-1"
