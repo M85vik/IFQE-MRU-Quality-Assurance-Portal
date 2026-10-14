@@ -208,9 +208,15 @@ const createSubmission = async (req, res) => {
     });
 
     // Convert the Maps back into nested arrays for the final schema structure.
+    // Apply natural numeric sorting so subcriteria like 3.10 come after 3.9, not after 3.1.
+    // NOTE: This only affects NEW submissions. Existing submissions in the DB are NOT touched.
+    const naturalSort = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
     const finalPartB = Array.from(criteriaMap.values()).map(crit => ({
         ...crit,
-        subCriteria: Array.from(crit.subCriteria.values()),
+        subCriteria: Array.from(crit.subCriteria.values()).sort((a, b) => naturalSort(a.subCriteriaCode, b.subCriteriaCode)).map(sc => ({
+            ...sc,
+            indicators: sc.indicators.sort((a, b) => naturalSort(a.indicatorCode, b.indicatorCode)),
+        })),
     }));
 
     // Define the default structure for Part A.

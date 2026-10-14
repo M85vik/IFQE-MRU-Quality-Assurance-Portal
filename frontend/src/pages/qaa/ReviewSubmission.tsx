@@ -5,9 +5,10 @@ import Spinner from '../../components/shared/Spinner';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
-import { Download, FileText, MessageSquare, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Download, FileText, MessageSquare, CheckCircle, AlertTriangle, Eye } from 'lucide-react';
 import apiClient from '../../api/axiosConfig';
 import toast from 'react-hot-toast';
+import FilePreviewModal from '../../components/shared/FilePreviewModal';
 
 interface Indicator {
     indicatorCode: string;
@@ -77,15 +78,37 @@ const INDICATOR_MAX_SCORES: Record<string, number> = {
   '4.2.1': 16,
 };
 
+/**
+ * Natural numeric sort comparator for codes like "3.1", "3.2", ..., "3.10".
+ * Uses localeCompare with numeric option so "3.10" comes after "3.9" (not after "3.1").
+ * This is display-only — it does NOT modify the stored data.
+ */
+const naturalCodeCompare = (a: string, b: string): number =>
+    a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
+/** Calculate criteria-wise scores (dept claimed + reviewer awarded). Pure function, no side-effects. */
+const calcCriterionScores = (criterion: Criterion) => {
+    let deptTotal = 0;
+    let reviewTotal = 0;
+    criterion.subCriteria.forEach(sc => {
+        sc.indicators.forEach(ind => {
+            if (typeof ind.selfAssessedScore === 'number') deptTotal += ind.selfAssessedScore;
+            const rScore = typeof ind.reviewScore === 'number' ? ind.reviewScore : ind.selfAssessedScore;
+            if (typeof rScore === 'number') reviewTotal += rScore;
+        });
+    });
+    return { deptTotal, reviewTotal };
+};
+
 
 const ReviewSubmission: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    // const { downloadFile, isDownloading } = useSecureDownloader();
-     const { downloadFile} = useSecureDownloader(); //not using global downloading state 
-    
-     const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
+    const { downloadFile } = useSecureDownloader();
+    const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
+    const [previewFileKey, setPreviewFileKey] = useState<string | null>(null);
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
     const [submission, setSubmission] = useState<Submission | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -189,8 +212,6 @@ const ReviewSubmission: React.FC = () => {
 
     const handleDownload = async (key?: string) => {
     if (!key || downloadingKey) return;
-
-
     try {
         setDownloadingKey(key);
         await downloadFile(key);
@@ -198,6 +219,12 @@ const ReviewSubmission: React.FC = () => {
         setDownloadingKey(null);
     }
 };
+
+    const handleView = (key?: string) => {
+        if (!key) return;
+        setPreviewFileKey(key);
+        setIsPreviewModalOpen(true);
+    };
 
     // ✅ runs only after confirm dialog "Yes"
     const confirmSendForApproval = async () => {
@@ -224,6 +251,15 @@ const ReviewSubmission: React.FC = () => {
     if (error) return <Alert message={error} type="error" />;
     if (!submission) return <Alert message="Submission data not found." />;
 
+    // Calculate overall totals for the sticky header (safe: read-only computation)
+    const overallScores = submission.partB.criteria.reduce(
+        (acc, crit) => {
+            const s = calcCriterionScores(crit);
+            return { deptTotal: acc.deptTotal + s.deptTotal, reviewTotal: acc.reviewTotal + s.reviewTotal };
+        },
+        { deptTotal: 0, reviewTotal: 0 }
+    );
+
     return (
         <>
             <div className="space-y-6">
@@ -233,6 +269,17 @@ const ReviewSubmission: React.FC = () => {
                         <p className="text-muted-foreground">Status: <span className="font-semibold">{submission.status}</span></p>
                     </div>
                     <div className="flex items-center gap-4">
+                        {/* Score Summary Chips */}
+                        <div className="flex gap-2">
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5 text-center">
+                                <p className="text-[10px] uppercase tracking-wide text-blue-600 font-semibold">Dept. Claimed</p>
+                                <p className="text-lg font-bold text-blue-800">{overallScores.deptTotal}</p>
+                            </div>
+                            <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-1.5 text-center">
+                                <p className="text-[10px] uppercase tracking-wide text-green-600 font-semibold">Reviewer Total</p>
+                                <p className="text-lg font-bold text-green-800">{overallScores.reviewTotal}</p>
+                            </div>
+                        </div>
                         <SaveStatusIndicator status={saveStatus} />
                         <Button onClick={handleSendForApproval} isLoading={isSubmitting}   className='border border-white'>Send for Final Approval</Button>
                     </div>
@@ -242,58 +289,78 @@ const ReviewSubmission: React.FC = () => {
                     <div className="p-4 border-b border-border">
                         <h2 className="text-xl font-bold text-foreground flex items-center"><FileText size={22} className="mr-3 text-muted-foreground" /> Part A: Executive Summary</h2>
                     </div>
-                    <div className="p-4">
+                    <div className="p-4 flex flex-wrap gap-2">
                         {submission.partA.summaryFileKey ? (
-                            <Button onClick={() => handleDownload(submission.partA.summaryFileKey)} variant="secondary" 
-                            
-                            isLoading={downloadingKey===submission.partA.summaryFileKey}>
-                                <Download size={16} className="mr-2" /> View Summary Document
-                            </Button>
+                            <>
+                                <Button onClick={() => handleView(submission.partA.summaryFileKey)} variant="secondary">
+                                    <Eye size={16} className="mr-2" /> View Summary
+                                </Button>
+                                <Button onClick={() => handleDownload(submission.partA.summaryFileKey)} variant="outline"
+                                    isLoading={downloadingKey===submission.partA.summaryFileKey}>
+                                    <Download size={16} className="mr-2" /> Download Summary
+                                </Button>
+                            </>
                         ) : (
                             <span className="text-sm text-muted-foreground italic">No summary document submitted</span>
                         )}
                     </div>
                 </div>
 
-                {submission.partB.criteria.map((criterion, critIndex) => (
+                {submission.partB.criteria.map((criterion, critIndex) => {
+                    const critScores = calcCriterionScores(criterion);
+                    return (
                     <div key={criterion.criteriaCode} className="bg-card rounded-lg shadow-sm border border-border">
-                        <div className="p-4 border-b border-border">
+                        <div className="p-4 border-b border-border flex flex-wrap justify-between items-center gap-2">
                             <h2 className="text-xl font-bold text-foreground">Criterion {criterion.criteriaCode}: {criterion.title}</h2>
+                            <div className="flex gap-3 text-sm">
+                                <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium border border-blue-200">Dept: {critScores.deptTotal}</span>
+                                <span className="bg-green-50 text-green-700 px-2.5 py-1 rounded-full font-medium border border-green-200">Review: {critScores.reviewTotal}</span>
+                            </div>
                         </div>
 
-                        {criterion.subCriteria.map((sc, scIndex) => (
+                        {/* Sort subcriteria naturally for display: 3.1, 3.2, ..., 3.9, 3.10 (not 3.1, 3.10, 3.2...) */}
+                        {[...criterion.subCriteria]
+                            .sort((a, b) => naturalCodeCompare(a.subCriteriaCode, b.subCriteriaCode))
+                            .map((sc) => {
+                            // Find original index for handleStateChange path (so saved data goes to correct position)
+                            const scIndex = criterion.subCriteria.findIndex(s => s.subCriteriaCode === sc.subCriteriaCode);
+                            return (
                             <div key={sc.subCriteriaCode} className="border-t border-border">
                                 <h3 className="text-lg font-semibold bg-secondary p-3 text-secondary-foreground">{sc.subCriteriaCode}: {sc.title}</h3>
                                 <div className="p-4">
                                     <div className="divide-y divide-border">
-                                        {sc.indicators.map((ind, indIndex) => (
+                                        {[...sc.indicators]
+                                            .sort((a, b) => naturalCodeCompare(a.indicatorCode, b.indicatorCode))
+                                            .map((ind) => {
+                                            // Find original index for handleStateChange path
+                                            const indIndex = sc.indicators.findIndex(i => i.indicatorCode === ind.indicatorCode);
+                                            return (
                                             <div key={ind.indicatorCode} className="py-4">
                                                 <p className="text-sm font-semibold text-foreground mb-2">{ind.indicatorCode}: {ind.title}</p>
                                                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                                                    {ind.fileKey && <Button
-                                                    
-                                                    onClick={() => handleDownload(ind.fileKey)} size="sm" variant="outline" 
-
-                                                    isLoading={downloadingKey===ind.fileKey}
-                                                    
-                                                    >View Main Doc</Button>}
-                                                    {ind.evidenceLinkFileKey && <Button 
-                                                    
-                                                    onClick={() => handleDownload(ind.evidenceLinkFileKey)} 
-                                                    
-                                                    size="sm" variant="outline" 
-                                                    
-                                                    isLoading={downloadingKey===ind.evidenceLinkFileKey}>View Evidence Doc</Button>}
+                                                    {/* View + Download dual buttons for all document types */}
+                                                    {ind.fileKey && <>
+                                                        <Button onClick={() => handleView(ind.fileKey)} size="sm" variant="outline">
+                                                            <Eye size={14} className="mr-1" />View Main Doc</Button>
+                                                        <Button onClick={() => handleDownload(ind.fileKey)} size="sm" variant="outline"
+                                                            isLoading={downloadingKey===ind.fileKey}>
+                                                            <Download size={14} className="mr-1" />Download</Button>
+                                                    </>}
+                                                    {ind.evidenceLinkFileKey && <>
+                                                        <Button onClick={() => handleView(ind.evidenceLinkFileKey)} size="sm" variant="outline">
+                                                            <Eye size={14} className="mr-1" />View Evidence</Button>
+                                                        <Button onClick={() => handleDownload(ind.evidenceLinkFileKey)} size="sm" variant="outline"
+                                                            isLoading={downloadingKey===ind.evidenceLinkFileKey}>
+                                                            <Download size={14} className="mr-1" />Download</Button>
+                                                    </>}
                                                     {ind.evidenceFileKeys && ind.evidenceFileKeys.length > 0 && ind.evidenceFileKeys.map((key, idx) => (
-                                                        <Button key={key} 
-                                                        
-                                                        onClick={() => handleDownload(key)} 
-                                                        
-                                                        size="sm" variant="outline" 
-                                                        
-                                                        isLoading={downloadingKey===key}
-                                                        
-                                                        >Evidence {idx + 1}</Button>
+                                                        <span key={key} className="inline-flex gap-1">
+                                                            <Button onClick={() => handleView(key)} size="sm" variant="outline">
+                                                                <Eye size={14} className="mr-1" />Evidence {idx + 1}</Button>
+                                                            <Button onClick={() => handleDownload(key)} size="sm" variant="outline"
+                                                                isLoading={downloadingKey===key}>
+                                                                <Download size={14} /></Button>
+                                                        </span>
                                                     ))}
                                                     {!ind.fileKey && !ind.evidenceLinkFileKey && (!ind.evidenceFileKeys || ind.evidenceFileKeys.length === 0) && <span className="text-xs text-muted-foreground italic">No documents submitted</span>}
                                                 </div>
@@ -351,7 +418,7 @@ const ReviewSubmission: React.FC = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        ))}
+                                        )})}
                                     </div>
                                     <div className="pt-4 mt-4 border-t border-border">
                                         <label className="flex items-center text-sm font-medium text-foreground mb-1"><MessageSquare size={16} className="mr-2" />Overall Remarks for this Sub-Criterion</label>
@@ -365,14 +432,13 @@ const ReviewSubmission: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                        );})}
 
 
 
                     </div>
-
-
-                ))}
+                );
+                })}
 
 
 
@@ -386,6 +452,16 @@ const ReviewSubmission: React.FC = () => {
                 cancelLabel="Cancel"
                 onConfirm={confirmSendForApproval}
                 onCancel={() => setConfirmDialogOpen(false)}
+            />
+
+            <FilePreviewModal
+                isOpen={isPreviewModalOpen}
+                onClose={() => {
+                    setIsPreviewModalOpen(false);
+                    setPreviewFileKey(null);
+                }}
+                fileKey={previewFileKey}
+                submissionId={submission?._id}
             />
 
         </>
