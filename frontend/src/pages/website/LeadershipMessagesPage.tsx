@@ -7,19 +7,22 @@ const leaders = [
   {
     name: 'Prof. (Dr.) Deependra Kumar Jha',
     title: 'Vice-Chancellor, Manav Rachna University',
-    message: "The IFQE framework represents a significant leap forward in our relentless pursuit of academic excellence. By establishing a comprehensive framework for quality enhancement, we are not only aligning with national and global standards but are also fostering a culture of accountability and innovation from the ground up. It institutionalizes our commitment to quality and ensures that every stakeholder is an active participant in our journey of continuous improvement",
+    message:
+      "The second cycle of the Institutional Framework for Quality Enhancement (IFQE) 2026 marks another significant milestone in Manav Rachna University’s pursuit of academic excellence and institutional distinction. Building on the foundation laid in the first cycle, it reaffirms our commitment to a strong quality culture woven into every aspect of university life. By aligning our practices with national and global benchmarks, IFQE strengthens accountability, fosters innovation and nurtures a shared responsibility for continuous improvement. It ensures that quality remains not merely an institutional goal, but a collective commitment embraced by every stakeholder in our journey towards excellence.",
     imageUrl: './portraits/Prof. (Dr.) Deependra Kumar Jha.png',
   },
   {
     name: 'Prof. (Dr.) Sangita Banga',
     title: 'Pro Vice-Chancellor, Manav Rachna University',
-    message: "At Manav Rachna University, quality is not a destination—it is a dynamic journey of reflection, refinement, and reinvention. The Internal Framework for Quality Enhancement (IFQE) is a significant step in this journey. Designed with a forward-looking approach, the IFQE embodies our institutional philosophy of continuous improvement through evidence-based reflection.",
+    message:
+      "At Manav Rachna University, quality is viewed as an evolving pursuit—one that demands continuous reflection, thoughtful refinement, and the courage to innovate. Guided by the Institutional Framework for Quality Enhancement (IFQE), the University embeds evidence-based reflection and continuous assessment into all academic practices. Within this framework, assessment serves as a dynamic feedback loop that sharpens learning outcomes, refines teaching methodologies, and sustains academic rigor across disciplines. To meet the rapidly shifting demands of modern higher education, the IFQE empowers the University to proactively adapt its curricula to interdisciplinary trends, digital integration, and evolving industry expectations. This relentless focus on quality ensures that our academic, research, and institutional metrics consistently align with global benchmarks and standards set by premier accrediting and ranking bodies. Ultimately, sustainable excellence is achieved not through isolated interventions, but through a shared culture of learning, collaboration, and purposeful transformation. Through the frameworks codified in this document, we reaffirm our commitment to elevating institutional standards, fostering innovation, and empowering our graduates to excel in a dynamic global landscape.",
     imageUrl: './portraits/Prof. (Dr.) Sangita Banga.png',
   },
   {
     name: 'Prof. (Dr.) Deepa Arora',
     title: 'Director, Quality Assurance & Accreditation',
-    message: "The IFQE is more than a mechanism for evaluation; it's a testament to our university's allegiance to quality. This structured, dual-approach model empowers us to make data-informed decisions while valuing the rich academic experiences across our institution.",
+    message:
+      "The Institutional Framework for Quality Enhancement (IFQE) is a structured approach to embedding quality assurance and continuous improvement into the university's academic and administrative ecosystem. Beyond evaluation, it enables systematic reflection, evidence-based decision-making, and the identification of opportunities for meaningful enhancement. By establishing clearly defined quality benchmarks across teaching and learning, research, governance, and student support, IFQE promotes consistency, transparency, and institutional accountability while respecting the diverse academic contexts across the university. As a framework for sustained quality enhancement, it empowers stakeholders to translate insights into actionable improvements, strengthen institutional performance, and advance a culture of excellence aligned with evolving national and global expectations.",
     imageUrl: './portraits/Deepa-Arora.jpg',
   },
 ];

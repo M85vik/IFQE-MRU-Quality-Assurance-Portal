@@ -8,6 +8,24 @@ const fadeUp = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0 } };
 
 const teamMembers = [
   {
+    name: 'Aniket Jaiswal',
+    role: 'Full Stack Developer',
+    linkedin: 'https://www.linkedin.com/in/aniket-jaiswal-28345637a',
+    dept: 'School of Engineering',
+    email: 'aniketJaiswal.dev@gmail.com',
+    phone: '7011051647',
+    imageUrl: './portraits/Aniket.jpg',
+  },
+  {
+    name: 'Akshat Singh Bisht',
+    role: 'Full Stack Developer',
+    linkedin: 'https://www.linkedin.com/in/akshat-bisht-009768305',
+    dept: 'School of Engineering',
+    email: 'bishtakshat21@gmail.com',
+    phone: '7289901220',
+    imageUrl: './portraits/Akshat.jpg',
+  },
+  {
     name: 'Harsh Vardhan Kumar Mishra',
     role: 'Lead Frontend Developer',
     linkedin: 'https://linkedin.com/in/harshvardhankumarmishra',
@@ -108,6 +126,11 @@ export default function DevelopingTeamPage() {
               <img
                 src={member.imageUrl}
                 alt={member.name}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  target.onerror = null;
+                  target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1e293b&color=60a5fa&size=200`;
+                }}
                 className="w-28 h-28 mb-4 rounded-full object-cover shadow-xl border-4 border-blue-600"
                 loading="lazy"
               />
