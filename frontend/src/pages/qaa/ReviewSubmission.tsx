@@ -86,15 +86,54 @@ const INDICATOR_MAX_SCORES: Record<string, number> = {
 const naturalCodeCompare = (a: string, b: string): number =>
     a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 
+// Indicators with no department self-assessed score (qualitative metrics)
+const NO_SCORE_INDICATORS = ['3.1.2', '3.1.3', '3.1.5'];
+
+/**
+ * Get effective department claimed score for an indicator, matching submissionStore logic:
+ * - Excludes qualitative indicators (3.1.2, 3.1.3, 3.1.5)
+ * - Sums Govt + Non-Govt + Institutional for 2.3.x (Max 12)
+ * - Sums W/T + Conferences + Seminar + FDP for 4.2.1 (Max 16)
+ * - Otherwise returns selfAssessedScore
+ */
+export const getIndicatorDeptScore = (ind: Indicator): number | null => {
+    if (NO_SCORE_INDICATORS.includes(ind.indicatorCode)) {
+        return null;
+    }
+    const is23 = ind.indicatorCode?.startsWith('2.3.');
+    if (is23) {
+        const hasBreakdown = ind.selfAssessedScoreGovt != null || 
+                             ind.selfAssessedScoreNonGovt != null || 
+                             ind.selfAssessedScoreInstitutional != null;
+        if (hasBreakdown) {
+            return (ind.selfAssessedScoreGovt ?? 0) + 
+                   (ind.selfAssessedScoreNonGovt ?? 0) + 
+                   (ind.selfAssessedScoreInstitutional ?? 0);
+        }
+    } else if (ind.indicatorCode === '4.2.1') {
+        const has421Breakdown = ind.selfAssessedScoreWorkshopTraining != null ||
+                                ind.selfAssessedScoreConferences != null ||
+                                ind.selfAssessedScoreSeminar != null ||
+                                ind.selfAssessedScoreFDP != null;
+        if (has421Breakdown) {
+            return (ind.selfAssessedScoreWorkshopTraining ?? 0) +
+                   (ind.selfAssessedScoreConferences ?? 0) +
+                   (ind.selfAssessedScoreSeminar ?? 0) +
+                   (ind.selfAssessedScoreFDP ?? 0);
+        }
+    }
+    return typeof ind.selfAssessedScore === 'number' ? ind.selfAssessedScore : null;
+};
+
 /** Calculate criteria-wise scores (dept claimed + reviewer awarded). Pure function, no side-effects. */
 const calcCriterionScores = (criterion: Criterion) => {
     let deptTotal = 0;
     let reviewTotal = 0;
     criterion.subCriteria.forEach(sc => {
         sc.indicators.forEach(ind => {
-            if (typeof ind.selfAssessedScore === 'number') deptTotal += ind.selfAssessedScore;
-            const rScore = typeof ind.reviewScore === 'number' ? ind.reviewScore : ind.selfAssessedScore;
-            if (typeof rScore === 'number') reviewTotal += rScore;
+            const deptScore = getIndicatorDeptScore(ind);
+            if (typeof deptScore === 'number') deptTotal += deptScore;
+            if (typeof ind.reviewScore === 'number') reviewTotal += ind.reviewScore;
         });
     });
     return { deptTotal, reviewTotal };
@@ -116,29 +155,7 @@ const ReviewSubmission: React.FC = () => {
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
     const initialLoad = useRef(true);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-    // --- FIX START: Create a helper function to apply default scores ---
-    const getSubmissionWithDefaults = (sub: Submission): Submission => {
-        const subWithDefaults = JSON.parse(JSON.stringify(sub)); // Deep clone
-        subWithDefaults.partB.criteria.forEach((criterion: Criterion) => {
-            criterion.subCriteria.forEach((subCriterion: SubCriterion) => {
-                subCriterion.indicators.forEach((indicator: Indicator) => {
-                    // If reviewScore is null or undefined, default it to selfAssessedScore
-                    // if (indicator.reviewScore == null && indicator.selfAssessedScore != null) {
-                    //     indicator.reviewScore = indicator.selfAssessedScore;
-                    // }
 
-                    const maxScore = INDICATOR_MAX_SCORES[indicator.indicatorCode] ?? 4;
-
-                    if (indicator.reviewScore == null && indicator.selfAssessedScore != null) {
-                        indicator.reviewScore = Math.min(indicator.selfAssessedScore, maxScore);
-                    }
-
-                });
-            });
-        });
-        return subWithDefaults;
-    };
-    // --- FIX END ---
 
     useEffect(() => {
         const fetchSubmission = async () => {
@@ -157,6 +174,34 @@ const ReviewSubmission: React.FC = () => {
         fetchSubmission();
     }, [id]);
 
+    const preparePayloadForSave = (sub: Submission) => {
+        const payload = JSON.parse(JSON.stringify(sub.partB));
+        payload.criteria.forEach((criterion: any) => {
+            let critDept = 0;
+            let critReview = 0;
+            criterion.subCriteria?.forEach((sc: any) => {
+                let scDept = 0;
+                let scReview = 0;
+                sc.indicators?.forEach((ind: any) => {
+                    const dScore = getIndicatorDeptScore(ind);
+                    if (typeof dScore === 'number') {
+                        scDept += dScore;
+                        critDept += dScore;
+                    }
+                    if (typeof ind.reviewScore === 'number') {
+                        scReview += ind.reviewScore;
+                        critReview += ind.reviewScore;
+                    }
+                });
+                sc.selfAssessedScore = scDept;
+                sc.reviewScore = scReview;
+            });
+            criterion.selfAssessedScore = critDept;
+            criterion.reviewScore = critReview;
+        });
+        return payload;
+    };
+
     useEffect(() => {
         if (initialLoad.current || saveStatus === 'saving' || isLoading) {
             return;
@@ -166,9 +211,7 @@ const ReviewSubmission: React.FC = () => {
                 if (!submission) return;
                 setSaveStatus('saving');
                 try {
-                    // --- FIX: Apply defaults before autosaving ---
-                    const submissionToSave = getSubmissionWithDefaults(submission);
-                    const payload = { partB: submissionToSave.partB };
+                    const payload = { partB: preparePayloadForSave(submission) };
                     await apiClient.put(`/submissions/${id}`, payload);
                     setSaveStatus('saved');
                 } catch (err) {
@@ -232,10 +275,9 @@ const ReviewSubmission: React.FC = () => {
         setIsSubmitting(true);
         try {
             if (!submission) throw new Error('Submission data is missing.');
-            const submissionWithDefaults = getSubmissionWithDefaults(submission);
             const reviewData = {
                 status: 'Pending Final Approval',
-                partB: submissionWithDefaults.partB,
+                partB: preparePayloadForSave(submission),
             };
             await apiClient.put(`/submissions/${id}`, reviewData);
             toast.success('Submission sent for final approval!');
@@ -369,7 +411,9 @@ const ReviewSubmission: React.FC = () => {
                                                     <div className="flex items-center space-x-4">
                                                         <div className="text-center">
                                                             <label className="block text-xs font-medium text-muted-foreground">Dept. Score</label>
-                                                            <p className="text-2xl font-bold text-foreground">{ind.selfAssessedScore ?? 'N/A'}</p>
+                                                            <p className="text-2xl font-bold text-foreground">
+                                                                {getIndicatorDeptScore(ind) ?? 'N/A'}
+                                                            </p>
                                                             {ind.indicatorCode?.startsWith('2.3.') && (ind.selfAssessedScoreGovt != null || ind.selfAssessedScoreNonGovt != null || ind.selfAssessedScoreInstitutional != null) && (
                                                                 <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
                                                                     Govt: {ind.selfAssessedScoreGovt ?? '-'} | Non-Govt: {ind.selfAssessedScoreNonGovt ?? '-'} | Inst: {ind.selfAssessedScoreInstitutional ?? '-'}
@@ -380,27 +424,36 @@ const ReviewSubmission: React.FC = () => {
                                                                     W/T: {ind.selfAssessedScoreWorkshopTraining ?? '-'} | Conf: {ind.selfAssessedScoreConferences ?? '-'} | Sem: {ind.selfAssessedScoreSeminar ?? '-'} | FDP: {ind.selfAssessedScoreFDP ?? '-'}
                                                                 </p>
                                                             )}
+                                                            {NO_SCORE_INDICATORS.includes(ind.indicatorCode) && (
+                                                                <p className="text-[11px] text-muted-foreground italic leading-tight mt-0.5">
+                                                                    Qualitative Metric
+                                                                </p>
+                                                            )}
                                                         </div>
                                                         <div>
-                                                            <label className="block text-sm font-medium text-foreground mb-1">Review Score</label>
                                                             {(() => {
                                                                 const maxScore = INDICATOR_MAX_SCORES[ind.indicatorCode] ?? 4;
                                                                 return (
-                                                                    <select
-                                                                        className="w-full p-2 border border-input rounded-md bg-card focus:ring-ring focus:border-ring"
-                                                                        value={ind.reviewScore ?? ind.selfAssessedScore ?? ''}
-                                                                        onChange={(e) =>
-                                                                            handleStateChange(
-                                                                                ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'reviewScore'],
-                                                                                e.target.value === '' ? null : Number(e.target.value)
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <option value="">Set score...</option>
-                                                                        {Array.from({ length: maxScore + 1 }, (_, n) => maxScore - n).map(v => (
-                                                                            <option key={v} value={v}>{v}</option>
-                                                                        ))}
-                                                                    </select>
+                                                                    <>
+                                                                        <label className="block text-sm font-medium text-foreground mb-1">
+                                                                            Review Score <span className="text-xs text-muted-foreground font-normal">(Max: {maxScore})</span>
+                                                                        </label>
+                                                                        <select
+                                                                            className="w-full p-2 border border-input rounded-md bg-card focus:ring-ring focus:border-ring"
+                                                                            value={typeof ind.reviewScore === 'number' ? ind.reviewScore : ''}
+                                                                            onChange={(e) =>
+                                                                                handleStateChange(
+                                                                                    ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'reviewScore'],
+                                                                                    e.target.value === '' ? null : Number(e.target.value)
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <option value="">Set score...</option>
+                                                                            {Array.from({ length: maxScore + 1 }, (_, n) => maxScore - n).map(v => (
+                                                                                <option key={v} value={v}>{v}</option>
+                                                                            ))}
+                                                                        </select>
+                                                                    </>
                                                                 );
                                                             })()}
                                                         </div>
