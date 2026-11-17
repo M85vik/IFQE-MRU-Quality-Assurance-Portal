@@ -1,6 +1,6 @@
 // src/pages/department/AppealPage.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiClient from '../../api/axiosConfig';
 import { submitAppeal } from '../../services/submissionService';
@@ -8,6 +8,7 @@ import useSecureDownloader from '../../hooks/useSecureDownloader';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
+import Scorecard from '../../components/shared/Scorecard';
 import ConfirmDialog from '../../components/shared/ConfirmDialog';
 import Modal from '../../components/shared/Modal';
 import { Send, Download, MessageSquare } from 'lucide-react';
@@ -131,6 +132,22 @@ const AppealPage: React.FC = () => {
 
     const appealedCount = Object.keys(appealedIndicators).length;
 
+    const totalEvaluatedScore = useMemo(() => {
+        if (!submission?.partB?.criteria) return 0;
+        let sum = 0;
+        submission.partB.criteria.forEach((criterion) => {
+            criterion.subCriteria?.forEach((sc) => {
+                sc.indicators?.forEach((ind) => {
+                    const score = ind.finalScore ?? ind.reviewScore;
+                    if (typeof score === 'number') {
+                        sum += score;
+                    }
+                });
+            });
+        });
+        return sum;
+    }, [submission]);
+
     return (
         <>
             <div className="space-y-6">
@@ -139,10 +156,20 @@ const AppealPage: React.FC = () => {
                         <h1 className="text-2xl font-bold">Appeal Submission: {submission.title}</h1>
                         <p className="text-muted-foreground">Select indicators you wish to appeal and provide a clear justification.</p>
                     </div>
-                    <Button onClick={handleOpenConfirmDialog} isLoading={isSubmitting} disabled={appealedCount === 0}   className='border border-white'>
-                        <Send className="mr-2" size={18} />
-                        Submit Appeal ({appealedCount})
-                    </Button>
+                    <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap">
+                        <div className="w-44">
+                            <Scorecard
+                                title="Total Evaluated Score"
+                                score={totalEvaluatedScore}
+                                maxScore={500}
+                                colorClass="bg-primary"
+                            />
+                        </div>
+                        <Button onClick={handleOpenConfirmDialog} isLoading={isSubmitting} disabled={appealedCount === 0} className='border border-white'>
+                            <Send className="mr-2" size={18} />
+                            Submit Appeal ({appealedCount})
+                        </Button>
+                    </div>
                 </div>
 
                 {submission.partB.criteria.map((criterion) => (
