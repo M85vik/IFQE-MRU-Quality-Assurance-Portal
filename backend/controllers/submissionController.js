@@ -773,7 +773,7 @@ const getSubmissionById = async (req, res) => {
 const getSubmissionsForSuperuser = async (req, res) => {
     try {
         const submissions = await Submission.find({
-            status: { $in: ['Pending Final Approval', 'Appeal Submitted'] }
+            status: { $in: ['Pending Final Approval', 'Appeal Submitted', 'Completed', 'Appeal Closed'] }
         })
             .populate('school', 'name')
             .populate('department', 'name')

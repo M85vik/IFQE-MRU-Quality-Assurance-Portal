@@ -54,7 +54,7 @@ interface Submission {
     _id: string;
     title: string;
     academicYear: string;
-    status: 'Pending Final Approval' | 'Appeal Submitted';
+    status: 'Pending Final Approval' | 'Appeal Submitted' | 'Completed' | 'Appeal Closed';
     department: { name: string };
     school: { name: string }
     partB: {
@@ -244,22 +244,39 @@ const FinalReviewPage: React.FC = () => {
     if (error) return <Alert message={error} type="error" />;
     if (!submission) return null;
 
+    const isCompleted = ['Completed', 'Appeal Closed'].includes(submission.status);
     const isAppealReview = submission.status === 'Appeal Submitted';
     const appealedIndicatorCodes = isAppealReview ? submission.appeal.indicators.map(i => i.indicatorCode) : [];
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center bg-card p-4 rounded-lg border border-border sticky top-0 z-10">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card p-4 rounded-lg border border-border sticky top-0 z-10 shadow-sm">
                 <div>
                     <h1 className="text-2xl font-bold text-foreground">
-                        {isAppealReview ? 'Reviewing Appeal:' : 'Finalizing Submission:'} {submission.title}
+                        {isCompleted 
+                            ? 'View Submission:' 
+                            : isAppealReview 
+                                ? 'Reviewing Appeal:' 
+                                : 'Finalizing Submission:'
+                        } {submission.title}
                     </h1>
-                    <p className="text-muted-foreground">{submission.school.name} - {submission.academicYear}</p>
+                    <p className="text-muted-foreground">{submission.school?.name} - {submission.academicYear}</p>
                 </div>
-                <Button onClick={handleFinalize} isLoading={isSubmitting} className='border border-white'>
-                    <Check className="mr-2" size={18} />
-                    Finalize Score
-                </Button>
+                {isCompleted ? (
+                    <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-300">
+                            Status: {submission.status} (View Only)
+                        </span>
+                        <Button onClick={() => navigate(-1)} variant="secondary" size="sm" className="border border-input">
+                            Back
+                        </Button>
+                    </div>
+                ) : (
+                    <Button onClick={handleFinalize} isLoading={isSubmitting} className='border border-white'>
+                        <Check className="mr-2" size={18} />
+                        Finalize Score
+                    </Button>
+                )}
             </div>
 
             {submission.partB.criteria.map((criterion, critIndex) => (
@@ -274,7 +291,7 @@ const FinalReviewPage: React.FC = () => {
                                 {sc.indicators.map((ind, indIndex) => {
                                     const isAppealed = isAppealReview && appealedIndicatorCodes.includes(ind.indicatorCode);
                                     const appealInfo = isAppealed ? submission.appeal.indicators.find(i => i.indicatorCode === ind.indicatorCode) : null;
-                                    const isEditable = !isAppealReview || isAppealed;
+                                    const isEditable = !isCompleted && (!isAppealReview || isAppealed);
 
                                     return (
                                         <div key={ind.indicatorCode} className={`p-4 rounded-lg ${isAppealed ? 'border-2 border-orange-400 bg-orange-50' : 'border border-border'}`}>
@@ -396,8 +413,9 @@ const FinalReviewPage: React.FC = () => {
                                         value={sc.superuserRemark || ''}
                                         onChange={(e) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'superuserRemark'], e.target.value)}
                                         rows={2}
-                                        className="w-full p-2 border border-input rounded-md bg-card focus:ring-ring"
+                                        className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted cursor-not-allowed' : ''}`}
                                         placeholder="Add final summary comments for this section..."
+                                        disabled={!isEditable || isSubmitting}
                                     />
                                 </div>
                             </div>
