@@ -116,6 +116,7 @@ function App() {
             <Route path="superuser/dashboard" element={<Navigate to="/app/superuser/approval-queue" replace />} />
             <Route path="superuser/approval-queue" element={<SuperuserDashboard queueType="approval" />} />
             <Route path="superuser/appeal-queue" element={<SuperuserDashboard queueType="appeal" />} />
+            <Route path="superuser/completed-queue" element={<SuperuserDashboard queueType="completed" />} />
             <Route path="superuser/review/:id" element={<FinalReviewPage />} />
             <Route path="superuser/results" element={<ResultsPage />} />
 

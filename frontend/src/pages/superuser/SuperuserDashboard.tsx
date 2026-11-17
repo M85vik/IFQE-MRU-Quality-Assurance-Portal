@@ -5,19 +5,19 @@ import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
-import { FileCheck2, AlertCircle } from 'lucide-react';
+import { FileCheck2, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface Submission {
     _id: string;
     title: string;
     academicYear: string;
-    status: 'Pending Final Approval' | 'Appeal Submitted';
+    status: 'Pending Final Approval' | 'Appeal Submitted' | 'Completed' | 'Appeal Closed';
     school: { name: string };
     department: { name: string };
 }
 
 interface SuperuserDashboardProps {
-  queueType: 'approval' | 'appeal';
+  queueType: 'approval' | 'appeal' | 'completed';
 }
 
 const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) => {
@@ -42,11 +42,12 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
     fetchQueue();
   }, []);
 
-  const filteredItems = queue.filter(s => 
-    queueType === 'approval' 
-      ? s.status === 'Pending Final Approval' 
-      : s.status === 'Appeal Submitted'
-  );
+  const filteredItems = queue.filter(s => {
+    if (queueType === 'approval') return s.status === 'Pending Final Approval';
+    if (queueType === 'appeal') return s.status === 'Appeal Submitted';
+    if (queueType === 'completed') return ['Completed', 'Appeal Closed'].includes(s.status);
+    return false;
+  });
 
   const pageConfig = {
     approval: {
@@ -58,6 +59,11 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
       title: 'Appeals to Review',
       icon: <AlertCircle className="text-orange-500" />,
       buttonText: 'Review Appeal'
+    },
+    completed: {
+      title: 'Completed Submissions (View Only)',
+      icon: <CheckCircle className="text-green-500" />,
+      buttonText: 'View Submission'
     }
   };
 
@@ -75,6 +81,9 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
               <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Title</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">School</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Department</th>
+              {queueType === 'completed' && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Status</th>
+              )}
               <th className="relative px-6 py-3"><span className="sr-only">Action</span></th>
             </tr>
           </thead>
@@ -84,8 +93,15 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">{sub.title}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{sub.school?.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{sub.department?.name}</td>
+                {queueType === 'completed' && (
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+                      {sub.status}
+                    </span>
+                  </td>
+                )}
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Button onClick={() => navigate(`/app/superuser/review/${sub._id}`)}   className='border border-white'>
+                  <Button onClick={() => navigate(`/app/superuser/review/${sub._id}`)} className='border border-white'>
                     {currentConfig.buttonText}
                   </Button>
                 </td>

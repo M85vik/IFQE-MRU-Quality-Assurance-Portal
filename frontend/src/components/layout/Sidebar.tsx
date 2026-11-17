@@ -166,6 +166,7 @@ import {
   ShieldQuestion,
   FileCheck2,
   AlertCircle,
+  CheckCircle,
   Archive,
   Megaphone,
   Trash2,
@@ -286,6 +287,9 @@ const Sidebar = ({
               </NavItem>
               <NavItem to="/app/superuser/appeal-queue" icon={<AlertCircle size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 Appeal Queue
+              </NavItem>
+              <NavItem to="/app/superuser/completed-queue" icon={<CheckCircle size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
+                Completed
               </NavItem>
               <NavItem to="/app/superuser/results" icon={<BarChart2 size={20} />} isCollapsed={isCollapsed} onClick={onCloseMobile}>
                 Results
