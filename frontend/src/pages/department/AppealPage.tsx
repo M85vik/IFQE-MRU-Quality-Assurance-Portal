@@ -59,6 +59,24 @@ const AppealPage: React.FC = () => {
     const [appealedIndicators, setAppealedIndicators] = useState<Record<string, string>>({});
     const { downloadFile, isDownloading } = useSecureDownloader();
     const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, appealData: [] as any[] });
+
+    // ✅ useMemo must be declared BEFORE any early returns (Rules of Hooks)
+    const totalEvaluatedScore = useMemo(() => {
+        if (!submission?.partB?.criteria) return 0;
+        let sum = 0;
+        submission.partB.criteria.forEach((criterion) => {
+            criterion.subCriteria?.forEach((sc) => {
+                sc.indicators?.forEach((ind) => {
+                    const score = ind.finalScore ?? ind.reviewScore;
+                    if (typeof score === 'number') {
+                        sum += score;
+                    }
+                });
+            });
+        });
+        return sum;
+    }, [submission]);
+
     useEffect(() => {
         const fetchSubmission = async () => {
             setIsLoading(true);
@@ -131,22 +149,6 @@ const AppealPage: React.FC = () => {
     if (!submission) return null;
 
     const appealedCount = Object.keys(appealedIndicators).length;
-
-    const totalEvaluatedScore = useMemo(() => {
-        if (!submission?.partB?.criteria) return 0;
-        let sum = 0;
-        submission.partB.criteria.forEach((criterion) => {
-            criterion.subCriteria?.forEach((sc) => {
-                sc.indicators?.forEach((ind) => {
-                    const score = ind.finalScore ?? ind.reviewScore;
-                    if (typeof score === 'number') {
-                        sum += score;
-                    }
-                });
-            });
-        });
-        return sum;
-    }, [submission]);
 
     return (
         <>
