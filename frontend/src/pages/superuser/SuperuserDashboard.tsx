@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSuperuserQueue } from '../../services/superuserService';
+import { getLiveScorecardReport } from '../../services/adminService';
 import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
-import { FileCheck2, AlertCircle, CheckCircle } from 'lucide-react';
+import SchoolCriteriaScorecard, { SchoolScorecardData } from '../../components/shared/SchoolCriteriaScorecard';
+import { FileCheck2, AlertCircle, CheckCircle, Award } from 'lucide-react';
 
 interface Submission {
     _id: string;
@@ -25,6 +27,11 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
   const [queue, setQueue] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [scorecards, setScorecards] = useState<SchoolScorecardData[]>([]);
+  const [isScorecardLoading, setIsScorecardLoading] = useState(false);
+  const [scorecardError, setScorecardError] = useState('');
+  const [scorecardYear, setScorecardYear] = useState('2024-2025');
+  const [selectedSchoolFilter, setSelectedSchoolFilter] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,6 +48,22 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
     };
     fetchQueue();
   }, []);
+
+  useEffect(() => {
+    const fetchScorecards = async () => {
+      setIsScorecardLoading(true);
+      setScorecardError('');
+      try {
+        const res = await getLiveScorecardReport(scorecardYear);
+        setScorecards(res.schools || []);
+      } catch (err: any) {
+        setScorecardError(err.message || 'Failed to load live scorecards');
+      } finally {
+        setIsScorecardLoading(false);
+      }
+    };
+    fetchScorecards();
+  }, [scorecardYear]);
 
   const filteredItems = queue.filter(s => {
     if (queueType === 'approval') return s.status === 'Pending Final Approval';
@@ -131,6 +154,79 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
           <h2 className="text-xl font-semibold text-card-foreground">Queue ({filteredItems.length})</h2>
         </div>
         {renderTable()}
+      </CardWhite>
+
+      {/* Current Marks Status Scorecards Section */}
+      <CardWhite className="p-0">
+        <div className="px-6 py-4 border-b border-border flex flex-wrap justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <Award className="text-[#FA8112]" size={22} />
+            <div>
+              <h2 className="text-xl font-semibold text-card-foreground">Current Marks Status Scorecard</h2>
+              <p className="text-xs text-muted-foreground">
+                Live criteria marks status & grades across submission, reviewer, superuser, and final stages.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-semibold text-muted-foreground">AY:</label>
+            <select
+              value={scorecardYear}
+              onChange={(e) => setScorecardYear(e.target.value)}
+              className="p-1.5 border border-input bg-card rounded-md text-sm text-foreground"
+            >
+              <option value="2025-2026">2025-2026</option>
+              <option value="2024-2025">2024-2025</option>
+              <option value="2023-2024">2023-2024</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="p-6">
+          {isScorecardLoading && <Spinner size="md" />}
+          {scorecardError && <Alert message={scorecardError} type="error" />}
+
+          {!isScorecardLoading && !scorecardError && scorecards.length === 0 && (
+            <p className="text-center text-muted-foreground py-6">
+              No submission criteria data found for academic year {scorecardYear}.
+            </p>
+          )}
+
+          {!isScorecardLoading && !scorecardError && scorecards.length > 0 && (
+            <div className="space-y-6">
+              {scorecards.length > 1 && (
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-semibold text-foreground">Filter School:</label>
+                  <select
+                    value={selectedSchoolFilter}
+                    onChange={(e) => setSelectedSchoolFilter(e.target.value)}
+                    className="p-2 border border-input bg-card rounded-md text-sm text-foreground"
+                  >
+                    <option value="all">All Schools ({scorecards.length})</option>
+                    {scorecards.map((s) => (
+                      <option key={s.schoolId} value={s.schoolId}>
+                        {s.schoolName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="space-y-6">
+                {(selectedSchoolFilter === 'all'
+                  ? scorecards
+                  : scorecards.filter((s) => s.schoolId === selectedSchoolFilter)
+                ).map((school, idx) => (
+                  <SchoolCriteriaScorecard
+                    key={school.schoolId}
+                    school={school}
+                    index={idx}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </CardWhite>
     </div>
   );

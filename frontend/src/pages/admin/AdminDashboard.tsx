@@ -191,7 +191,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   getSchoolPerformanceData,
-  getApprovedSubmissions
+  getApprovedSubmissions,
+  getLiveScorecardReport
 } from '../../services/adminService';
 
 import useArchiveDownloader from '../../hooks/useArchiveDownloader.tsuseArchiveDownloader';
@@ -200,11 +201,13 @@ import Card from '../../components/shared/Card';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
+import SchoolCriteriaScorecard, { SchoolScorecardData } from '../../components/shared/SchoolCriteriaScorecard';
 
 import {
   BarChart3,
   Archive,
-  Download
+  Download,
+  Award
 } from 'lucide-react';
 
 import {
@@ -293,8 +296,12 @@ const ScoreboardChart: React.FC<{ data: ChartData[] }> = ({ data }) => {
 const AdminDashboard: React.FC = () => {
   const [performanceData, setPerformanceData] = useState<ChartData[]>([]);
   const [approvedSubmissions, setApprovedSubmissions] = useState<Submission[]>([]);
+  const [scorecardSchools, setScorecardSchools] = useState<SchoolScorecardData[]>([]);
+  const [selectedSchoolFilter, setSelectedSchoolFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
+  const [isScorecardLoading, setIsScorecardLoading] = useState(true);
   const [error, setError] = useState('');
+  const [scorecardError, setScorecardError] = useState('');
 
   const availableYears = ['2025-2026', '2024-2025', '2023-2024'];
   const [selectedYear, setSelectedYear] = useState(availableYears[0]);
@@ -327,7 +334,21 @@ const AdminDashboard: React.FC = () => {
       }
     };
 
+    const fetchScorecard = async () => {
+      setIsScorecardLoading(true);
+      setScorecardError('');
+      try {
+        const res = await getLiveScorecardReport(selectedYear);
+        setScorecardSchools(res.schools || []);
+      } catch (err: any) {
+        setScorecardError(err.message || 'Failed to load scorecards');
+      } finally {
+        setIsScorecardLoading(false);
+      }
+    };
+
     fetchData();
+    fetchScorecard();
   }, [selectedYear]);
 
   // ------------------------------------------------------------------
@@ -416,6 +437,54 @@ const AdminDashboard: React.FC = () => {
     );
   };
 
+  const renderScorecardsContent = () => {
+    if (isScorecardLoading) return <div className="p-6"><Spinner /></div>;
+    if (scorecardError) return <div className="p-6"><Alert message={scorecardError} type="error" /></div>;
+    if (scorecardSchools.length === 0) {
+      return (
+        <p className="text-center text-muted-foreground py-8">
+          No submission criteria data found for {selectedYear}.
+        </p>
+      );
+    }
+
+    const displayedSchools = selectedSchoolFilter === 'all'
+      ? scorecardSchools
+      : scorecardSchools.filter(s => s.schoolId === selectedSchoolFilter);
+
+    return (
+      <div className="space-y-6">
+        {scorecardSchools.length > 1 && (
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-semibold text-gray-700">Filter School:</label>
+            <select
+              value={selectedSchoolFilter}
+              onChange={e => setSelectedSchoolFilter(e.target.value)}
+              className="p-2 border border-gray-300 rounded-md bg-white text-gray-900 text-sm shadow-sm"
+            >
+              <option value="all">All Schools ({scorecardSchools.length})</option>
+              {scorecardSchools.map(s => (
+                <option key={s.schoolId} value={s.schoolId}>
+                  {s.schoolName}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        <div className="space-y-6">
+          {displayedSchools.map((school, idx) => (
+            <SchoolCriteriaScorecard
+              key={school.schoolId}
+              school={school}
+              index={idx}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   // ------------------------------------------------------------------
   // RENDER
   // ------------------------------------------------------------------
@@ -439,6 +508,18 @@ const AdminDashboard: React.FC = () => {
           ))}
         </select>
       </div>
+
+      <Card className="p-0">
+        <div className="px-6 py-4 border-b border-border bg-white rounded-t-lg">
+          <h2 className="text-xl font-semibold flex items-center gap-3">
+            <Award size={22} className="text-[#FA8112]" /> Current AY School Criteria Scorecards & Grades
+          </h2>
+          <p className="text-sm text-black mt-1">
+            Dynamic criteria marks status (self-assessed, reviewer, superuser, and final) with grades for {selectedYear}.
+          </p>
+        </div>
+        <div className="p-6">{renderScorecardsContent()}</div>
+      </Card>
 
       <Card className="p-0 ">
         <div className="px-6 py-4 border-b border-border bg-white rounded-t-lg">

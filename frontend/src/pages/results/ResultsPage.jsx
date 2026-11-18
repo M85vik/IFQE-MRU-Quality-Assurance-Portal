@@ -130,13 +130,14 @@ function ResultTable({ school, isDepartment }) {
       <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
         <thead className="bg-[#222222] text-white text-sm">
           <tr>
-            <th className="p-3">S. No.</th>
+            <th className="p-3 text-center">S. No.</th>
             <th className="p-3 text-left">Criteria</th>
-            { <th className="p-3 text-center">Weightage</th>}
-            {<th className="p-3 text-center">Max Marks</th>}
-            {<th className="p-3 text-center">Marks Awarded</th>}
-            {<th className="p-3 text-center">% Achieved</th>}
-            {<th className="p-3 text-center">Weighted</th>}
+            <th className="p-3 text-center">Weightage</th>
+            <th className="p-3 text-center">Max Marks</th>
+            <th className="p-3 text-center">Marks Awarded</th>
+            <th className="p-3 text-center">% Achieved</th>
+            <th className="p-3 text-center">Weighted</th>
+            <th className="p-3 text-center">Grade</th>
           </tr>
         </thead>
 
@@ -144,33 +145,34 @@ function ResultTable({ school, isDepartment }) {
           {school.criteria.map((row) => (
             <tr key={row.code} className="even:bg-gray-50 hover:bg-[#FAF3E1] transition">
               <td className="p-3 text-center">{row.sNo}</td>
-              <td className="p-3">{row.name}</td>
-              {<td className="p-3 text-center">{row.weightage}%</td>}
-              {<td className="p-3 text-center">{row.maxMarks}</td>}
-              {<td className="p-3 text-center">{row.marksAwarded}</td>}
-              {(
-                <td className="p-3 text-center">
-                  <span className="px-3 py-1 rounded-md bg-[#FFA240] text-[#000000] font-semibold">
-                    {row.percentage}%
-                  </span>
-                </td>
-              )}
-              { (
-                <td className="p-3 text-center font-bold text-[#000000]">
-                  {row.weightedScore}
-                </td>
-              )}
+              <td className="p-3 font-medium">{row.name}</td>
+              <td className="p-3 text-center">{row.weightage}%</td>
+              <td className="p-3 text-center">{row.maxMarks}</td>
+              <td className="p-3 text-center font-semibold">{row.marksAwarded}</td>
+              <td className="p-3 text-center">
+                <span className="px-3 py-1 rounded-md bg-[#FFA240] text-[#000000] font-semibold text-xs">
+                  {row.percentage}%
+                </span>
+              </td>
+              <td className="p-3 text-center font-bold text-[#000000]">
+                {row.weightedScore}
+              </td>
+              <td className="p-3 text-center font-bold text-gray-900">
+                {row.grade || '—'}
+              </td>
             </tr>
           ))}
 
-          
-          {(
+          {school.finalScore && (
             <tr className="bg-[#FFA240] font-bold border-t">
-              <td colSpan={6} className="p-3 text-right text-[#000000]">
+              <td colSpan={6} className="p-3 text-right text-[#000000] uppercase tracking-wider">
                 FINAL SCORE
               </td>
-              <td className="p-3 text-center text-[#000000] text-lg">
-                {school.finalScore.totalWeightedScore} / {school.finalScore.outOf}
+              <td className="p-3 text-center text-[#000000] text-base font-extrabold whitespace-nowrap">
+                {school.finalScore.totalWeightedScore} / {school.finalScore.outOf ?? 100}
+              </td>
+              <td className="p-3 text-center text-[#000000] text-base font-extrabold">
+                {school.finalScore.grade || '—'}
               </td>
             </tr>
           )}
