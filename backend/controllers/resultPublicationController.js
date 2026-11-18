@@ -1,8 +1,9 @@
 const ResultPublication = require("../models/ResultPublication");
 const Submission = require("../models/Submission");
 const CRITERIA_CONFIG = require("../config/criteriaConfig");
-const SchoolResult = require('../models/SchoolResult')
-const logger = require("../utils/logger.js")
+const SchoolResult = require('../models/SchoolResult');
+const logger = require("../utils/logger.js");
+const { calculateGrade } = require("../utils/gradeHelper");
 exports.getPublicationStatus = async (req, res) => {
   try {
     const { academicYear } = req.query;
@@ -136,7 +137,8 @@ async function buildSchoolsReportForYear(academicYear) {
  
      const percentage = maxMarks ? (totalScore / maxMarks) * 100 : 0;
      const weightedScore = (percentage * weightage) / 100;
- 
+     const grade = calculateGrade(percentage);
+
      schoolsMap[schoolId].criteria.push({
        sNo: schoolsMap[schoolId].criteria.length + 1,
        code: criteriaCode,
@@ -146,6 +148,7 @@ async function buildSchoolsReportForYear(academicYear) {
        marksAwarded: Number(totalScore.toFixed(2)),
        percentage: Number(percentage.toFixed(2)),
        weightedScore: Number(weightedScore.toFixed(2)),
+       grade,
      });
  
      schoolsMap[schoolId].finalScore += weightedScore;
@@ -161,13 +164,17 @@ async function buildSchoolsReportForYear(academicYear) {
    }
  
    // convert to array + fix finalScore format
-   const schools = Object.values(schoolsMap).map((school) => ({
-     ...school,
-     finalScore: {
-       totalWeightedScore: Number(school.finalScore.toFixed(2)),
-       outOf: 100,
-     },
-   }));
+   const schools = Object.values(schoolsMap).map((school) => {
+     const totalWeighted = Number(school.finalScore.toFixed(2));
+     return {
+       ...school,
+       finalScore: {
+         totalWeightedScore: totalWeighted,
+         outOf: 100,
+         grade: calculateGrade(totalWeighted),
+       },
+     };
+   });
  
    // sort by ranking
    schools.sort(

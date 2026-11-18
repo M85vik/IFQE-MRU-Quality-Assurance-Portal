@@ -48,3 +48,21 @@ export async function updatePublicationStatus(academicYear, isPublished) {
    throw new Error(error.response?.data?.message || 'Could not update publishing status.')
 }
 }
+
+export const getLiveScorecardReport = async (academicYear) => {
+  try {
+    const { data } = await apiClient.get(`/reports/live-scorecard?academicYear=${academicYear}`);
+    return data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Could not fetch live scorecard report.');
+  }
+};
+
+export const getMySchoolLiveReport = async (academicYear) => {
+  try {
+    const { data } = await apiClient.get(`/reports/my-school-live?academicYear=${academicYear}`);
+    return data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Could not fetch my school live report.');
+  }
+};

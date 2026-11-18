@@ -3,13 +3,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyDepartmentSubmissions, createNewSubmission } from '../../services/submissionService';
+import { getMySchoolLiveReport } from '../../services/adminService';
 import CardWhite from '../../components/shared/CardWhite';
 import Button from '../../components/shared/Button';
 import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
-import { PlusCircle, Edit, Clock, Inbox } from 'lucide-react';
+import SchoolCriteriaScorecard, { SchoolScorecardData } from '../../components/shared/SchoolCriteriaScorecard';
+import { PlusCircle, Edit, Clock, Inbox, Award } from 'lucide-react';
 
 interface Submission {
   _id: string;
@@ -25,6 +27,9 @@ const DepartmentDashboard: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [modalError, setModalError] = useState('');
   const [newSubmissionData, setNewSubmissionData] = useState({ title: '', academicYear: '', submissionType: 'Annual' });
+  const [schoolScorecard, setSchoolScorecard] = useState<SchoolScorecardData | null>(null);
+  const [isScorecardLoading, setIsScorecardLoading] = useState(false);
+  const [scorecardYear, setScorecardYear] = useState('2024-2025');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +45,21 @@ const DepartmentDashboard: React.FC = () => {
     };
     fetchSubmissions();
   }, []);
+
+  useEffect(() => {
+    const fetchScorecard = async () => {
+      setIsScorecardLoading(true);
+      try {
+        const data = await getMySchoolLiveReport(scorecardYear);
+        setSchoolScorecard(data);
+      } catch {
+        setSchoolScorecard(null);
+      } finally {
+        setIsScorecardLoading(false);
+      }
+    };
+    fetchScorecard();
+  }, [scorecardYear]);
 
   const { drafts, inProgress } = useMemo(() => {
     const drafts = submissions.filter(s => ['Draft', 'Needs Revision'].includes(s.status));
@@ -90,6 +110,45 @@ const DepartmentDashboard: React.FC = () => {
             <table className="min-w-full"><thead className="bg-secondary/50"><tr><th className="px-6 py-3 text-left text-xs uppercase">Title</th><th className="px-6 py-3 text-left text-xs uppercase">Status</th></tr></thead>
               <tbody className="divide-y divide-border">{inProgress.map(sub => (<tr key={sub._id} className="hover:bg-accent"><td className="px-6 py-4 font-medium">{sub.title}</td><td className="px-6 py-4 text-sm">{sub.status}</td></tr>))}</tbody></table>
           ) : <p className="text-center text-muted-foreground py-8">No submissions are currently under review.</p>}
+        </CardWhite>
+
+        {/* School Dynamic Scorecard Card */}
+        <CardWhite className="p-0">
+          <div className="px-6 py-4 border-b border-border flex flex-wrap justify-between items-center gap-3">
+            <div className="flex items-center gap-3">
+              <Award className="text-[#FA8112]" size={22} />
+              <div>
+                <h2 className="text-xl font-semibold">School Scorecard & Dynamic Marks</h2>
+                <p className="text-xs text-muted-foreground">
+                  Criteria marks breakdown and grades (dynamic before appeal and after final result).
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-semibold text-muted-foreground">AY:</label>
+              <select
+                value={scorecardYear}
+                onChange={(e) => setScorecardYear(e.target.value)}
+                className="p-1.5 border border-input bg-card rounded-md text-sm text-foreground"
+              >
+                <option value="2025-2026">2025-2026</option>
+                <option value="2024-2025">2024-2025</option>
+                <option value="2023-2024">2023-2024</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {isScorecardLoading && <Spinner size="md" />}
+            {!isScorecardLoading && schoolScorecard && (
+              <SchoolCriteriaScorecard school={schoolScorecard} showSchoolHeader={true} />
+            )}
+            {!isScorecardLoading && !schoolScorecard && (
+              <p className="text-center text-muted-foreground py-6">
+                No active scorecard available for academic year {scorecardYear}.
+              </p>
+            )}
+          </div>
         </CardWhite>
       </div>
 
