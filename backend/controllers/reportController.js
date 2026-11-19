@@ -81,7 +81,6 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
             criteriaCode: "$partB.criteria.criteriaCode"
           },
           totalScore: {
-
             $sum: {
               $ifNull: [
                 "$partB.criteria.subCriteria.indicators.finalScore",
@@ -93,7 +92,24 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
                 }
               ]
             }
-
+          },
+          // Dynamic max marks: sum indicator-level max scores based on indicatorCode
+          maxPossibleScore: {
+            $sum: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $regexMatch: { input: "$partB.criteria.subCriteria.indicators.indicatorCode", regex: "^2\\.3\\.\\d+$" } },
+                    then: 12
+                  },
+                  {
+                    case: { $eq: ["$partB.criteria.subCriteria.indicators.indicatorCode", "4.2.1"] },
+                    then: 16
+                  }
+                ],
+                default: 4
+              }
+            }
           }
         }
       },
@@ -113,7 +129,8 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
           schoolId: "$_id.school",
           schoolName: "$schoolInfo.name",
           criteriaCode: "$_id.criteriaCode",
-          totalScore: 1
+          totalScore: 1,
+          maxPossibleScore: 1
         }
       }
     ]);
@@ -121,7 +138,7 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
     // Rebuild structure like before
     const schoolsMap = {};
     for (const row of results) {
-      const { schoolId, schoolName, criteriaCode, totalScore } = row;
+      const { schoolId, schoolName, criteriaCode, totalScore, maxPossibleScore } = row;
 
       if (!schoolsMap[schoolId]) {
         schoolsMap[schoolId] = {
@@ -137,7 +154,11 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
       const config = CRITERIA_CONFIG[configKey];
       if (!config) continue;
 
-      const percentage = (totalScore / config.maxMarks) * 100;
+      // Use dynamically calculated max marks from actual submission indicator data.
+      // Falls back to criteriaConfig value only if no indicator data exists.
+      const effectiveMaxMarks = maxPossibleScore > 0 ? maxPossibleScore : config.maxMarks;
+
+      const percentage = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
       const weightedScore = (percentage * config.weightage) / 100;
       const grade = calculateGrade(percentage);
 
@@ -145,7 +166,7 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
         code: criteriaCode,
         name: config.name,
         weightage: config.weightage,
-        maxMarks: config.maxMarks,
+        maxMarks: effectiveMaxMarks,
         marksAwarded: Number(totalScore.toFixed(2)),
         percentage: Number(percentage.toFixed(2)),
         weightedScore: Number(weightedScore.toFixed(2)),

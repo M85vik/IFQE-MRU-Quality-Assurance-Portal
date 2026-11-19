@@ -80,6 +80,24 @@ async function buildSchoolsReportForYear(academicYear) {
              ],
            },
          },
+         // Dynamic max marks: sum indicator-level max scores based on indicatorCode
+         maxPossibleScore: {
+           $sum: {
+             $switch: {
+               branches: [
+                 {
+                   case: { $regexMatch: { input: "$partB.criteria.subCriteria.indicators.indicatorCode", regex: "^2\\.3\\.\\d+$" } },
+                   then: 12
+                 },
+                 {
+                   case: { $eq: ["$partB.criteria.subCriteria.indicators.indicatorCode", "4.2.1"] },
+                   then: 16
+                 }
+               ],
+               default: 4
+             }
+           }
+         },
        },
      },
  
@@ -104,6 +122,7 @@ async function buildSchoolsReportForYear(academicYear) {
          schoolName: "$schoolInfo.name",
          criteriaCode: "$_id.criteriaCode",
          totalScore: 1,
+         maxPossibleScore: 1,
        },
      },
    ]);
@@ -111,7 +130,7 @@ async function buildSchoolsReportForYear(academicYear) {
    const schoolsMap = {};
  
    for (const row of results) {
-     const { schoolId, schoolName, criteriaCode, totalScore } = row;
+     const { schoolId, schoolName, criteriaCode, totalScore, maxPossibleScore } = row;
  
      if (!schoolsMap[schoolId]) {
        schoolsMap[schoolId] = {
@@ -133,9 +152,11 @@ async function buildSchoolsReportForYear(academicYear) {
      }
  
      const weightage = config.weightage;
-     const maxMarks = config.maxMarks;
+     // Use dynamically calculated max marks from actual submission indicator data.
+     // Falls back to criteriaConfig value only if no indicator data exists.
+     const effectiveMaxMarks = maxPossibleScore > 0 ? maxPossibleScore : config.maxMarks;
  
-     const percentage = maxMarks ? (totalScore / maxMarks) * 100 : 0;
+     const percentage = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
      const weightedScore = (percentage * weightage) / 100;
      const grade = calculateGrade(percentage);
 
@@ -144,7 +165,7 @@ async function buildSchoolsReportForYear(academicYear) {
        code: criteriaCode,
        name: config.name,
        weightage,
-       maxMarks,
+       maxMarks: effectiveMaxMarks,
        marksAwarded: Number(totalScore.toFixed(2)),
        percentage: Number(percentage.toFixed(2)),
        weightedScore: Number(weightedScore.toFixed(2)),
