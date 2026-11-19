@@ -99,6 +99,15 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
               $switch: {
                 branches: [
                   {
+                    case: {
+                      $in: [
+                        "$partB.criteria.subCriteria.indicators.indicatorCode",
+                        ["3.1.2", "3.1.3", "3.1.5"]
+                      ]
+                    },
+                    then: 0
+                  },
+                  {
                     case: { $regexMatch: { input: "$partB.criteria.subCriteria.indicators.indicatorCode", regex: "^2\\.3\\.\\d+$" } },
                     then: 12
                   },
@@ -158,8 +167,9 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
       // Falls back to criteriaConfig value only if no indicator data exists.
       const effectiveMaxMarks = maxPossibleScore > 0 ? maxPossibleScore : config.maxMarks;
 
-      const percentage = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
-      const weightedScore = (percentage * config.weightage) / 100;
+      const percentageRaw = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
+      const percentage = Number(percentageRaw.toFixed(2));
+      const weightedScore = Number((Math.round(percentage * config.weightage) / 100).toFixed(2));
       const grade = calculateGrade(percentage);
 
       schoolsMap[schoolId].criteria.push({
@@ -168,8 +178,8 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
         weightage: config.weightage,
         maxMarks: effectiveMaxMarks,
         marksAwarded: Number(totalScore.toFixed(2)),
-        percentage: Number(percentage.toFixed(2)),
-        weightedScore: Number(weightedScore.toFixed(2)),
+        percentage: percentage,
+        weightedScore: weightedScore,
         grade: grade
       });
 
@@ -305,23 +315,30 @@ async function buildLiveSchoolsReport(academicYear, schoolIdFilter = null) {
         },
         totalScore: {
           $sum: {
-            $ifNull: [
-              "$partB.criteria.subCriteria.indicators.finalScore",
-              {
+            $cond: {
+              if: { $eq: ["$status", "Draft"] },
+              then: {
                 $ifNull: [
-                  "$partB.criteria.subCriteria.indicators.reviewScore",
+                  "$partB.criteria.subCriteria.indicators.selfAssessedScore",
+                  0,
+                ],
+              },
+              else: {
+                $ifNull: [
+                  "$partB.criteria.subCriteria.indicators.finalScore",
                   {
                     $ifNull: [
-                      "$partB.criteria.subCriteria.indicators.selfAssessedScore",
+                      "$partB.criteria.subCriteria.indicators.reviewScore",
                       0,
                     ],
                   },
                 ],
               },
-            ],
+            },
           },
         },
         // Dynamically calculate max possible marks per indicator based on indicatorCode
+        // 3.1.2, 3.1.3, 3.1.5: Qualitative indicators ("No marking") = 0 max
         // 2.3.x indicators: 3 sub-scores × 4 = 12 max
         // 4.2.1 indicator: 4 sub-scores × 4 = 16 max
         // All others: 4 max
@@ -329,6 +346,15 @@ async function buildLiveSchoolsReport(academicYear, schoolIdFilter = null) {
           $sum: {
             $switch: {
               branches: [
+                {
+                  case: {
+                    $in: [
+                      "$partB.criteria.subCriteria.indicators.indicatorCode",
+                      ["3.1.2", "3.1.3", "3.1.5"],
+                    ],
+                  },
+                  then: 0,
+                },
                 {
                   case: {
                     $regexMatch: {
@@ -399,8 +425,9 @@ async function buildLiveSchoolsReport(academicYear, schoolIdFilter = null) {
     // Falls back to criteriaConfig value only if no indicator data exists.
     const effectiveMaxMarks = maxPossibleScore > 0 ? maxPossibleScore : config.maxMarks;
 
-    const percentage = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
-    const weightedScore = (percentage * config.weightage) / 100;
+    const percentageRaw = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
+    const percentage = Number(percentageRaw.toFixed(2));
+    const weightedScore = Number((Math.round(percentage * config.weightage) / 100).toFixed(2));
     const grade = calculateGrade(percentage);
 
     schoolsMap[sId].criteria.push({
@@ -409,8 +436,8 @@ async function buildLiveSchoolsReport(academicYear, schoolIdFilter = null) {
       weightage: config.weightage,
       maxMarks: effectiveMaxMarks,
       marksAwarded: Number(totalScore.toFixed(2)),
-      percentage: Number(percentage.toFixed(2)),
-      weightedScore: Number(weightedScore.toFixed(2)),
+      percentage: percentage,
+      weightedScore: weightedScore,
       grade: grade,
     });
 

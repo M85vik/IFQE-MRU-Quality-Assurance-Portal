@@ -76,11 +76,11 @@ const SchoolCriteriaScorecard: React.FC<SchoolCriteriaScorecardProps> = ({
                 </td>
                 <td className="p-3 text-center">
                   <span className="px-3 py-1 rounded-md bg-[#FFA240] text-[#000000] font-semibold text-xs">
-                    {row.percentage}%
+                    {Number(row.percentage).toFixed(2)}%
                   </span>
                 </td>
                 <td className="p-3 text-center font-bold text-[#000000]">
-                  {row.weightedScore}
+                  {Number(row.weightedScore).toFixed(2)}
                 </td>
                 <td className="p-3 text-center font-bold text-gray-900">
                   {row.grade || '—'}
@@ -95,7 +95,7 @@ const SchoolCriteriaScorecard: React.FC<SchoolCriteriaScorecardProps> = ({
                   FINAL SCORE
                 </td>
                 <td className="p-3 text-center text-[#000000] text-base font-extrabold whitespace-nowrap">
-                  {school.finalScore.totalWeightedScore} / {school.finalScore.outOf ?? 100}
+                  {Number(school.finalScore.totalWeightedScore).toFixed(2)} / {school.finalScore.outOf ?? 100}
                 </td>
                 <td className="p-3 text-center text-[#000000] text-base font-extrabold">
                   {school.finalScore.grade || '—'}
