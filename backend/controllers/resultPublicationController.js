@@ -68,13 +68,8 @@ async function buildSchoolsReportForYear(academicYear) {
                "$partB.criteria.subCriteria.indicators.finalScore",
                {
                  $ifNull: [
-                   "$partB.criteria.subCriteria.indicators.reviewerScore",
-                   {
-                     $ifNull: [
-                       "$partB.criteria.subCriteria.indicators.selfAssessedScore",
-                       0,
-                     ],
-                   },
+                   "$partB.criteria.subCriteria.indicators.reviewScore",
+                   0,
                  ],
                },
              ],
@@ -85,6 +80,15 @@ async function buildSchoolsReportForYear(academicYear) {
            $sum: {
              $switch: {
                branches: [
+                 {
+                   case: {
+                     $in: [
+                       "$partB.criteria.subCriteria.indicators.indicatorCode",
+                       ["3.1.2", "3.1.3", "3.1.5"]
+                     ]
+                   },
+                   then: 0
+                 },
                  {
                    case: { $regexMatch: { input: "$partB.criteria.subCriteria.indicators.indicatorCode", regex: "^2\\.3\\.\\d+$" } },
                    then: 12
@@ -156,8 +160,9 @@ async function buildSchoolsReportForYear(academicYear) {
      // Falls back to criteriaConfig value only if no indicator data exists.
      const effectiveMaxMarks = maxPossibleScore > 0 ? maxPossibleScore : config.maxMarks;
  
-     const percentage = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
-     const weightedScore = (percentage * weightage) / 100;
+     const percentageRaw = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
+     const percentage = Number(percentageRaw.toFixed(2));
+     const weightedScore = Number((Math.round(percentage * weightage) / 100).toFixed(2));
      const grade = calculateGrade(percentage);
 
      schoolsMap[schoolId].criteria.push({
@@ -167,8 +172,8 @@ async function buildSchoolsReportForYear(academicYear) {
        weightage,
        maxMarks: effectiveMaxMarks,
        marksAwarded: Number(totalScore.toFixed(2)),
-       percentage: Number(percentage.toFixed(2)),
-       weightedScore: Number(weightedScore.toFixed(2)),
+       percentage: percentage,
+       weightedScore: weightedScore,
        grade,
      });
  
