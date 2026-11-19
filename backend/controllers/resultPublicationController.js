@@ -160,9 +160,8 @@ async function buildSchoolsReportForYear(academicYear) {
      // Falls back to criteriaConfig value only if no indicator data exists.
      const effectiveMaxMarks = maxPossibleScore > 0 ? maxPossibleScore : config.maxMarks;
  
-     const percentageRaw = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
-     const percentage = Number(percentageRaw.toFixed(2));
-     const weightedScore = Number((Math.round(percentage * weightage) / 100).toFixed(2));
+     const percentage = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
+     const weightedScore = (percentage * weightage) / 100;
      const grade = calculateGrade(percentage);
 
      schoolsMap[schoolId].criteria.push({
@@ -172,8 +171,8 @@ async function buildSchoolsReportForYear(academicYear) {
        weightage,
        maxMarks: effectiveMaxMarks,
        marksAwarded: Number(totalScore.toFixed(2)),
-       percentage: percentage,
-       weightedScore: weightedScore,
+       percentage: Number(percentage.toFixed(2)),
+       weightedScore: Number(weightedScore.toFixed(2)),
        grade,
      });
  

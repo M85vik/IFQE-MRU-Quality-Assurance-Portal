@@ -167,9 +167,8 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
       // Falls back to criteriaConfig value only if no indicator data exists.
       const effectiveMaxMarks = maxPossibleScore > 0 ? maxPossibleScore : config.maxMarks;
 
-      const percentageRaw = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
-      const percentage = Number(percentageRaw.toFixed(2));
-      const weightedScore = Number((Math.round(percentage * config.weightage) / 100).toFixed(2));
+      const percentage = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
+      const weightedScore = (percentage * config.weightage) / 100;
       const grade = calculateGrade(percentage);
 
       schoolsMap[schoolId].criteria.push({
@@ -178,8 +177,8 @@ exports.getAllSchoolsCriteriaReport = async (req, res) => {
         weightage: config.weightage,
         maxMarks: effectiveMaxMarks,
         marksAwarded: Number(totalScore.toFixed(2)),
-        percentage: percentage,
-        weightedScore: weightedScore,
+        percentage: Number(percentage.toFixed(2)),
+        weightedScore: Number(weightedScore.toFixed(2)),
         grade: grade
       });
 
@@ -425,9 +424,8 @@ async function buildLiveSchoolsReport(academicYear, schoolIdFilter = null) {
     // Falls back to criteriaConfig value only if no indicator data exists.
     const effectiveMaxMarks = maxPossibleScore > 0 ? maxPossibleScore : config.maxMarks;
 
-    const percentageRaw = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
-    const percentage = Number(percentageRaw.toFixed(2));
-    const weightedScore = Number((Math.round(percentage * config.weightage) / 100).toFixed(2));
+    const percentage = effectiveMaxMarks ? (totalScore / effectiveMaxMarks) * 100 : 0;
+    const weightedScore = (percentage * config.weightage) / 100;
     const grade = calculateGrade(percentage);
 
     schoolsMap[sId].criteria.push({
@@ -436,8 +434,8 @@ async function buildLiveSchoolsReport(academicYear, schoolIdFilter = null) {
       weightage: config.weightage,
       maxMarks: effectiveMaxMarks,
       marksAwarded: Number(totalScore.toFixed(2)),
-      percentage: percentage,
-      weightedScore: weightedScore,
+      percentage: Number(percentage.toFixed(2)),
+      weightedScore: Number(weightedScore.toFixed(2)),
       grade: grade,
     });
 
