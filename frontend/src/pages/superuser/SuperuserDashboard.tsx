@@ -65,6 +65,10 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
     fetchScorecards();
   }, [scorecardYear]);
 
+  const approvalCount = queue.filter(s => s.status === 'Pending Final Approval').length;
+  const appealCount = queue.filter(s => s.status === 'Appeal Submitted').length;
+  const completedCount = queue.filter(s => ['Completed', 'Appeal Closed'].includes(s.status)).length;
+
   const filteredItems = queue.filter(s => {
     if (queueType === 'approval') return s.status === 'Pending Final Approval';
     if (queueType === 'appeal') return s.status === 'Appeal Submitted';
@@ -94,6 +98,22 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
 
   const renderTable = () => {
     if (filteredItems.length === 0) {
+      if (queueType === 'approval' && appealCount > 0) {
+        return (
+          <div className="text-center py-10 px-4 space-y-4">
+            <p className="text-muted-foreground">No submissions awaiting initial final approval.</p>
+            <div className="inline-flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-lg text-orange-800">
+              <AlertCircle className="text-orange-500 flex-shrink-0" size={20} />
+              <span className="text-sm font-medium">
+                You have <strong>{appealCount} appeal(s)</strong> awaiting review in the Appeal Queue.
+              </span>
+              <Button size="sm" onClick={() => navigate('/app/superuser/appeal-queue')} className="border border-white">
+                Go to Appeal Queue ({appealCount})
+              </Button>
+            </div>
+          </div>
+        );
+      }
       return <p className="text-center text-muted-foreground py-8">This queue is empty.</p>;
     }
     return (
@@ -147,6 +167,46 @@ const SuperuserDashboard: React.FC<SuperuserDashboardProps> = ({ queueType }) =>
 >
   {currentConfig.title}
 </h1>
+
+      {/* Queue Quick Switcher Tabs */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => navigate('/app/superuser/approval-queue')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 border ${
+            queueType === 'approval'
+              ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+              : 'bg-card text-muted-foreground hover:bg-accent border-border'
+          }`}
+        >
+          <FileCheck2 size={16} />
+          Approval Queue ({approvalCount})
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate('/app/superuser/appeal-queue')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 border ${
+            queueType === 'appeal'
+              ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
+              : 'bg-card text-muted-foreground hover:bg-accent border-border'
+          }`}
+        >
+          <AlertCircle size={16} />
+          Appeal Queue ({appealCount})
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate('/app/superuser/completed-queue')}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 border ${
+            queueType === 'completed'
+              ? 'bg-green-600 text-white border-green-600 shadow-sm'
+              : 'bg-card text-muted-foreground hover:bg-accent border-border'
+          }`}
+        >
+          <CheckCircle size={16} />
+          Completed ({completedCount})
+        </button>
+      </div>
 
       <CardWhite className="p-0">
         <div className="px-6 py-4 border-b border-border flex items-center gap-3">

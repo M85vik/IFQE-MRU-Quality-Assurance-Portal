@@ -5,7 +5,7 @@ import Spinner from '../../components/shared/Spinner';
 import Alert from '../../components/shared/Alert';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
-import { Check, Download } from 'lucide-react';
+import { Check, Download, AlertCircle, Filter, Eye } from 'lucide-react';
 import useSecureDownloader from '../../hooks/useSecureDownloader';
 import toast from 'react-hot-toast';
 
@@ -91,6 +91,7 @@ const FinalReviewPage: React.FC = () => {
     const { downloadFile } = useSecureDownloader(); // not using global isDownloading state 
 
     const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
+    const [showAppealedOnly, setShowAppealedOnly] = useState(true);
 
 
    const handleDownload = async (key?: string) => {
@@ -205,17 +206,21 @@ const FinalReviewPage: React.FC = () => {
             let payload: { partB: any; appeal?: any };
 
             if (submission.status === 'Appeal Submitted') {
-                const updatedAppealIndicators = submission.appeal.indicators.map(appealedInd => {
+                const updatedAppealIndicators = (submission.appeal?.indicators || []).map(appealedInd => {
                     let finalScore: number | undefined;
+                    let superuserDecisionComment: string | undefined;
 
-                    submission.partB.criteria.forEach(c =>
-                        c.subCriteria.forEach(sc => {
-                            const ind = sc.indicators.find(i => i.indicatorCode === appealedInd.indicatorCode);
-                            if (ind) finalScore = ind.finalScore;
+                    submission.partB?.criteria?.forEach(c =>
+                        c.subCriteria?.forEach(sc => {
+                            const ind = sc.indicators?.find(i => i.indicatorCode === appealedInd.indicatorCode);
+                            if (ind) {
+                                finalScore = ind.finalScore;
+                                superuserDecisionComment = ind.superuserRemark || appealedInd.superuserDecisionComment;
+                            }
                         })
                     );
 
-                    return { ...appealedInd, finalScore };
+                    return { ...appealedInd, finalScore, superuserDecisionComment };
                 });
 
                 payload = {
@@ -246,7 +251,8 @@ const FinalReviewPage: React.FC = () => {
 
     const isCompleted = ['Completed', 'Appeal Closed'].includes(submission.status);
     const isAppealReview = submission.status === 'Appeal Submitted';
-    const appealedIndicatorCodes = isAppealReview ? submission.appeal.indicators.map(i => i.indicatorCode) : [];
+    const isAppealedSubmission = ['Appeal Submitted', 'Appeal Closed'].includes(submission.status) && (submission.appeal?.indicators?.length ?? 0) > 0;
+    const appealedIndicatorCodes = isAppealedSubmission ? (submission.appeal?.indicators || []).map(i => i.indicatorCode) : [];
 
     return (
         <div className="space-y-6">
@@ -279,19 +285,96 @@ const FinalReviewPage: React.FC = () => {
                 )}
             </div>
 
-            {submission.partB.criteria.map((criterion, critIndex) => (
-                <div key={criterion.criteriaCode} className="bg-card rounded-lg border border-border overflow-hidden">
-                    <h2 className="text-xl font-bold p-4 bg-secondary text-secondary-foreground">
-                        Criterion {criterion.criteriaCode}: {criterion.title}
-                    </h2>
-                    {criterion.subCriteria.map((sc, scIndex) => (
-                        <div key={sc.subCriteriaCode} className="border-t border-border">
-                            <h3 className="text-lg font-semibold p-3 bg-secondary/50">{sc.subCriteriaCode}: {sc.title}</h3>
-                            <div className="p-4 space-y-4">
-                                {sc.indicators.map((ind, indIndex) => {
-                                    const isAppealed = isAppealReview && appealedIndicatorCodes.includes(ind.indicatorCode);
-                                    const appealInfo = isAppealed ? submission.appeal.indicators.find(i => i.indicatorCode === ind.indicatorCode) : null;
-                                    const isEditable = !isCompleted && (!isAppealReview || isAppealed);
+            {/* Appeal Overview & Filter Banner */}
+            {isAppealedSubmission && appealedIndicatorCodes.length > 0 && (
+                <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-5 space-y-3 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <AlertCircle className="text-orange-600 flex-shrink-0" size={24} />
+                            <div>
+                                <h2 className="text-lg font-bold text-orange-950">
+                                    Appealed Indicators ({appealedIndicatorCodes.length} item{appealedIndicatorCodes.length > 1 ? 's' : ''})
+                                </h2>
+                                <p className="text-xs text-orange-800">
+                                    {isCompleted 
+                                        ? 'Viewing submitted appeal remarks and decisions.' 
+                                        : 'Review department comments below, update final scores & remarks, then finalize.'}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setShowAppealedOnly(true)}
+                                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition border flex items-center gap-1.5 ${
+                                    showAppealedOnly 
+                                        ? 'bg-orange-600 text-white border-orange-600 shadow-sm' 
+                                        : 'bg-white text-orange-900 border-orange-300 hover:bg-orange-100'
+                                }`}
+                            >
+                                <Filter size={14} />
+                                Appealed Only ({appealedIndicatorCodes.length})
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setShowAppealedOnly(false)}
+                                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition border flex items-center gap-1.5 ${
+                                    !showAppealedOnly 
+                                        ? 'bg-orange-600 text-white border-orange-600 shadow-sm' 
+                                        : 'bg-white text-orange-900 border-orange-300 hover:bg-orange-100'
+                                }`}
+                            >
+                                <Eye size={14} />
+                                All 117 Indicators
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {submission.partB?.criteria?.map((criterion) => {
+                const originalCritIndex = submission.partB.criteria.findIndex(c => c.criteriaCode === criterion.criteriaCode);
+                const countAppealedInCrit = criterion.subCriteria.reduce((acc, sc) => 
+                    acc + sc.indicators.filter(i => appealedIndicatorCodes.includes(i.indicatorCode)).length, 0
+                );
+
+                const visibleSubCriteria = criterion.subCriteria.filter(sc => {
+                    if (!showAppealedOnly || appealedIndicatorCodes.length === 0) return true;
+                    return sc.indicators.some(ind => appealedIndicatorCodes.includes(ind.indicatorCode));
+                });
+
+                if (showAppealedOnly && appealedIndicatorCodes.length > 0 && visibleSubCriteria.length === 0) {
+                    return null;
+                }
+
+                return (
+                    <div key={criterion.criteriaCode} className="bg-card rounded-lg border border-border overflow-hidden">
+                        <h2 className="text-xl font-bold p-4 bg-secondary text-secondary-foreground flex items-center justify-between">
+                            <span>Criterion {criterion.criteriaCode}: {criterion.title}</span>
+                            {countAppealedInCrit > 0 && (
+                                <span className="text-xs px-2.5 py-1 rounded-full bg-orange-200 text-orange-900 font-semibold">
+                                    {countAppealedInCrit} appealed
+                                </span>
+                            )}
+                        </h2>
+                        {visibleSubCriteria.map((sc) => {
+                            const originalScIndex = criterion.subCriteria.findIndex(s => s.subCriteriaCode === sc.subCriteriaCode);
+                            const visibleIndicators = sc.indicators.filter(ind => {
+                                if (!showAppealedOnly || appealedIndicatorCodes.length === 0) return true;
+                                return appealedIndicatorCodes.includes(ind.indicatorCode);
+                            });
+
+                            if (visibleIndicators.length === 0) return null;
+
+                            return (
+                                <div key={sc.subCriteriaCode} className="border-t border-border">
+                                    <h3 className="text-lg font-semibold p-3 bg-secondary/50">{sc.subCriteriaCode}: {sc.title}</h3>
+                                    <div className="p-4 space-y-4">
+                                        {visibleIndicators.map((ind) => {
+                                            const originalIndIndex = sc.indicators.findIndex(i => i.indicatorCode === ind.indicatorCode);
+                                            const isAppealed = appealedIndicatorCodes.includes(ind.indicatorCode);
+                                            const appealInfo = isAppealed ? submission.appeal?.indicators?.find(i => i.indicatorCode === ind.indicatorCode) : null;
+                                            const isEditable = !isCompleted && (!isAppealReview || isAppealed);
 
                                     return (
                                         <div key={ind.indicatorCode} className={`p-4 rounded-lg ${isAppealed ? 'border-2 border-orange-400 bg-orange-50' : 'border border-border'}`}>
@@ -363,7 +446,7 @@ const FinalReviewPage: React.FC = () => {
                                                                     value={ind.finalScore ?? ''}
                                                                     onChange={(e) =>
                                                                         handleStateChange(
-                                                                            ['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'finalScore'],
+                                                                            ['partB', 'criteria', originalCritIndex, 'subCriteria', originalScIndex, 'indicators', originalIndIndex, 'finalScore'],
                                                                             e.target.value === '' ? null : Number(e.target.value)
                                                                         )
                                                                     }
@@ -399,7 +482,7 @@ const FinalReviewPage: React.FC = () => {
                                                         placeholder="Add superuser remark..."
                                                         className="w-full p-2 border border-input rounded-md bg-card focus:ring-ring"
                                                         value={ind.superuserRemark || ''}
-                                                        onChange={(e) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'indicators', indIndex, 'superuserRemark'], e.target.value)}
+                                                        onChange={(e) => handleStateChange(['partB', 'criteria', originalCritIndex, 'subCriteria', originalScIndex, 'indicators', originalIndIndex, 'superuserRemark'], e.target.value)}
                                                         disabled={!isEditable || isSubmitting}
                                                     />
                                                 </div>
@@ -411,7 +494,7 @@ const FinalReviewPage: React.FC = () => {
                                     <label className="block text-sm font-medium text-foreground mb-1">Overall Superuser Remarks for this Sub-Criterion</label>
                                     <textarea
                                         value={sc.superuserRemark || ''}
-                                        onChange={(e) => handleStateChange(['partB', 'criteria', critIndex, 'subCriteria', scIndex, 'superuserRemark'], e.target.value)}
+                                        onChange={(e) => handleStateChange(['partB', 'criteria', originalCritIndex, 'subCriteria', originalScIndex, 'superuserRemark'], e.target.value)}
                                         rows={2}
                                         className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted cursor-not-allowed' : ''}`}
                                         placeholder="Add final summary comments for this section..."
@@ -420,9 +503,11 @@ const FinalReviewPage: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div>
-            ))}
+                    );
+                })}
+            </div>
+        );
+    })}
         </div>
     );
 };
