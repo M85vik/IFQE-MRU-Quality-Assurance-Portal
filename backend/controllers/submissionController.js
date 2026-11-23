@@ -533,23 +533,38 @@ const updateSubmission = async (req, res) => {
 
             if (submission.status === 'Appeal Submitted') {
                 // Appeal finalization
-                for (const appealed of appeal.indicators) {
-                    submission.partB.criteria.forEach(c =>
-                        c.subCriteria.forEach(sc => {
-                            const dbInd = sc.indicators.find(i => i.indicatorCode === appealed.indicatorCode);
-                            if (dbInd) dbInd.finalScore = appealed.finalScore;
-                        })
-                    );
+                if (appeal && Array.isArray(appeal.indicators)) {
+                    for (const appealed of appeal.indicators) {
+                        submission.partB.criteria.forEach(c =>
+                            c.subCriteria.forEach(sc => {
+                                const dbInd = sc.indicators.find(i => i.indicatorCode === appealed.indicatorCode);
+                                if (dbInd) {
+                                    dbInd.finalScore = appealed.finalScore;
+                                    if (appealed.superuserDecisionComment) {
+                                        dbInd.superuserRemark = appealed.superuserDecisionComment;
+                                    }
+                                }
+                            })
+                        );
 
-                    const dbAppealInd = submission.appeal.indicators.find(i => i.indicatorCode === appealed.indicatorCode);
-                    if (dbAppealInd) {
-                        dbAppealInd.superuserDecisionComment = appealed.superuserDecisionComment;
+                        if (submission.appeal && Array.isArray(submission.appeal.indicators)) {
+                            const dbAppealInd = submission.appeal.indicators.find(i => i.indicatorCode === appealed.indicatorCode);
+                            if (dbAppealInd) {
+                                dbAppealInd.superuserDecisionComment = appealed.superuserDecisionComment;
+                                dbAppealInd.finalScore = appealed.finalScore;
+                            }
+                        }
                     }
                 }
 
                 submission.status = 'Appeal Closed';
-                submission.appeal.status = 'Closed';
-                submission.appeal.closedOn = new Date();
+                if (submission.appeal) {
+                    submission.appeal.status = 'Closed';
+                    submission.appeal.closedOn = new Date();
+                }
+
+                submission.markModified('partB');
+                submission.markModified('appeal');
 
 
             } else {
