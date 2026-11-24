@@ -365,6 +365,7 @@ const FinalReviewPage: React.FC = () => {
                             });
 
                             if (visibleIndicators.length === 0) return null;
+                            const isScEditable = !isCompleted && (!isAppealReview || sc.indicators.some(i => appealedIndicatorCodes.includes(i.indicatorCode)));
 
                             return (
                                 <div key={sc.subCriteriaCode} className="border-t border-border">
@@ -496,9 +497,9 @@ const FinalReviewPage: React.FC = () => {
                                         value={sc.superuserRemark || ''}
                                         onChange={(e) => handleStateChange(['partB', 'criteria', originalCritIndex, 'subCriteria', originalScIndex, 'superuserRemark'], e.target.value)}
                                         rows={2}
-                                        className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isEditable ? 'bg-muted cursor-not-allowed' : ''}`}
+                                        className={`w-full p-2 border border-input rounded-md bg-card focus:ring-ring ${!isScEditable ? 'bg-muted cursor-not-allowed' : ''}`}
                                         placeholder="Add final summary comments for this section..."
-                                        disabled={!isEditable || isSubmitting}
+                                        disabled={!isScEditable || isSubmitting}
                                     />
                                 </div>
                             </div>
